@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Thank you! - Nova Labs"
+  description="Your purchase was successful. Welcome to the AI OS Blueprint."
+>
+  <!-- Google Ads Conversion Tracking - fires on page load -->
+  <script is:inline>
+    window.addEventListener('load', function() {
+      if (typeof gtag === 'function') {
+        var params = new URLSearchParams(window.location.search);
+        var orderId = params.get('order_id') || '';
+        // Detect purchase value from checkout_id or default to 47
+        var checkoutId = params.get('checkout_id') || '';
+        // LemonSqueezy passes product info - use 97 for bundle, 47 for playbook
+        var value = (window.location.search.indexOf('bundle') !== -1 ||
+                     params.get('product_name') === 'bundle') ? 97.0 : 47.0;
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18013644812/8ZpPCI7G-4ccEIzQyY1D',
+          'value': value,
+          'currency': 'USD',
+          'transaction_id': orderId
+        });
+        gtag('event', 'purchase', {
+          'currency': 'USD',
+          'value': value,
+          'transaction_id': orderId
+        });
+      }
+    });
+  </script>
+
+  <section class="min-h-screen flex items-center justify-center py-20">
+    <div class="section-container max-w-2xl text-center">
+      <div class="glass-card p-10 md:p-14 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-success via-primary to-success"></div>
+
+        <div class="w-20 h-20 rounded-full bg-success/15 flex items-center justify-center mx-auto mb-8">
+          <svg class="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">
+          You're in! <span class="gradient-text">Welcome.</span>
+        </h1>
+
+        <p class="text-text-muted text-lg leading-relaxed mb-6">
+          Your purchase was successful. Check your email for the download link and getting started instructions.
+        </p>
+
+        <div class="bg-surface-light/50 border border-surface-lighter rounded-xl p-6 mb-8 text-left">
+          <h3 class="font-semibold mb-3">What happens next:</h3>
+          <ol class="space-y-3 text-text-muted">
+            <li class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary-light mt-0.5">1</span>
+              <span>Check your inbox for the download email from LemonSqueezy</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary-light mt-0.5">2</span>
+              <span>Download the playbook PDF and clone the repository</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary-light mt-0.5">3</span>
+              <span>Follow Chapter 1 to set up your AI OS in about an hour</span>
+            </li>
+          </ol>
+        </div>
+
+        <p class="text-text-dim text-sm mb-6">
+          Questions? Email us at <a href="mailto:support@nova-labs.dev" class="text-primary-light hover:underline">support@nova-labs.dev</a>
+        </p>
+
+        <a href="/" class="btn-secondary">
+          Back to homepage
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

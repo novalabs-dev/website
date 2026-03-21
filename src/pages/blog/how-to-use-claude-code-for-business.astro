@@ -1,0 +1,296 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to use Claude Code for business: the complete guide to AI that actually runs things"
+  description="Claude Code can do more than answer questions. With the right setup, it runs your email, writes your content, manages your pipeline, and remembers everything. Here is how to set it up for real business automation."
+  date="March 19, 2026"
+  readTime="12 min read"
+  keywords={["claude code for business", "claude code automation", "claude code tutorial", "ai business automation", "claude code setup"]}
+  relatedPosts={[
+    { title: "What is an AI Operating System?", slug: "what-is-an-ai-operating-system" },
+    { title: "Claude Code vs ChatGPT for business automation", slug: "claude-code-vs-chatgpt-for-business" },
+    { title: "How to build an AI OS in a weekend", slug: "how-to-build-an-ai-os-in-a-weekend" },
+  ]}
+>
+  <p>
+    You have probably tried Claude Code. Maybe you used it to write a script, debug some code, or generate a document. It worked. Then you closed the terminal and moved on with your day.
+  </p>
+
+  <p>
+    That is how most people use it. And it is roughly 5% of what Claude Code can actually do for a business.
+  </p>
+
+  <p>
+    Claude Code is not a chatbot. It is a coding agent that can read your files, edit them, run scripts, interact with APIs, and maintain context across an entire project. When you give it the right structure, it stops being a tool you use and starts being a system that runs things for you.
+  </p>
+
+  <p>
+    This guide shows you how to set that up. Not the basics. The full business setup that turns Claude Code into an autonomous operations layer.
+  </p>
+
+  <h2>What makes Claude Code different from ChatGPT and other AI tools</h2>
+
+  <p>
+    The short answer: Claude Code operates inside your file system. That changes everything.
+  </p>
+
+  <p>
+    ChatGPT, Gemini, and most AI tools run in a browser. You type a prompt, get a response, copy-paste it somewhere. The AI has no access to your files, no memory between sessions, and no ability to execute anything.
+  </p>
+
+  <p>
+    Claude Code runs in your terminal. It can:
+  </p>
+
+  <ul>
+    <li><strong>Read and edit files directly</strong> on your computer</li>
+    <li><strong>Run scripts and commands</strong> like a developer would</li>
+    <li><strong>Access APIs</strong> with your stored credentials</li>
+    <li><strong>Remember context</strong> through files it reads at the start of each session</li>
+    <li><strong>Execute multi-step workflows</strong> without you babysitting each step</li>
+  </ul>
+
+  <p>
+    This is not a theoretical difference. It means Claude Code can check your email, draft replies, update your CRM, write a blog post, commit it to your website repo, and deploy it. All in one session. Without you touching a keyboard after the initial instruction.
+  </p>
+
+  <p>
+    We covered this distinction in depth in our <a href="/blog/claude-code-vs-chatgpt-for-business">Claude Code vs ChatGPT comparison</a>. The short version: Claude Code is for automation. ChatGPT is for conversation.
+  </p>
+
+  <h2>The foundation: giving Claude Code business context</h2>
+
+  <p>
+    The single most important thing you can do is give Claude Code a file that describes your business. Without it, every session starts from zero. The AI does not know what you sell, who your customers are, or how you like things done.
+  </p>
+
+  <p>
+    Create a file called <code>CLAUDE.md</code> in your project root. This file is automatically loaded at the start of every session. It is your AI's operating manual.
+  </p>
+
+  <p>
+    A good business context file includes:
+  </p>
+
+  <ul>
+    <li><strong>What your business does</strong> in 2-3 sentences</li>
+    <li><strong>Who your customers are</strong> and what they need</li>
+    <li><strong>Your products or services</strong> with pricing</li>
+    <li><strong>Your voice and tone</strong> for written communication</li>
+    <li><strong>Key tools you use</strong> (email, CRM, project management)</li>
+    <li><strong>Current priorities</strong> and what you are working on this week</li>
+  </ul>
+
+  <p>
+    With this file in place, Claude Code does not just execute tasks. It executes them with the right context. An email draft sounds like you. A blog post targets the right audience. A sales follow-up references the right product at the right price.
+  </p>
+
+  <p>
+    We wrote a detailed guide on <a href="/blog/teach-ai-your-business">teaching AI your business context</a> if you want to go deeper.
+  </p>
+
+  <h2>Skills: turning one-off prompts into repeatable workflows</h2>
+
+  <p>
+    The biggest upgrade from casual AI use to real automation is skills. A skill is a markdown file that defines exactly how a task should be done. Think of it as a standard operating procedure that Claude Code follows every time.
+  </p>
+
+  <p>
+    Here is what a skill looks like in practice:
+  </p>
+
+  <pre><code># Email Triage Skill
+
+1. Connect to inbox via IMAP
+2. Read unread messages
+3. Categorize by urgency (high/medium/low)
+4. Draft responses for high-urgency items
+5. Create a summary with action items
+6. Send summary via Telegram</code></pre>
+
+  <p>
+    When you tell Claude Code to "check my email," it matches the request to this skill and executes every step. You do not need to explain the process each time. You do not need to remember what steps to follow. The skill handles it.
+  </p>
+
+  <p>
+    Real businesses we have seen automate with skills:
+  </p>
+
+  <ul>
+    <li><strong>Email management:</strong> Triage inbox, draft replies, flag urgent items</li>
+    <li><strong>Content creation:</strong> Research topic, write draft, format for platform, schedule</li>
+    <li><strong>Sales pipeline:</strong> Track leads, send follow-ups, update CRM stages</li>
+    <li><strong>Client onboarding:</strong> Generate contracts, create project folders, send welcome sequence</li>
+    <li><strong>Financial tracking:</strong> Categorize expenses, generate reports, flag anomalies</li>
+  </ul>
+
+  <p>
+    Each of these replaces hours of manual work per week. And because they are defined in files, they get better over time as you refine the instructions.
+  </p>
+
+  <h2>Memory: making your AI actually learn</h2>
+
+  <p>
+    Claude Code does not have built-in long-term memory between sessions. But you can build one. A memory system stores facts, preferences, and decisions so your AI does not repeat mistakes or ask questions it already knows the answer to.
+  </p>
+
+  <p>
+    The simplest version is a <code>MEMORY.md</code> file that Claude Code reads at session start:
+  </p>
+
+  <pre><code># Memory
+
+## Preferences
+- Writing tone: direct, no fluff
+- Client communication: always cc the project manager
+- Invoice format: PDF with line items
+
+## Business Facts
+- Main product: consulting packages ($5K-$15K)
+- Biggest client: Acme Corp (since 2024)
+- Payment terms: net 30
+
+## Learned Behaviors
+- Monday reports go to Slack #team-updates
+- Blog posts need SEO keywords in first paragraph
+- Follow up on proposals after 3 business days</code></pre>
+
+  <p>
+    Every time Claude Code starts a session, it reads this file and immediately has context. It remembers your preferences, your clients, your processes. You never have to repeat yourself.
+  </p>
+
+  <p>
+    For a deeper dive, read our guide on <a href="/blog/build-a-second-brain-with-ai">building a second brain with AI</a>.
+  </p>
+
+  <h2>Automation: tasks that run without you</h2>
+
+  <p>
+    Once you have context, skills, and memory in place, you can set up tasks that run on a schedule. Claude Code can be triggered by cron jobs, webhooks, or a simple task scheduler.
+  </p>
+
+  <p>
+    Examples of automated tasks:
+  </p>
+
+  <ul>
+    <li><strong>Morning:</strong> Check email, triage inbox, send you a summary via Slack or Telegram</li>
+    <li><strong>Afternoon:</strong> Check sales pipeline, send follow-up emails to stale leads</li>
+    <li><strong>Evening:</strong> Compile the day's activities into a log, update project status</li>
+    <li><strong>Weekly:</strong> Generate a business review with metrics, wins, and blockers</li>
+    <li><strong>On demand:</strong> Research a new lead, draft a proposal, prepare meeting notes</li>
+  </ul>
+
+  <p>
+    This is not theoretical. This is how Nova Labs operates. The AI checks email twice daily, publishes blog content, manages a sales pipeline, and sends daily analytics reports. All autonomously, with human oversight for anything that goes external.
+  </p>
+
+  <h2>The ROI math: what this actually saves</h2>
+
+  <p>
+    Let us be concrete. Here is what a typical solo business owner or small team spends time on weekly, and what AI can realistically handle:
+  </p>
+
+  <ul>
+    <li><strong>Email management:</strong> 5-7 hours/week reduced to 30 min review</li>
+    <li><strong>Content creation:</strong> 8-10 hours/week reduced to 1-2 hours editing</li>
+    <li><strong>CRM and follow-ups:</strong> 3-4 hours/week reduced to 15 min oversight</li>
+    <li><strong>Reporting and analytics:</strong> 2-3 hours/week reduced to automated daily summaries</li>
+    <li><strong>Meeting prep:</strong> 1-2 hours/meeting reduced to 10 min review</li>
+  </ul>
+
+  <p>
+    Conservative estimate: 15-20 hours per week freed up. That is a part-time employee you do not need to hire. At $25-50/hour, that is $1,500 to $4,000 per month in saved labor costs. Against a one-time setup investment of a few hours and less than $100 in tools.
+  </p>
+
+  <p>
+    We built a full ROI framework in our post on <a href="/blog/ai-automation-roi">measuring AI automation ROI</a>.
+  </p>
+
+  <h2>Common objections (and honest answers)</h2>
+
+  <h3>Is it safe to give AI access to my files and email?</h3>
+
+  <p>
+    Claude Code runs locally on your machine. Your data does not go to a third-party server beyond the API calls to Anthropic for processing. You control exactly what files it can access. And you can set up guardrails that require your approval before any external action (sending emails, posting content, making API calls).
+  </p>
+
+  <h3>Do I need to be technical?</h3>
+
+  <p>
+    You need to be comfortable opening a terminal and running commands. You do not need to write code. Claude Code writes the code for you. The setup involves creating text files (your context, memory, and skills) and running a few commands. If you can follow a recipe, you can set this up.
+  </p>
+
+  <h3>What if Claude Code makes a mistake?</h3>
+
+  <p>
+    It will. The system is designed for that. Guardrails prevent the AI from taking destructive actions without your approval. Memory captures what went wrong so it does not repeat the mistake. And because everything is file-based, you can always review, undo, or adjust.
+  </p>
+
+  <h3>How much does it cost?</h3>
+
+  <p>
+    Claude Code requires a Claude Pro or Max subscription ($20-200/month depending on usage). The business automation setup itself costs nothing beyond that. No additional SaaS tools, no monthly fees, no per-seat pricing. Everything runs on files on your computer.
+  </p>
+
+  <h2>The shortcut: getting the complete system in one package</h2>
+
+  <p>
+    You can build all of this from scratch. Read the docs, experiment with file structures, figure out what works through trial and error. That is a valid path. It takes most people 2-4 weeks to get a solid setup running.
+  </p>
+
+  <p>
+    Or you can start with a system that already works.
+  </p>
+
+  <p>
+    The <a href="/#pricing">AI OS Blueprint</a> is a complete, battle-tested system for running a business with Claude Code. It includes:
+  </p>
+
+  <ul>
+    <li><strong>A 53-page playbook</strong> covering every layer of the system (context, skills, memory, automation, guardrails)</li>
+    <li><strong>A clone-ready repository</strong> you set up in under an hour with pre-built skills and file structures</li>
+    <li><strong>5 business skills</strong> for email management, content creation, sales pipeline, client onboarding, and financial tracking</li>
+    <li><strong>The real case study</strong> of Nova Labs using this exact system to run an entire business</li>
+  </ul>
+
+  <p>
+    It is the difference between reading about exercise and getting a complete training program with the equipment included.
+  </p>
+
+  <p>
+    Starting at $47 for the playbook, or $97 for the bundle with all premium skills included. One-time purchase, 30-day money-back guarantee.
+  </p>
+
+  <p>
+    <a href="/#pricing">See what is included and pick your tier here.</a>
+  </p>
+
+  <h2>Getting started today</h2>
+
+  <p>
+    Whether you build from scratch or start with the Blueprint, here is the minimum viable path:
+  </p>
+
+  <ol>
+    <li><strong>Install Claude Code</strong> and connect it to your project directory</li>
+    <li><strong>Create a CLAUDE.md</strong> with your business context</li>
+    <li><strong>Build your first skill</strong> for the task you repeat most often</li>
+    <li><strong>Set up a MEMORY.md</strong> to capture preferences and learned behavior</li>
+    <li><strong>Run it for a week</strong> and watch the time savings stack up</li>
+  </ol>
+
+  <p>
+    After step 5, you will not go back to doing these tasks manually. The leverage is too obvious once you experience it.
+  </p>
+
+  <p>
+    If you want to see the system architecture before committing, <a href="/free-chapter">read the first two chapters of the AI OS Blueprint for free</a>. No email required, just the content.
+  </p>
+
+  <p>
+    Ready for the complete system? The full <a href="/#pricing">AI OS Blueprint</a> gives you everything above, pre-built and documented.
+  </p>
+</BlogPost>

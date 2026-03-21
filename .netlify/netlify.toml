@@ -1,0 +1,46 @@
+functionsDirectory = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/netlify/functions"
+functionsDirectoryOrigin = "config"
+headersOrigin = "config"
+plugins = []
+redirects = []
+
+[build]
+publish = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/dist"
+publishOrigin = "config"
+commandOrigin = "config"
+base = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website"
+command = "npm run build"
+functions = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/netlify/functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+node_bundler = "esbuild"
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+for = "/_astro/*"
+
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"

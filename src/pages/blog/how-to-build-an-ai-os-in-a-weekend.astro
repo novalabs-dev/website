@@ -1,0 +1,220 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to build an AI OS in a weekend"
+  description="A step-by-step walkthrough of building your own AI Operating System from scratch. No coding experience required. Just a laptop, Claude, and a free weekend."
+  date="March 9, 2026"
+  readTime="8 min read"
+  relatedPosts={[
+    { title: "What is an AI Operating System?", slug: "what-is-an-ai-operating-system" },
+    { title: "No-code AI automation: build business workflows without writing code", slug: "no-code-ai-automation" },
+    { title: "5 business tasks you should automate with AI (and how to actually do it)", slug: "5-business-tasks-to-automate-with-ai" },
+  ]}
+>
+  <p>
+    Last week, we built the AI Operating System that now runs Nova Labs. The entire setup took a single weekend. Not a prototype. Not a proof of concept. A working system that handles meeting prep, lead research, content creation, email triage, and weekly reviews. Autonomously.
+  </p>
+
+  <p>
+    Here's how you can do the same thing.
+  </p>
+
+  <h2>What you need before you start</h2>
+
+  <p>
+    You need three things: a computer, a Claude subscription (Pro or Max), and two uninterrupted days. That's it. No Python knowledge required. No server setup. No API integrations on day one.
+  </p>
+
+  <p>
+    The tool we're using is <strong>Claude Code</strong>, which runs in your terminal and can read, write, and execute files on your machine. Think of it as an AI that lives inside your computer rather than in a browser tab.
+  </p>
+
+  <h2>Saturday morning: the foundation</h2>
+
+  <h3>Step 1: Create your project structure</h3>
+
+  <p>
+    Your AI OS lives in a regular folder. The structure matters because it's how the AI finds and uses information. Here's what you need:
+  </p>
+
+  <ul>
+    <li><strong>context/</strong> - Your business knowledge: who you are, who your customers are, how you talk</li>
+    <li><strong>skills/</strong> - Reusable workflows: step-by-step processes the AI follows</li>
+    <li><strong>memory/</strong> - Persistent notes and logs that carry across sessions</li>
+    <li><strong>data/</strong> - Databases for structured information like tasks and leads</li>
+    <li><strong>args/</strong> - Configuration settings that control behavior</li>
+  </ul>
+
+  <p>
+    Create these folders. This is your AI's brain structure.
+  </p>
+
+  <h3>Step 2: Write your business context</h3>
+
+  <p>
+    The single most important file in your AI OS is <code>context/my-business.md</code>. This is everything the AI needs to know about you and your business: your name, what you sell, your target audience, your pricing, your competitors, your strengths.
+  </p>
+
+  <p>
+    Don't overthink this. Write it like you're briefing a new employee. Two pages is plenty. You'll refine it over time.
+  </p>
+
+  <p>
+    Next, create <code>context/voice-guide.md</code>. Pull 5-10 examples of your best writing (emails, posts, proposals) and describe the patterns. Short sentences or long? Formal or casual? Words you use often? Words you never use? This file is what prevents your AI from sounding like every other AI-generated text.
+  </p>
+
+  <h3>Step 3: Write your first skill</h3>
+
+  <p>
+    A skill is a markdown file that describes a workflow. It's not code. It's instructions. Here's the skeleton:
+  </p>
+
+  <pre><code># Meeting Prep
+
+## Trigger
+Run this before any scheduled meeting.
+
+## Steps
+1. Look up the person/company in my contacts and CRM notes
+2. Check for any previous meeting notes
+3. Research recent company news
+4. Draft 5 talking points based on their likely priorities
+5. Note any follow-ups from previous meetings
+
+## Output
+A one-page brief I can read in 2 minutes.</code></pre>
+
+  <p>
+    That's a skill. The AI reads this, follows the steps, and produces the output. No code required.
+  </p>
+
+  <h2>Saturday afternoon: make it useful</h2>
+
+  <h3>Step 4: Build your ICP (Ideal Customer Profile)</h3>
+
+  <p>
+    Create <code>context/icp.md</code>. Describe your ideal customer in detail: company size, industry, role of the buyer, their biggest pain points, what they've tried before, what they search for online. Be specific. "Small business owners" is too vague. "Operations managers at 20-50 person service companies who waste 10+ hours per week on manual scheduling" is useful.
+  </p>
+
+  <p>
+    This file powers your lead research, content creation, and outreach. Every skill that touches customers will reference it.
+  </p>
+
+  <h3>Step 5: Add 3-4 more skills</h3>
+
+  <p>
+    Start with the workflows you do most often. Good candidates for your first set:
+  </p>
+
+  <ol>
+    <li><strong>Email triage</strong> - Categorize inbox by urgency, draft responses for routine emails</li>
+    <li><strong>Content writer</strong> - Write blog posts or social content using your voice guide</li>
+    <li><strong>Lead research</strong> - Research a company and score them against your ICP</li>
+    <li><strong>Weekly review</strong> - Summarize what happened this week, flag issues, suggest priorities</li>
+  </ol>
+
+  <p>
+    Each skill is a separate markdown file. Keep them focused. One skill does one thing well.
+  </p>
+
+  <h3>Step 6: Set up memory</h3>
+
+  <p>
+    Create <code>memory/MEMORY.md</code>. This is your AI's persistent brain. It starts small: your key preferences, important dates, ongoing projects. The AI updates this file as it learns.
+  </p>
+
+  <p>
+    Also create a <code>memory/logs/</code> folder. Each day gets a log file. The AI writes what it did, what decisions were made, what's pending. Tomorrow's session starts by reading today's log. That's how context carries forward without you repeating yourself.
+  </p>
+
+  <h2>Sunday morning: connect it all</h2>
+
+  <h3>Step 7: Write your system instructions</h3>
+
+  <p>
+    Create a <code>CLAUDE.md</code> file in your project root. This is the master instruction set. It tells the AI:
+  </p>
+
+  <ul>
+    <li>Where to find skills, context, and memory</li>
+    <li>How to pick which skill to use</li>
+    <li>When to ask for permission vs. act autonomously</li>
+    <li>How to log its work</li>
+    <li>What never to do (send emails without approval, delete files, etc.)</li>
+  </ul>
+
+  <p>
+    This file is loaded at the start of every session. It's the operating system kernel. Get this right and everything else flows.
+  </p>
+
+  <h3>Step 8: Test with a real task</h3>
+
+  <p>
+    Open Claude Code in your project folder. Give it a real task: "Prep for my meeting with [client name] tomorrow." Watch it find the meeting prep skill, reference your business context, check memory for past interactions, and produce a brief.
+  </p>
+
+  <p>
+    It won't be perfect the first time. That's fine. The fix is always the same: update the skill with clearer instructions, add missing context, or refine the voice guide. You're training a system, not writing code.
+  </p>
+
+  <h2>Sunday afternoon: automate and refine</h2>
+
+  <h3>Step 9: Add scheduling</h3>
+
+  <p>
+    An AI OS that only works when you ask it to is half the value. Set up a simple task scheduler (a cron job, a HEARTBEAT file, or whatever fits your setup) that triggers the AI to run specific skills on a schedule:
+  </p>
+
+  <ul>
+    <li>Monday morning: weekly review</li>
+    <li>Every morning: email triage</li>
+    <li>Tuesday and Thursday: content creation</li>
+    <li>Before each meeting: meeting prep (triggered by calendar)</li>
+  </ul>
+
+  <h3>Step 10: Let it run and iterate</h3>
+
+  <p>
+    The system is live. Use it for a week. You'll notice gaps: a skill that misses a step, context that's too vague, a workflow that needs splitting into two skills. Fix these as you go. Each fix makes the system permanently better.
+  </p>
+
+  <p>
+    After two weeks, you'll have an AI that knows your business, writes in your voice, handles routine work autonomously, and gets better every day. That's not hype. That's architecture.
+  </p>
+
+  <h2>Common mistakes to avoid</h2>
+
+  <ul>
+    <li><strong>Too many skills too fast.</strong> Start with 4-5. Master those before adding more.</li>
+    <li><strong>Vague context files.</strong> "We sell software" doesn't help. "We sell project management tools to construction firms with 10-50 employees" does.</li>
+    <li><strong>No voice guide.</strong> Without it, every output sounds generic. This is the #1 thing people skip and regret.</li>
+    <li><strong>No guardrails.</strong> Define what the AI should never do. Send emails unsupervised? Post on social media? Delete files? Write these rules down explicitly.</li>
+    <li><strong>Expecting perfection on day one.</strong> An AI OS is a living system. Week 1 is good. Week 4 is great. Month 3 is transformative.</li>
+  </ul>
+
+  <h2>What this looks like in practice</h2>
+
+  <p>
+    Nova Labs runs entirely on this architecture. Right now, as you read this, our AI OS is researching content topics, drafting blog posts, managing our product roadmap, and logging everything it does. We built the first version in a weekend. We've refined it daily since then.
+  </p>
+
+  <p>
+    The total cost to get started: a Claude subscription and a weekend of your time.
+  </p>
+
+  <p>
+    Not sure if this is right for you? <a href="/free-chapter">Read the first two chapters of the AI OS Blueprint for free</a>. They cover why an AI OS matters and how the architecture works, so you can decide before committing time or money.
+  </p>
+
+  <p>
+    If you want to skip the setup and start with a working system, the full <a href="/#pricing">AI OS Blueprint</a> includes the complete folder structure, 5 pre-built business skills, context templates, and a step-by-step setup guide. It is the system described above, ready to clone and customize.
+  </p>
+
+  <hr />
+
+  <p>
+    <strong>Nova Labs</strong> is an AI-first company building tools for AI-powered business automation. This post was written and published by our AI OS.
+  </p>
+</BlogPost>

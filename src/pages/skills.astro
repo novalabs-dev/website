@@ -1,0 +1,359 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      "name": "Research Lead - Claude Code Skill",
+      "description": "Transform LinkedIn URLs into complete research packages with personalized DM sequences in under 60 seconds.",
+      "brand": { "@type": "Brand", "name": "Nova Labs" },
+      "offers": {
+        "@type": "Offer",
+        "price": "97",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/PreOrder"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Task Manager - Free Claude Code Skill",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Cross-platform",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Email Assistant - Free Claude Code Skill",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Cross-platform",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+  ]
+};
+---
+
+<Layout
+  title="Premium Skills - Claude Code Automation Tools | Nova Labs"
+  description="Production-ready Claude Code skills that automate your business. Research leads, write content, manage tasks. Built by an AI company that runs on these tools daily."
+  ogImage="/og-skills.png"
+  jsonLd={jsonLd}
+>
+  <!-- ============================================ -->
+  <!-- NAV -->
+  <!-- ============================================ -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/" class="text-text-muted hover:text-text text-sm transition-colors">Playbook</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors">Blog</a>
+        <a href="#research-lead" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Get Research Lead
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================ -->
+  <!-- HERO -->
+  <!-- ============================================ -->
+  <section class="relative min-h-[70vh] flex items-center pt-20 pb-16 overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container relative z-10 text-center max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light border border-surface-lighter mb-8 text-sm text-text-muted">
+        <span class="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+        Claude Code Skills
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+        Skills that <span class="gradient-text">do the work.</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+        Production-ready Claude Code skills. Install once, automate forever. Built by an AI company that runs on these tools daily.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- RESEARCH LEAD -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="research-lead">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-5xl relative z-10">
+      <div class="fade-in">
+        <!-- Product header -->
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent-light text-sm font-medium mb-6">
+            Premium Skill
+          </div>
+          <h2 class="text-4xl md:text-5xl font-black mb-6">
+            Research Any Lead in <span class="gradient-text">60 Seconds</span>
+          </h2>
+          <p class="text-xl text-text-muted max-w-2xl mx-auto">
+            A Claude Code skill that turns LinkedIn URLs into complete research packages with personalized outreach. Powered by AI, running on your machine.
+          </p>
+        </div>
+
+        <!-- How it works -->
+        <div class="grid md:grid-cols-3 gap-6 mb-20">
+          {[
+            { step: '1', title: 'Paste a LinkedIn URL', desc: 'Drop any LinkedIn profile URL into Claude Code. One command, one URL.' },
+            { step: '2', title: 'AI researches everything', desc: 'Scrapes the profile, researches the company, analyzes pain points, finds opportunities.' },
+            { step: '3', title: 'Get a complete package', desc: 'Detailed lead profile, relevance score, pain/gain analysis, and 3 personalized DM drafts.' },
+          ].map((item) => (
+            <div class="glass-card p-8 text-center hover:border-primary/30 transition-all duration-300">
+              <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-5">
+                <span class="text-xl font-black text-primary-light">{item.step}</span>
+              </div>
+              <h3 class="text-lg font-bold mb-3">{item.title}</h3>
+              <p class="text-text-muted">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- Features grid -->
+        <div class="grid md:grid-cols-2 gap-6 mb-20">
+          {[
+            { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', title: 'Deep Profile Analysis', desc: 'Extracts role, experience, company size, industry, and decision-making level from LinkedIn.' },
+            { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', title: 'Company Research', desc: 'Pulls company data via Perplexity: recent news, funding, tech stack, market position.' },
+            { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Relevance Scoring', desc: 'Filters leads by fit. Scores based on role, company size, industry, and buying signals.' },
+            { icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', title: 'Personalized DMs', desc: '3-message sequence tailored to their role, company, and pain points. Ready to send.' },
+            { icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4', title: 'Batch Processing', desc: 'Research multiple leads at once. Drop a CSV, get a complete package for each.' },
+            { icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', title: 'HTML Reports', desc: 'Clean, shareable reports for each lead. Forward to your team or save for reference.' },
+          ].map((item) => (
+            <div class="flex items-start gap-5 p-6 glass-card hover:border-primary/30 transition-all duration-300">
+              <span class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center">
+                <svg class="w-6 h-6 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon} />
+                </svg>
+              </span>
+              <div>
+                <h3 class="text-lg font-bold mb-2">{item.title}</h3>
+                <p class="text-text-muted">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <!-- Comparison -->
+        <div class="glass-card overflow-hidden mb-20">
+          <div class="p-8 text-center border-b border-surface-lighter/30">
+            <h3 class="text-2xl font-bold">Why Research Lead?</h3>
+          </div>
+          <div class="grid grid-cols-3 text-sm font-semibold uppercase tracking-wider">
+            <div class="p-4 text-text-dim text-center"></div>
+            <div class="p-4 bg-red-500/10 text-red-400 text-center">Manual / Other tools</div>
+            <div class="p-4 bg-success/10 text-success text-center">Research Lead</div>
+          </div>
+          {[
+            ['Time per lead', '30-60 minutes', '60 seconds'],
+            ['Cost per lead', '$5-50 (SaaS subscriptions)', '~$0.40 (API costs only)'],
+            ['Personalization', 'Generic templates', 'AI-tailored to each lead'],
+            ['Runs on', 'Third-party servers', 'Your machine (private)'],
+            ['Payment', 'Monthly subscription', 'One-time purchase'],
+          ].map((row, i) => (
+            <div class={`grid grid-cols-3 ${i % 2 === 0 ? 'bg-surface-light/30' : ''}`}>
+              <div class="p-4 text-text-muted font-medium border-r border-surface-lighter/30">{row[0]}</div>
+              <div class="p-4 text-text-dim border-r border-surface-lighter/30 text-center">{row[1]}</div>
+              <div class="p-4 text-text text-center font-medium">{row[2]}</div>
+            </div>
+          ))}
+        </div>
+
+        <!-- Pricing -->
+        <div class="max-w-md mx-auto">
+          <div class="glass-card p-10 text-center border-primary/30 relative">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
+              One-time purchase
+            </div>
+
+            <h3 class="text-2xl font-bold mb-2 mt-2">Research Lead</h3>
+            <div class="flex items-baseline gap-1 justify-center mb-6">
+              <span class="text-5xl font-black gradient-text">$97</span>
+              <span class="text-text-dim">once</span>
+            </div>
+
+            <ul class="space-y-3 mb-8 text-left max-w-xs mx-auto">
+              {[
+                'Complete skill package (7 scripts)',
+                '4 AI prompt templates',
+                'HTML report generator',
+                'Batch processing',
+                'Slack integration',
+                'Setup script (one-click install)',
+                'Free updates',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <a href="#" class="btn-primary w-full text-center" id="buy-research-lead">
+              Get Research Lead - $97
+            </a>
+
+            <p class="mt-4 text-text-dim text-sm">Pays for itself after 3-5 leads. 30-day money-back guarantee.</p>
+          </div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="mt-16 max-w-2xl mx-auto">
+          <div class="fade-in">
+            <h3 class="text-xl font-bold mb-6 text-center">Requirements</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              {[
+                'Claude Code (Pro or Max)',
+                'Relevance AI API key (~$0.10/lead)',
+                'Perplexity API key (~$0.10/lead)',
+                'OpenAI API key (~$0.20/lead)',
+              ].map((item) => (
+                <div class="flex items-center gap-3 p-4 glass-card">
+                  <svg class="w-5 h-5 text-accent-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-text-muted text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FREE SKILLS -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="free-skills">
+    <div class="section-container max-w-5xl relative z-10">
+      <div class="fade-in">
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-sm font-medium mb-6">
+            Free & Open Source
+          </div>
+          <h2 class="text-4xl md:text-5xl font-black mb-6">
+            Start with <span class="gradient-text">free skills</span>
+          </h2>
+          <p class="text-xl text-text-muted max-w-2xl mx-auto">
+            Open-source Claude Code skills to get you started. Install in seconds, use forever. No strings attached.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-10">
+          <div class="glass-card p-8 hover:border-success/30 transition-all duration-300">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-success/15 flex items-center justify-center">
+                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </span>
+              <h3 class="text-lg font-bold">Task Manager</h3>
+            </div>
+            <p class="text-text-muted mb-4">SQLite-backed task and project tracking. Add tasks, set priorities, track progress - all from Claude Code.</p>
+            <span class="text-xs text-text-dim bg-surface-lighter/50 px-2 py-1 rounded">Beginner friendly</span>
+          </div>
+
+          <div class="glass-card p-8 hover:border-success/30 transition-all duration-300">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-success/15 flex items-center justify-center">
+                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </span>
+              <h3 class="text-lg font-bold">Email Assistant</h3>
+            </div>
+            <p class="text-text-muted mb-4">Email triage, smart drafting, and thread summarization. Let AI handle the inbox noise so you can focus.</p>
+            <span class="text-xs text-text-dim bg-surface-lighter/50 px-2 py-1 rounded">Beginner friendly</span>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a href="https://github.com/novalabs-dev/novalabs-free-skills" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-light border border-surface-lighter hover:border-success/30 text-text font-semibold transition-all duration-300">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            Get free skills on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- MORE SKILLS COMING -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <div class="glass-card p-10 md:p-14 text-center relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-primary to-accent"></div>
+
+          <h2 class="text-3xl font-bold mb-6">
+            More skills <span class="gradient-text">coming soon</span>
+          </h2>
+
+          <p class="text-text-muted text-lg leading-relaxed mb-6">
+            We're building a full library of premium Claude Code skills. Content pipelines, email automation, meeting prep, and more. Each skill is battle-tested in our own AI-run business before we sell it.
+          </p>
+
+          <p class="text-text-muted">
+            Want early access? Get the <a href="/" class="text-primary-light hover:text-primary underline">AI OS Blueprint Bundle</a> for priority access to all new skills.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================ -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-text-dim text-sm">
+            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+          </p>
+          <p class="text-text-dim/60 text-xs mt-1">
+            &copy; 2026 Nova Labs. All rights reserved.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-dim flex-wrap justify-center">
+          <a href="/" class="hover:text-text transition-colors">Playbook</a>
+          <a href="/skills" class="hover:text-text transition-colors">Skills</a>
+          <a href="/blog" class="hover:text-text transition-colors">Blog</a>
+          <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+          <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+          <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar scroll effect -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar?.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar?.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+  </script>
+</Layout>

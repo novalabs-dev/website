@@ -1,0 +1,872 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "Nova Labs",
+      "url": "https://nova-labs.dev",
+      "description": "AI-first business building digital products. An experiment by AckNova Automations.",
+      "foundingDate": "2026-03-07"
+    },
+    {
+      "@type": "Product",
+      "name": "AI OS Blueprint",
+      "description": "Build your own AI Operating System with Claude Code. Complete playbook with ready-to-use system, 5 business skills, and case study.",
+      "image": "https://nova-labs.dev/og-image.png",
+      "brand": { "@type": "Brand", "name": "Nova Labs" },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "5",
+        "bestRating": "5"
+      },
+      "review": {
+        "@type": "Review",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+        "author": { "@type": "Person", "name": "Early Access User" },
+        "reviewBody": "Finally a practical guide that actually shows you how to build an AI system for your business. Set up in under an hour."
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Playbook",
+          "price": "47",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://nova-labs.dev",
+          "priceValidUntil": "2026-12-31",
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "USD" },
+            "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "US" },
+            "deliveryTime": { "@type": "ShippingDeliveryTime", "handlingTime": { "@type": "QuantitativeValue", "minValue": "0", "maxValue": "0", "unitCode": "d" }, "transitTime": { "@type": "QuantitativeValue", "minValue": "0", "maxValue": "0", "unitCode": "d" } }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "US",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": "30",
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Bundle",
+          "price": "97",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://nova-labs.dev",
+          "priceValidUntil": "2026-12-31",
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "USD" },
+            "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "US" },
+            "deliveryTime": { "@type": "ShippingDeliveryTime", "handlingTime": { "@type": "QuantitativeValue", "minValue": "0", "maxValue": "0", "unitCode": "d" }, "transitTime": { "@type": "QuantitativeValue", "minValue": "0", "maxValue": "0", "unitCode": "d" } }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "US",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": "30",
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Do I need coding experience?", "acceptedAnswer": { "@type": "Answer", "text": "No. The AI OS Blueprint is designed for non-technical entrepreneurs. You copy, paste, and customize." }},
+        { "@type": "Question", "name": "Does this work with ChatGPT?", "acceptedAnswer": { "@type": "Answer", "text": "The system is built specifically for Claude Code by Anthropic. ChatGPT does not support the skills and automation architecture used in AI OS." }},
+        { "@type": "Question", "name": "How long does setup take?", "acceptedAnswer": { "@type": "Answer", "text": "Most users have their AI OS running within 1 hour. The playbook includes step-by-step instructions and a clone-ready repository." }}
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="AI OS Blueprint - Build Your Own AI-Powered Business | Nova Labs"
+  description="Build your own AI Operating System with Claude Code. No coding required. Complete system set up in 1 hour. By Nova Labs."
+  jsonLd={jsonLd}
+>
+  <!-- ============================================ -->
+  <!-- NAV -->
+  <!-- ============================================ -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/free-chapter" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Free Preview</a>
+        <a href="/skills" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Skills</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="#pricing" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Get the playbook
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================ -->
+  <!-- HERO -->
+  <!-- ============================================ -->
+  <section class="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="section-container relative z-10 text-center max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light border border-surface-lighter mb-8 text-sm text-text-muted">
+        <span class="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+        Launch pricing - limited time
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+        Stop re-explaining your business <span class="gradient-text">to AI every time</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-4 leading-relaxed">
+        Build an AI system that knows your customers, writes in your voice, and runs your daily operations. Using Claude Code.
+      </p>
+
+      <p class="text-lg text-text-dim max-w-xl mx-auto mb-10">
+        Complete playbook + ready-to-clone system. Set up in 1 hour. No coding required.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="#pricing" class="btn-primary text-lg">
+          Get the playbook - $47
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+        <a href="/free-chapter" class="btn-secondary">
+          Read 2 chapters free
+        </a>
+      </div>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-6 text-sm text-text-dim">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+          30-day money-back guarantee
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          One-time payment
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          Instant access
+        </span>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" aria-hidden="true">
+      <svg class="w-6 h-6 text-text-dim" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- PROOF BAR -->
+  <!-- ============================================ -->
+  <section class="py-12 border-y border-surface-lighter/30 bg-surface-light/30">
+    <div class="section-container">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div>
+          <p class="text-3xl font-black gradient-text">65+</p>
+          <p class="text-text-dim text-sm mt-1">Pages of guidance</p>
+        </div>
+        <div>
+          <p class="text-3xl font-black gradient-text">5</p>
+          <p class="text-text-dim text-sm mt-1">Ready-to-use skills</p>
+        </div>
+        <div>
+          <p class="text-3xl font-black gradient-text">1 hr</p>
+          <p class="text-text-dim text-sm mt-1">Setup time</p>
+        </div>
+        <div>
+          <p class="text-3xl font-black gradient-text">$0</p>
+          <p class="text-text-dim text-sm mt-1">Extra tools needed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WHO IS THIS FOR -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="who">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">Built for people who <span class="gradient-text">actually use AI</span></h2>
+        <p class="text-text-muted text-center text-lg mb-12">You already know AI is powerful. You just need a system to make it stick.</p>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          {[
+            { role: 'Solopreneurs & freelancers', desc: 'who want an AI employee without hiring one' },
+            { role: 'Small business owners', desc: 'who lose hours on content, email, and admin every week' },
+            { role: 'Agency founders', desc: 'who want to deliver more with a smaller team' },
+            { role: 'Tech-curious professionals', desc: 'who tried ChatGPT but want something that actually remembers' },
+          ].map((item) => (
+            <div class="flex items-start gap-4 p-5 glass-card hover:border-primary/30 transition-all">
+              <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center mt-0.5">
+                <svg class="w-4 h-4 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+              <div>
+                <p class="font-semibold text-text">{item.role}</p>
+                <p class="text-text-muted text-sm mt-0.5">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- PROBLEM -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="problem">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Sound familiar?</h2>
+
+        <div class="space-y-5">
+          {[
+            'You use ChatGPT or Claude, but every session you start from scratch',
+            'You see others talking about "AI OS" but have no idea where to begin',
+            'You lose hours on content writing, emails, planning and admin',
+            'You want to automate but don\'t have the budget for expensive agencies',
+            'Claude Code sounds interesting, but "too technical" for you',
+          ].map((item) => (
+            <div class="flex items-start gap-4 p-5 rounded-xl bg-surface-light/50 border border-red-500/10 hover:border-red-500/25 transition-colors">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-500/15 flex items-center justify-center mt-0.5">
+                <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </span>
+              <p class="text-text-muted text-lg">{item}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-12 p-6 rounded-xl border border-primary/20 bg-primary/5 text-center">
+          <p class="text-xl md:text-2xl font-semibold">
+            You don't need an AI tool.<br />
+            <span class="gradient-text">You need an AI system.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- SOLUTION -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-3xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 text-center">
+          What if your AI <span class="gradient-text">actually knew your business</span>?
+        </h2>
+
+        <p class="text-text-muted text-center text-lg mb-12">Imagine your AI could:</p>
+
+        <div class="grid gap-4">
+          {[
+            { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', text: 'Know your customers and how you write' },
+            { icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', text: 'Plan your day based on your priorities' },
+            { icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z', text: 'Create content that sounds like you' },
+            { icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', text: 'Analyze your inbox and highlight what matters' },
+            { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', text: 'Remember everything you\'ve ever discussed' },
+          ].map((item) => (
+            <div class="flex items-center gap-4 p-5 glass-card hover:border-primary/30 transition-all duration-300">
+              <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon} />
+                </svg>
+              </span>
+              <p class="text-lg">{item.text}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-10 text-center">
+          <p class="text-xl text-text-muted">
+            That's an <strong class="text-text">AI Operating System</strong>. And this playbook shows you how to build one.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WHAT YOU GET -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="whats-included">
+    <div class="section-container">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">What you get</h2>
+        <p class="text-text-muted text-center text-lg mb-16 max-w-xl mx-auto">
+          Everything you need to go from zero to a working AI system.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <!-- Playbook -->
+          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">The Playbook (65+ pages)</h3>
+            <p class="text-text-muted leading-relaxed">
+              From concept to working system. Step by step, with diagrams and examples. Written for entrepreneurs, not developers.
+            </p>
+          </div>
+
+          <!-- Clone-ready repo -->
+          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Ready-to-use system</h3>
+            <p class="text-text-muted leading-relaxed">
+              No blank slate. A fully configured AI OS with 5 business skills, context templates, and memory system. Clone, fill in, and you're running.
+            </p>
+          </div>
+
+          <!-- 5 Business Skills -->
+          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-success/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">5 Business Skills</h3>
+            <ul class="text-text-muted space-y-2">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Content writing in your voice
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Daily planning and task management
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Email inbox analysis and prioritization
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Meeting preparation
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Weekly review and strategy
+              </li>
+            </ul>
+          </div>
+
+          <!-- Case Study -->
+          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Nova Labs Case Study</h3>
+            <p class="text-text-muted leading-relaxed">
+              How an AI-run company uses this system daily. No theory - real results.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- COMPARISON -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-0 left-1/4 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="section-container max-w-4xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          This isn't a course. <span class="gradient-text">It's a system.</span>
+        </h2>
+        <p class="text-text-muted text-center mb-12 text-lg">See the difference.</p>
+
+        <div class="glass-card overflow-hidden">
+          <div class="grid grid-cols-2 text-sm font-semibold uppercase tracking-wider">
+            <div class="p-5 bg-red-500/10 text-red-400 text-center">What you do now</div>
+            <div class="p-5 bg-success/10 text-success text-center">With AI OS Blueprint</div>
+          </div>
+
+          {[
+            ['Re-explain who you are every chat', 'Your AI knows your business, clients, and writing style'],
+            ['Hunt for copy-paste prompts', 'Skills that automatically do the right thing'],
+            ['Forget what you discussed last week', 'Memory system that remembers everything'],
+            ['Hours on content and admin', 'Automated workflows'],
+            ['Disconnected tools that don\'t talk to each other', 'An integrated system'],
+          ].map((row, i) => (
+            <div class={`grid grid-cols-2 ${i % 2 === 0 ? 'bg-surface-light/30' : ''}`}>
+              <div class="p-5 text-text-muted border-r border-surface-lighter/50 flex items-center gap-3">
+                <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {row[0]}
+              </div>
+              <div class="p-5 flex items-center gap-3">
+                <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {row[1]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- SOCIAL PROOF -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <div class="glass-card p-10 md:p-14 text-center relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
+
+          <h2 class="text-3xl md:text-4xl font-bold mb-6">
+            Not theory. <span class="gradient-text">Battle-tested.</span>
+          </h2>
+
+          <p class="text-text-muted text-lg leading-relaxed mb-6">
+            This playbook wasn't written by someone who "read about AI." Nova Labs is a real company that runs on this exact system every day. The AI writes content, manages projects, checks email, and tracks sales - autonomously.
+          </p>
+
+          <p class="text-text-muted text-lg leading-relaxed">
+            Every skill, every workflow, every tip comes from production use. You're not buying ideas. You're buying a working system.
+          </p>
+
+          <div class="mt-8 grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p class="text-2xl font-bold text-primary-light">40+</p>
+              <p class="text-text-dim text-xs">Blog posts written by AI</p>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-primary-light">13</p>
+              <p class="text-text-dim text-xs">Days from zero to live</p>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-primary-light">24/7</p>
+              <p class="text-text-dim text-xs">Autonomous operation</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- PRICE ANCHORING -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          The math is <span class="gradient-text">simple</span>
+        </h2>
+        <p class="text-text-muted text-center text-lg mb-12">Compare what you'd pay for the same result.</p>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-card p-6 text-center opacity-60">
+            <p class="text-text-dim text-sm uppercase tracking-wider mb-2">Hire a VA</p>
+            <p class="text-3xl font-black text-red-400 line-through">$500+</p>
+            <p class="text-text-dim text-sm mt-2">per month, needs training</p>
+          </div>
+          <div class="glass-card p-6 text-center opacity-60">
+            <p class="text-text-dim text-sm uppercase tracking-wider mb-2">AI automation agency</p>
+            <p class="text-3xl font-black text-red-400 line-through">$3,000+</p>
+            <p class="text-text-dim text-sm mt-2">setup fee, ongoing costs</p>
+          </div>
+          <div class="glass-card p-6 text-center border-primary/30">
+            <p class="text-primary-light text-sm uppercase tracking-wider font-semibold mb-2">AI OS Blueprint</p>
+            <p class="text-3xl font-black gradient-text">$47</p>
+            <p class="text-text-dim text-sm mt-2">one-time, set up yourself in 1hr</p>
+          </div>
+        </div>
+
+        <p class="text-center text-text-muted mt-8 text-lg">
+          If this saves you just <strong class="text-text">2 hours per week</strong>, it pays for itself in <strong class="text-text">the first day</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WHAT'S INSIDE PREVIEW -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="preview">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-accent/8 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-3xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          Peek inside the <span class="gradient-text">playbook</span>
+        </h2>
+        <p class="text-text-muted text-center text-lg mb-12">12 chapters, 65+ pages. Here's what you'll build.</p>
+
+        <div class="glass-card p-8 md:p-10">
+          <div class="grid gap-3">
+            {[
+              { ch: '1-3', title: 'Foundation', desc: 'What an AI OS is, how it thinks, and the architecture that makes it work' },
+              { ch: '4-5', title: 'Context & Memory', desc: 'Teach your AI your business, customers, and writing style so it never forgets' },
+              { ch: '6-7', title: 'Skills & Automation', desc: 'Build reusable workflows: content writing, email triage, task management' },
+              { ch: '8-9', title: 'Daily Operations', desc: 'Set up daily planning, weekly reviews, and autonomous task execution' },
+              { ch: '10-12', title: 'Scale & Optimize', desc: 'Advanced patterns: multi-agent systems, cost optimization, security' },
+            ].map((item) => (
+              <div class="flex items-start gap-4 p-4 rounded-lg hover:bg-surface-light/50 transition-colors">
+                <span class="flex-shrink-0 px-2.5 py-1 rounded-md bg-primary/15 text-primary-light text-xs font-mono font-bold mt-0.5">
+                  Ch {item.ch}
+                </span>
+                <div>
+                  <p class="font-semibold text-text">{item.title}</p>
+                  <p class="text-text-muted text-sm mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-surface-lighter/50 text-center">
+            <p class="text-text-muted">
+              Plus: Nova Labs case study, clone-ready repository, and 5 production skills included.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- PRICING -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="pricing">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/8 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-4xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">Choose your plan</h2>
+        <p class="text-text-muted text-center text-lg mb-4">One-time payment. No subscription. Instant access.</p>
+        <div class="flex justify-center mb-12">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 border border-warning/20 text-warning text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Launch pricing - price increases after early access
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Playbook -->
+          <div class="glass-card p-8 flex flex-col">
+            <h3 class="text-2xl font-bold mb-2">Playbook</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black">$47</span>
+              <span class="text-text-dim">one-time</span>
+            </div>
+
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                'The complete playbook (PDF)',
+                'Cloneable AI OS system',
+                '5 business skills',
+                'Nova Labs case study',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <a href="https://novalabs-ai.lemonsqueezy.com/buy/16d3cd7e-e35b-4241-9ac6-998104954056" class="btn-secondary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook</a>
+          </div>
+
+          <!-- Bundle -->
+          <div class="glass-card p-8 flex flex-col relative border-primary/30">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
+              Best value
+            </div>
+
+            <h3 class="text-2xl font-bold mb-2">Bundle</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black gradient-text">$97</span>
+              <span class="text-text-dim">one-time</span>
+            </div>
+
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                'Everything in the Playbook',
+                'Sales Pipeline & CRM skill',
+                'Client Onboarding skill',
+                'Market Intelligence Scanner skill',
+                'Content Calendar skill',
+                'Financial Tracker skill',
+                'Free future updates',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <a href="https://novalabs-ai.lemonsqueezy.com/buy/24f40696-6dd9-484e-b2ec-83c4e5d45bfa" class="btn-primary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle</a>
+          </div>
+        </div>
+
+        <p class="text-center text-text-dim text-sm mt-6">30-day money-back guarantee. No questions asked.</p>
+
+        <!-- What happens after purchase -->
+        <div class="mt-12 glass-card p-8 max-w-2xl mx-auto">
+          <h3 class="text-xl font-bold mb-4 text-center">What happens after you buy</h3>
+          <div class="grid gap-4">
+            {[
+              { step: '1', text: 'Instant download: PDF playbook + clone-ready system' },
+              { step: '2', text: 'Run one terminal command to set up your AI OS' },
+              { step: '3', text: 'Fill in your business context (15 min)' },
+              { step: '4', text: 'Your AI starts working with your 5 included skills' },
+            ].map((item) => (
+              <div class="flex items-center gap-4">
+                <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-light font-bold text-sm">{item.step}</span>
+                <p class="text-text-muted">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- EMAIL CAPTURE -->
+  <!-- ============================================ -->
+  <section class="py-16 relative" id="notify">
+    <div class="section-container max-w-2xl text-center">
+      <div class="fade-in">
+        <div class="glass-card p-8 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-primary to-accent"></div>
+
+          <h3 class="text-2xl font-bold mb-3">
+            Not sure yet? <span class="gradient-text">Read 2 chapters free</span>
+          </h3>
+
+          <p class="text-text-muted mb-6">
+            Get the first 2 chapters of the AI OS Blueprint. See the concept and architecture before you buy. No credit card needed.
+          </p>
+
+          <a href="/free-chapter" class="btn-primary text-lg inline-flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Get your free preview
+          </a>
+
+          <p class="mt-3 text-text-dim text-xs">8 pages. 10-minute read. Zero fluff.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FAQ -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="faq">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Frequently asked questions</h2>
+
+        <div class="space-y-4">
+          {[
+            {
+              q: 'Do I need to know how to code?',
+              a: 'No. You need to be able to open a terminal and copy commands. The playbook walks you through every step.'
+            },
+            {
+              q: 'Does this work with ChatGPT?',
+              a: 'No, this is specifically for Claude Code (Anthropic). Claude Code has unique features (skills, hooks, memory) that make this system possible.'
+            },
+            {
+              q: 'Do I need Claude Max?',
+              a: 'Claude Code works with a Claude Max ($100/mo) or Claude Pro ($20/mo + API credits) subscription. The playbook works with both.'
+            },
+            {
+              q: 'How quickly can I get started?',
+              a: 'The basic setup takes about 1 hour. Within a day you\'ll have a working system for your daily tasks.'
+            },
+            {
+              q: 'How much time will this actually save me?',
+              a: 'Most business owners spend 5-10 hours per week on content, email, admin, and planning. With AI OS, your AI handles the bulk of that. Even saving just 2 hours per week makes this a $47 investment that pays for itself on day one.'
+            },
+            {
+              q: 'Are there ongoing costs?',
+              a: 'Only your Claude subscription ($20/mo for Pro, $100/mo for Max). The playbook and system are one-time purchases. No hidden fees, no upsells.'
+            },
+            {
+              q: 'What if it doesn\'t work for me?',
+              a: '30-day money-back guarantee, no questions asked. If you\'re not happy, email support@nova-labs.dev and you get a full refund.'
+            },
+          ].map((faq) => (
+            <details class="glass-card group cursor-pointer">
+              <summary class="p-6 flex items-center justify-between font-semibold text-lg list-none select-none">
+                {faq.q}
+                <svg class="w-5 h-5 text-text-dim group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 pb-6 text-text-muted leading-relaxed">
+                {faq.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FINAL CTA -->
+  <!-- ============================================ -->
+  <section class="py-24 relative">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-3xl relative z-10 text-center">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-5xl font-bold mb-6">
+          Your AI employee is <span class="gradient-text">one hour away</span>
+        </h2>
+
+        <p class="text-xl text-text-muted mb-6 max-w-xl mx-auto leading-relaxed">
+          Tomorrow morning, your AI could be writing content, managing your inbox, and planning your week. All you need is this playbook and one hour.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+          <a href="https://novalabs-ai.lemonsqueezy.com/buy/16d3cd7e-e35b-4241-9ac6-998104954056" class="btn-primary text-lg checkout-link" data-value="47" data-product="playbook">
+            Get the Playbook - $47
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+          <a href="https://novalabs-ai.lemonsqueezy.com/buy/24f40696-6dd9-484e-b2ec-83c4e5d45bfa" class="btn-secondary checkout-link" data-value="97" data-product="bundle">
+            Get the Bundle - $97
+          </a>
+        </div>
+
+        <p class="text-sm text-text-dim">30-day money-back guarantee. One-time payment. Instant access.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================ -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-text-dim text-sm">
+            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+          </p>
+          <p class="text-text-dim/60 text-xs mt-1">
+            &copy; 2026 Nova Labs. All rights reserved.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-dim flex-wrap justify-center">
+          <a href="/" class="hover:text-text transition-colors">Playbook</a>
+          <a href="/skills" class="hover:text-text transition-colors">Skills</a>
+          <a href="/blog" class="hover:text-text transition-colors">Blog</a>
+          <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+          <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+          <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar scroll effect + form handler -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar?.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar?.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+
+    // Google Ads checkout click tracking (backup voor conversion tracking)
+    document.querySelectorAll('.checkout-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const value = parseFloat((link as HTMLElement).dataset.value || '47');
+        const product = (link as HTMLElement).dataset.product || 'playbook';
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-18013644812/8ZpPCI7G-4ccEIzQyY1D',
+            'value': value,
+            'currency': 'USD'
+          });
+          gtag('event', 'begin_checkout', {
+            'currency': 'USD',
+            'value': value,
+            'items': [{ 'item_name': 'AI OS Blueprint - ' + product, 'price': value }]
+          });
+        }
+      });
+    });
+
+    // Free chapter click tracking
+    document.querySelectorAll('a[href="/free-chapter"]').forEach(link => {
+      link.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          gtag('event', 'view_item', {
+            'items': [{ 'item_name': 'AI OS Blueprint - Free Preview', 'price': 0 }]
+          });
+        }
+      });
+    });
+  </script>
+</Layout>

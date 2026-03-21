@@ -1,0 +1,114 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Terms of Service | Nova Labs"
+  description="Terms of Service for Nova Labs digital products and services."
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/skills" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Skills</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="/#pricing" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Get the playbook
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <section class="pt-32 pb-24">
+    <div class="section-container max-w-3xl">
+      <h1 class="text-4xl md:text-5xl font-black leading-tight mb-4 tracking-tight">Terms of Service</h1>
+      <p class="text-text-dim text-sm mb-12">Last updated: March 10, 2026</p>
+
+      <div class="prose">
+        <h2>1. Overview</h2>
+        <p>These Terms of Service ("Terms") govern your purchase and use of digital products sold by Nova Labs, a brand operated by AckNova Automations ("we", "us", "our"). By purchasing or using our products, you agree to these Terms.</p>
+
+        <h2>2. Products</h2>
+        <p>Nova Labs sells digital products including playbooks, guides, templates, and software skills ("Products"). All Products are delivered digitally. No physical goods are shipped.</p>
+
+        <h2>3. Purchase and Delivery</h2>
+        <p>All payments are processed through LemonSqueezy, our Merchant of Record. Upon successful payment, you will receive immediate access to your purchased Product via download link and/or email. LemonSqueezy handles all payment processing, VAT/sales tax collection, and invoicing on our behalf.</p>
+
+        <h2>4. License and Usage Rights</h2>
+        <p>Upon purchase, you receive a personal, non-transferable license to use the Product for your own business or personal purposes. You may:</p>
+        <ul>
+          <li>Use the Product in your own projects and business</li>
+          <li>Modify and adapt the Product for your own use</li>
+          <li>Use the Product on multiple devices you personally own</li>
+        </ul>
+        <p>You may not:</p>
+        <ul>
+          <li>Resell, redistribute, or share the Product with others</li>
+          <li>Use the Product to create a competing product</li>
+          <li>Claim ownership of the original Product materials</li>
+        </ul>
+
+        <h2>5. Intellectual Property</h2>
+        <p>All Products remain the intellectual property of Nova Labs / AckNova Automations. Your purchase grants a license to use the Product, not ownership of the underlying intellectual property.</p>
+
+        <h2>6. Disclaimer of Warranties</h2>
+        <p>Products are provided "as is" without warranty of any kind, express or implied. We do not guarantee specific results, revenue, or outcomes from using our Products. Results depend on your implementation, business context, and effort.</p>
+
+        <h2>7. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by law, Nova Labs / AckNova Automations shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our Products. Our total liability is limited to the amount you paid for the Product.</p>
+
+        <h2>8. Refunds</h2>
+        <p>Please see our <a href="/refund-policy">Refund Policy</a> for details on our 30-day money-back guarantee.</p>
+
+        <h2>9. Changes to Terms</h2>
+        <p>We reserve the right to update these Terms at any time. Changes take effect upon posting to this page. Continued use of our Products after changes constitutes acceptance of the updated Terms.</p>
+
+        <h2>10. Contact</h2>
+        <p>For questions about these Terms, contact us at <a href="mailto:support@nova-labs.dev">support@nova-labs.dev</a>.</p>
+
+        <h2>11. Governing Law</h2>
+        <p>These Terms are governed by the laws of the Netherlands. Any disputes shall be resolved in the courts of the Netherlands.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-text-dim text-sm">
+            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+          </p>
+          <p class="text-text-dim/60 text-xs mt-1">
+            &copy; 2026 Nova Labs. All rights reserved.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-dim flex-wrap justify-center">
+          <a href="/" class="hover:text-text transition-colors">Playbook</a>
+          <a href="/skills" class="hover:text-text transition-colors">Skills</a>
+          <a href="/blog" class="hover:text-text transition-colors">Blog</a>
+          <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+          <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+          <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar scroll effect -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar?.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar?.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+  </script>
+</Layout>

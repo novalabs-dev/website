@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Refund Policy | Nova Labs"
+  description="30-day money-back guarantee on all Nova Labs digital products."
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/skills" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Skills</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="/#pricing" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Get the playbook
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <section class="pt-32 pb-24">
+    <div class="section-container max-w-3xl">
+      <h1 class="text-4xl md:text-5xl font-black leading-tight mb-4 tracking-tight">Refund Policy</h1>
+      <p class="text-text-dim text-sm mb-12">Last updated: March 10, 2026</p>
+
+      <div class="prose">
+        <h2>30-Day Money-Back Guarantee</h2>
+        <p>We want you to be completely satisfied with your purchase. If our product doesn't meet your expectations, we offer a straightforward 30-day money-back guarantee on all digital products.</p>
+
+        <h2>How It Works</h2>
+        <ul>
+          <li><strong>Eligibility:</strong> You can request a refund within 30 days of your purchase date.</li>
+          <li><strong>No questions asked:</strong> You don't need to provide a reason, though feedback is always appreciated so we can improve.</li>
+          <li><strong>Full refund:</strong> You'll receive a complete refund of your purchase price.</li>
+          <li><strong>Processing time:</strong> Refunds are processed within 5-10 business days, depending on your payment provider.</li>
+        </ul>
+
+        <h2>How to Request a Refund</h2>
+        <p>Send an email to <a href="mailto:support@nova-labs.dev">support@nova-labs.dev</a> with:</p>
+        <ul>
+          <li>Your order number or the email address used for purchase</li>
+          <li>The product you'd like refunded</li>
+        </ul>
+        <p>We'll process your refund promptly. All refunds are handled through LemonSqueezy, our payment processor.</p>
+
+        <h2>After a Refund</h2>
+        <p>Once a refund is processed, your license to use the Product is revoked. Please delete any copies of the Product from your devices.</p>
+
+        <h2>Exceptions</h2>
+        <p>This refund policy applies to all standard purchases. Refund requests made after 30 days will be reviewed on a case-by-case basis. We reserve the right to deny refunds in cases of obvious abuse (e.g., repeated purchase-and-refund cycles).</p>
+
+        <h2>Contact</h2>
+        <p>Questions about refunds? Reach out at <a href="mailto:support@nova-labs.dev">support@nova-labs.dev</a>. We're happy to help.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-text-dim text-sm">
+            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+          </p>
+          <p class="text-text-dim/60 text-xs mt-1">
+            &copy; 2026 Nova Labs. All rights reserved.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-dim flex-wrap justify-center">
+          <a href="/" class="hover:text-text transition-colors">Playbook</a>
+          <a href="/skills" class="hover:text-text transition-colors">Skills</a>
+          <a href="/blog" class="hover:text-text transition-colors">Blog</a>
+          <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+          <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+          <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Navbar scroll effect -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar?.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar?.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+  </script>
+</Layout>
