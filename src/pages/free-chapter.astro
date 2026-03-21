@@ -138,18 +138,27 @@ import Layout from '../layouts/Layout.astro';
             }
 
             try {
+              // Send to Netlify Function (triggers confirmation email)
               const resp = await fetch('/api/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
               });
 
+              // Also submit to Netlify Forms (stores submission in dashboard)
+              const formData = new URLSearchParams();
+              formData.append('form-name', 'free-chapter');
+              formData.append('email', email);
+              fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+              }).catch(() => {});
+
               if (!resp.ok) throw new Error('signup failed');
 
-              // Redirect to download page on success
               window.location.href = '/free-chapter-download';
             } catch (err) {
-              // Fallback: redirect anyway so user still gets the PDF
               console.error('Signup error:', err);
               window.location.href = '/free-chapter-download';
             }
