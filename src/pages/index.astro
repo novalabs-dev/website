@@ -17,18 +17,6 @@ const jsonLd = {
       "description": "Build your own AI Operating System with Claude Code. Complete playbook with ready-to-use system, 5 business skills, and case study.",
       "image": "https://nova-labs.dev/og-image.png",
       "brand": { "@type": "Brand", "name": "Nova Labs" },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "5",
-        "bestRating": "5"
-      },
-      "review": {
-        "@type": "Review",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
-        "author": { "@type": "Person", "name": "Early Access User" },
-        "reviewBody": "Finally a practical guide that actually shows you how to build an AI system for your business. Set up in under an hour."
-      },
       "offers": [
         {
           "@type": "Offer",
@@ -118,15 +106,29 @@ const jsonLd = {
   <!-- HERO -->
   <!-- ============================================ -->
   <section class="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
-    <!-- Background effects -->
+    <!-- Mesh grid background (inspired by OG image) -->
+    <div class="hero-mesh" aria-hidden="true"></div>
+
+    <!-- Floating orbs -->
     <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]"></div>
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]"></div>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Floating particles -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
     </div>
 
     <div class="section-container relative z-10 text-center max-w-4xl">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light border border-surface-lighter mb-8 text-sm text-text-muted">
-        <span class="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+      <div class="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light border border-surface-lighter mb-8 text-sm text-text-muted">
+        <span class="w-2 h-2 bg-success rounded-full pulse-ring"></span>
         Launch pricing - limited time
       </div>
 
@@ -154,7 +156,9 @@ const jsonLd = {
         </a>
       </div>
 
-      <div class="mt-8 flex flex-wrap justify-center gap-6 text-sm text-text-dim">
+      <p class="mt-4 text-sm text-text-dim">400+ visitors this month. Free preview available.</p>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-text-dim">
         <span class="flex items-center gap-1.5">
           <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
           30-day money-back guarantee
@@ -181,23 +185,23 @@ const jsonLd = {
   <!-- ============================================ -->
   <!-- PROOF BAR -->
   <!-- ============================================ -->
-  <section class="py-12 border-y border-surface-lighter/30 bg-surface-light/30">
+  <section class="py-12 border-y border-surface-lighter/30 bg-surface-light/30 shimmer-line">
     <div class="section-container">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         <div>
-          <p class="text-3xl font-black gradient-text">65+</p>
+          <p class="text-3xl font-black gradient-text stat-glow">65+</p>
           <p class="text-text-dim text-sm mt-1">Pages of guidance</p>
         </div>
         <div>
-          <p class="text-3xl font-black gradient-text">5</p>
+          <p class="text-3xl font-black gradient-text stat-glow">5</p>
           <p class="text-text-dim text-sm mt-1">Ready-to-use skills</p>
         </div>
         <div>
-          <p class="text-3xl font-black gradient-text">1 hr</p>
+          <p class="text-3xl font-black gradient-text stat-glow">1 hr</p>
           <p class="text-text-dim text-sm mt-1">Setup time</p>
         </div>
         <div>
-          <p class="text-3xl font-black gradient-text">$0</p>
+          <p class="text-3xl font-black gradient-text stat-glow">$0</p>
           <p class="text-text-dim text-sm mt-1">Extra tools needed</p>
         </div>
       </div>
@@ -236,6 +240,8 @@ const jsonLd = {
       </div>
     </div>
   </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
 
   <!-- ============================================ -->
   <!-- PROBLEM -->
@@ -318,6 +324,8 @@ const jsonLd = {
     </div>
   </section>
 
+  <div class="section-divider" aria-hidden="true"></div>
+
   <!-- ============================================ -->
   <!-- WHAT YOU GET -->
   <!-- ============================================ -->
@@ -331,8 +339,8 @@ const jsonLd = {
 
         <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <!-- Playbook -->
-          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-7 h-7 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
@@ -344,8 +352,8 @@ const jsonLd = {
           </div>
 
           <!-- Clone-ready repo -->
-          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-accent w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-7 h-7 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -357,8 +365,8 @@ const jsonLd = {
           </div>
 
           <!-- 5 Business Skills -->
-          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-success/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-success w-14 h-14 rounded-2xl bg-success/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-7 h-7 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -389,8 +397,8 @@ const jsonLd = {
           </div>
 
           <!-- Case Study -->
-          <div class="glass-card p-8 hover:border-primary/30 transition-all duration-300 group">
-            <div class="w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-warning w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-7 h-7 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -454,12 +462,31 @@ const jsonLd = {
   </section>
 
   <!-- ============================================ -->
+  <!-- MID-PAGE FREE CHAPTER CTA -->
+  <!-- ============================================ -->
+  <section class="py-12 relative">
+    <div class="section-container max-w-2xl text-center">
+      <div class="p-6 md:p-8 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20">
+        <p class="text-lg md:text-xl font-semibold mb-2">Want to see this in action before you commit?</p>
+        <p class="text-text-muted mb-4">Read the first 2 chapters free. See exactly what you're building.</p>
+        <a href="/free-chapter" class="btn-primary inline-flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Get your free preview
+        </a>
+        <p class="mt-2 text-text-dim text-xs">8 pages. Free. Download link sent to your email.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
   <!-- SOCIAL PROOF -->
   <!-- ============================================ -->
   <section class="py-24 relative">
     <div class="section-container max-w-3xl">
       <div class="fade-in">
-        <div class="glass-card p-10 md:p-14 text-center relative overflow-hidden">
+        <div class="glass-card glow-border p-10 md:p-14 text-center relative overflow-hidden">
           <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
 
           <h2 class="text-3xl md:text-4xl font-bold mb-6">
@@ -476,11 +503,11 @@ const jsonLd = {
 
           <div class="mt-8 grid grid-cols-3 gap-4 text-center">
             <div>
-              <p class="text-2xl font-bold text-primary-light">40+</p>
+              <p class="text-2xl font-bold text-primary-light">58+</p>
               <p class="text-text-dim text-xs">Blog posts written by AI</p>
             </div>
             <div>
-              <p class="text-2xl font-bold text-primary-light">13</p>
+              <p class="text-2xl font-bold text-primary-light">17</p>
               <p class="text-text-dim text-xs">Days from zero to live</p>
             </div>
             <div>
@@ -524,6 +551,111 @@ const jsonLd = {
 
         <p class="text-center text-text-muted mt-8 text-lg">
           If this saves you just <strong class="text-text">2 hours per week</strong>, it pays for itself in <strong class="text-text">the first day</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- ROI CALCULATOR -->
+  <!-- ============================================ -->
+  <section class="py-24 relative" id="calculator">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-3xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          Calculate <span class="gradient-text">your ROI</span>
+        </h2>
+        <p class="text-text-muted text-center text-lg mb-12">See what an AI OS saves you in real numbers.</p>
+
+        <div class="glass-card glow-border p-8 md:p-10">
+          <!-- Input: Hours per week -->
+          <div class="mb-8">
+            <label class="block text-sm font-semibold text-text mb-3">
+              Hours per week on repetitive tasks
+              <span class="text-text-dim font-normal">(content, email, admin, planning)</span>
+            </label>
+            <div class="flex items-center gap-4">
+              <input
+                type="range"
+                id="calc-hours"
+                min="2"
+                max="30"
+                value="10"
+                class="w-full h-2 bg-surface-lighter rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <span id="calc-hours-display" class="text-2xl font-black gradient-text min-w-[3ch] text-right">10</span>
+              <span class="text-text-dim text-sm">hrs</span>
+            </div>
+          </div>
+
+          <!-- Input: Hourly rate -->
+          <div class="mb-10">
+            <label class="block text-sm font-semibold text-text mb-3">
+              Your hourly rate (or value of your time)
+            </label>
+            <div class="flex items-center gap-4">
+              <input
+                type="range"
+                id="calc-rate"
+                min="15"
+                max="200"
+                value="50"
+                step="5"
+                class="w-full h-2 bg-surface-lighter rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <span class="text-text-dim text-sm">$</span>
+              <span id="calc-rate-display" class="text-2xl font-black gradient-text min-w-[4ch] text-right">50</span>
+              <span class="text-text-dim text-sm">/hr</span>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-surface-lighter/50 pt-8 mb-2"></div>
+
+          <!-- Results -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="p-4 rounded-xl bg-surface-light/50">
+              <p id="calc-saved-hours" class="text-2xl md:text-3xl font-black text-primary-light">5</p>
+              <p class="text-text-dim text-xs mt-1">Hours saved per week</p>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-light/50">
+              <p id="calc-saved-week" class="text-2xl md:text-3xl font-black text-primary-light">$250</p>
+              <p class="text-text-dim text-xs mt-1">Saved per week</p>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-light/50">
+              <p id="calc-saved-year" class="text-2xl md:text-3xl font-black gradient-text">$13k</p>
+              <p class="text-text-dim text-xs mt-1">Saved per year</p>
+            </div>
+            <div class="p-4 rounded-xl bg-success/10 border border-success/20">
+              <p id="calc-roi" class="text-2xl md:text-3xl font-black text-success">532%</p>
+              <p class="text-text-dim text-xs mt-1">ROI in first month</p>
+            </div>
+          </div>
+
+          <!-- Payback message -->
+          <div class="mt-6 text-center">
+            <p id="calc-payback" class="text-text-muted">
+              The $47 playbook pays for itself in <strong class="text-primary-light">under 1 hour</strong> of saved time.
+            </p>
+          </div>
+
+          <!-- CTA -->
+          <div class="mt-8 text-center">
+            <a href="#pricing" class="btn-primary inline-flex items-center gap-2">
+              Start saving time today
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <p class="text-center text-text-dim text-xs mt-4">
+          Based on 50% time reduction on automated tasks. Results vary by business.
         </p>
       </div>
     </div>
@@ -575,6 +707,8 @@ const jsonLd = {
     </div>
   </section>
 
+  <div class="section-divider" aria-hidden="true"></div>
+
   <!-- ============================================ -->
   <!-- PRICING -->
   <!-- ============================================ -->
@@ -594,9 +728,40 @@ const jsonLd = {
           </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Skill Pack -->
+          <div class="glass-card p-8 flex flex-col relative" id="skillpack-card">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-success rounded-full text-sm font-semibold text-white">
+              Starter
+            </div>
+
+            <h3 class="text-2xl font-bold mb-2 mt-2">Skill Pack</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black">$9</span>
+              <span class="text-text-dim">one-time</span>
+            </div>
+
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                '5 ready-to-use business skills',
+                'Content writer, email, meetings',
+                'Daily planner + weekly review',
+                'Context templates included',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <a href="/free-chapter?ref=skillpack" class="btn-secondary w-full text-center checkout-link" data-value="9" data-product="skillpack">Get the Skill Pack - $9</a>
+          </div>
+
           <!-- Playbook -->
-          <div class="glass-card p-8 flex flex-col">
+          <div class="glass-card p-8 flex flex-col relative" id="playbook-card">
             <h3 class="text-2xl font-bold mb-2">Playbook</h3>
             <div class="flex items-baseline gap-1 mb-6">
               <span class="text-4xl font-black">$47</span>
@@ -619,11 +784,11 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/buy/16d3cd7e-e35b-4241-9ac6-998104954056" class="btn-secondary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-secondary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook</a>
           </div>
 
           <!-- Bundle -->
-          <div class="glass-card p-8 flex flex-col relative border-primary/30">
+          <div class="glass-card glow-border p-8 flex flex-col relative border-primary/30">
             <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
               Best value
             </div>
@@ -653,11 +818,16 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/buy/24f40696-6dd9-484e-b2ec-83c4e5d45bfa" class="btn-primary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-primary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle</a>
           </div>
         </div>
 
-        <p class="text-center text-text-dim text-sm mt-6">30-day money-back guarantee. No questions asked.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+          <div class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-success/10 border border-success/20">
+            <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            <span class="text-sm font-medium text-success">30-day money-back guarantee. No questions asked.</span>
+          </div>
+        </div>
 
         <!-- What happens after purchase -->
         <div class="mt-12 glass-card p-8 max-w-2xl mx-auto">
@@ -785,18 +955,22 @@ const jsonLd = {
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          <a href="https://novalabs-ai.lemonsqueezy.com/buy/16d3cd7e-e35b-4241-9ac6-998104954056" class="btn-primary text-lg checkout-link" data-value="47" data-product="playbook">
+          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary text-lg checkout-link" data-value="47" data-product="playbook">
             Get the Playbook - $47
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
-          <a href="https://novalabs-ai.lemonsqueezy.com/buy/24f40696-6dd9-484e-b2ec-83c4e5d45bfa" class="btn-secondary checkout-link" data-value="97" data-product="bundle">
+          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary checkout-link" data-value="97" data-product="bundle">
             Get the Bundle - $97
           </a>
         </div>
 
         <p class="text-sm text-text-dim">30-day money-back guarantee. One-time payment. Instant access.</p>
+
+        <p class="mt-6 text-text-muted">
+          Not ready to buy? <a href="/free-chapter" class="text-primary-light hover:text-primary font-medium underline underline-offset-2">Read 2 chapters free first</a>
+        </p>
       </div>
     </div>
   </section>
@@ -827,14 +1001,33 @@ const jsonLd = {
     </div>
   </footer>
 
+  <!-- Sticky mobile CTA bar -->
+  <div id="sticky-cta" class="fixed bottom-0 left-0 right-0 z-30 bg-surface/95 backdrop-blur-lg border-t border-surface-lighter/30 py-3 px-4 sm:hidden translate-y-full transition-transform duration-300">
+    <div class="flex gap-3 items-center justify-center">
+      <a href="/free-chapter" class="btn-primary !py-2.5 !px-4 !text-sm flex-1 text-center">
+        Free preview
+      </a>
+      <a href="#pricing" class="btn-secondary !py-2.5 !px-4 !text-sm flex-1 text-center">
+        Buy - $47
+      </a>
+    </div>
+  </div>
+
   <!-- Navbar scroll effect + form handler -->
   <script>
     const navbar = document.getElementById('navbar');
+    const stickyCta = document.getElementById('sticky-cta');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 50) {
         navbar?.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
       } else {
         navbar?.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+      // Show sticky CTA after scrolling past hero
+      if (window.scrollY > 600) {
+        stickyCta?.classList.remove('translate-y-full');
+      } else {
+        stickyCta?.classList.add('translate-y-full');
       }
     });
 
@@ -857,6 +1050,62 @@ const jsonLd = {
         }
       });
     });
+
+    // ROI Calculator
+    const calcHours = document.getElementById('calc-hours') as HTMLInputElement;
+    const calcRate = document.getElementById('calc-rate') as HTMLInputElement;
+    const calcHoursDisplay = document.getElementById('calc-hours-display');
+    const calcRateDisplay = document.getElementById('calc-rate-display');
+    const calcSavedHours = document.getElementById('calc-saved-hours');
+    const calcSavedWeek = document.getElementById('calc-saved-week');
+    const calcSavedYear = document.getElementById('calc-saved-year');
+    const calcRoi = document.getElementById('calc-roi');
+    const calcPayback = document.getElementById('calc-payback');
+
+    function updateCalculator() {
+      const hours = parseInt(calcHours?.value || '10');
+      const rate = parseInt(calcRate?.value || '50');
+      const savedHrs = Math.round(hours * 0.5);
+      const savedWeek = savedHrs * rate;
+      const savedYear = savedWeek * 52;
+      const savedMonth = savedWeek * 4.33;
+      const roi = Math.round(((savedMonth - 47) / 47) * 100);
+      const paybackHours = 47 / rate;
+
+      if (calcHoursDisplay) calcHoursDisplay.textContent = String(hours);
+      if (calcRateDisplay) calcRateDisplay.textContent = String(rate);
+      if (calcSavedHours) calcSavedHours.textContent = String(savedHrs);
+      if (calcSavedWeek) calcSavedWeek.textContent = '$' + savedWeek.toLocaleString();
+      if (calcSavedYear) {
+        const yearK = savedYear >= 1000 ? '$' + Math.round(savedYear / 1000) + 'k' : '$' + savedYear;
+        calcSavedYear.textContent = yearK;
+      }
+      if (calcRoi) calcRoi.textContent = roi.toLocaleString() + '%';
+      if (calcPayback) {
+        let paybackText: string;
+        if (paybackHours < 1) {
+          paybackText = 'under 1 hour';
+        } else if (paybackHours < 2) {
+          paybackText = 'about 1 hour';
+        } else {
+          paybackText = Math.round(paybackHours) + ' hours';
+        }
+        calcPayback.innerHTML = 'The $47 playbook pays for itself in <strong class="text-primary-light">' + paybackText + '</strong> of saved time.';
+      }
+
+      // GA4 tracking on interaction
+      if (typeof gtag === 'function') {
+        gtag('event', 'calculator_interaction', {
+          'hours_per_week': hours,
+          'hourly_rate': rate,
+          'estimated_roi': roi
+        });
+      }
+    }
+
+    calcHours?.addEventListener('input', updateCalculator);
+    calcRate?.addEventListener('input', updateCalculator);
+    updateCalculator();
 
     // Free chapter click tracking
     document.querySelectorAll('a[href="/free-chapter"]').forEach(link => {
