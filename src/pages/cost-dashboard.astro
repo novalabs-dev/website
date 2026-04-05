@@ -1,0 +1,583 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "CostPilot - Claude Code Cost Intelligence",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web (cross-platform)",
+  "description": "Track Claude Code token usage, detect waste, and optimize costs. The only web-based cost intelligence tool for Claude.",
+  "offers": [
+    { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free tier - 7 day history" },
+    { "@type": "Offer", "price": "29", "priceCurrency": "USD", "description": "Pro - 90 day history, alerts, waste detection" }
+  ],
+  "brand": { "@type": "Brand", "name": "Nova Labs" }
+};
+---
+
+<Layout
+  title="CostPilot - Know Exactly Where Your Claude Tokens Go | Nova Labs"
+  description="Track Claude Code token usage, detect waste, and optimize costs. Web-based dashboard with alerts. Free tier available."
+  jsonLd={jsonLd}
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">AI OS Blueprint</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Join the waitlist
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+    <div class="hero-mesh" aria-hidden="true"></div>
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <div class="section-container relative z-10 text-center max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 border border-warning/20 mb-8 text-sm text-warning">
+        <span class="w-2 h-2 bg-warning rounded-full animate-pulse"></span>
+        Coming soon - join the waitlist
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+        Know exactly where your <span class="gradient-text">Claude tokens</span> go
+      </h1>
+
+      <p class="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-4 leading-relaxed">
+        Stop guessing why your quota runs out. CostPilot shows you which sessions burn tokens, where cache misses waste money, and when you're about to hit your limit.
+      </p>
+
+      <p class="text-lg text-text-dim max-w-xl mx-auto mb-10">
+        Web-based. Works with any plan. Free tier included.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="/cost-dashboard/analyze" class="btn-primary text-lg">
+          Try the free analyzer
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </a>
+        <a href="#waitlist" class="btn-secondary">
+          Join the Pro waitlist
+        </a>
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-text-dim">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Cross-platform (web)
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Free tier forever
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Analyzer runs in your browser
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAIN POINTS -->
+  <section class="py-24 relative" id="problem">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Sound familiar?</h2>
+
+        <div class="space-y-5">
+          {[
+            'Your Claude Max quota ran out in 19 minutes and you have no idea why',
+            'You\'re paying $200/month but can\'t tell which projects consume the most',
+            'Cache misses silently double your token usage and you don\'t even know',
+            'Your team uses Claude Code but nobody tracks how much each person burns',
+            'You hit the rate limit mid-session with no warning',
+          ].map((item) => (
+            <div class="flex items-start gap-4 p-5 rounded-xl bg-surface-light/50 border border-red-500/10 hover:border-red-500/25 transition-colors">
+              <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-500/15 flex items-center justify-center mt-0.5">
+                <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </span>
+              <p class="text-text-muted text-lg">{item}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-12 p-6 rounded-xl border border-primary/20 bg-primary/5 text-center">
+          <p class="text-xl md:text-2xl font-semibold">
+            The Anthropic console shows totals.<br />
+            <span class="gradient-text">CostPilot shows you where the money goes.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- FEATURES -->
+  <section class="py-24 relative" id="features">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/2 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-4xl relative z-10">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          What CostPilot <span class="gradient-text">shows you</span>
+        </h2>
+        <p class="text-text-muted text-center text-lg mb-12">Everything you need to understand and optimize your Claude usage.</p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Usage Breakdown -->
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Usage Breakdown</h3>
+            <p class="text-text-muted leading-relaxed">
+              See token usage by project, session, model, and day. Know exactly which conversations cost the most and why.
+            </p>
+          </div>
+
+          <!-- Waste Detection -->
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-accent w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Waste Detection</h3>
+            <p class="text-text-muted leading-relaxed">
+              Spot cache misses, bloated contexts, and repeated queries that silently burn through your quota. Get actionable tips to fix them.
+            </p>
+          </div>
+
+          <!-- Budget Alerts -->
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-success w-14 h-14 rounded-2xl bg-success/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Budget Alerts</h3>
+            <p class="text-text-muted leading-relaxed">
+              Get warned before you hit your limit. Set daily and monthly budgets with email alerts so you never get locked out mid-session again.
+            </p>
+          </div>
+
+          <!-- Cost Projection -->
+          <div class="glass-card glow-border p-8 hover:border-primary/30 transition-all duration-300 group">
+            <div class="icon-glow-warning w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Cost Projection</h3>
+            <p class="text-text-muted leading-relaxed">
+              See where your spend is heading. Monthly projection based on your actual usage pattern, so you can adjust before the bill arrives.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          Set up in <span class="gradient-text">under 2 minutes</span>
+        </h2>
+        <p class="text-text-muted text-center text-lg mb-12">Two ways to connect. Pick what fits your setup.</p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="glass-card p-8">
+            <div class="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
+              <span class="text-primary-light font-bold">A</span>
+            </div>
+            <h3 class="text-lg font-bold mb-3">API Key Connect</h3>
+            <p class="text-text-muted text-sm mb-4">For teams and API users. Paste your Anthropic Admin API key. CostPilot pulls your usage data automatically.</p>
+            <ul class="space-y-2 text-text-dim text-sm">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Automatic daily sync
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Per-workspace breakdown
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Budget alerts
+              </li>
+            </ul>
+          </div>
+
+          <div class="glass-card p-8">
+            <div class="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center mb-4">
+              <span class="text-accent-light font-bold">B</span>
+            </div>
+            <h3 class="text-lg font-bold mb-3">Local File Upload</h3>
+            <p class="text-text-muted text-sm mb-4">For Claude Max subscribers. Upload your session JSONL files from <code class="text-xs bg-surface-light px-1.5 py-0.5 rounded">~/.claude/</code>. Data stays on your machine.</p>
+            <ul class="space-y-2 text-text-dim text-sm">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Zero data sent to our servers
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Per-project breakdown
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                Works with any Claude plan
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- COMPARISON -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-4xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">
+          Why not just use <span class="gradient-text">existing tools</span>?
+        </h2>
+        <p class="text-text-muted text-center mb-12 text-lg">CostPilot fills the gap between free CLI tools and nothing.</p>
+
+        <div class="glass-card overflow-x-auto">
+          <div class="grid grid-cols-4 text-xs font-semibold uppercase tracking-wider min-w-[500px]">
+            <div class="p-4 bg-surface-light/50 text-text-dim"></div>
+            <div class="p-4 bg-surface-light/50 text-text-dim text-center">Anthropic Console</div>
+            <div class="p-4 bg-surface-light/50 text-text-dim text-center">Claude Usage Tracker</div>
+            <div class="p-4 bg-primary/10 text-primary-light text-center">CostPilot</div>
+          </div>
+
+          {[
+            ['Web-based (any OS)', false, false, true],
+            ['Per-project breakdown', false, true, true],
+            ['Waste detection', false, false, true],
+            ['Budget alerts', false, false, true],
+            ['Team/multi-user', false, false, true],
+            ['Cost projection', false, false, true],
+            ['Free tier', true, true, true],
+          ].map((row, i) => (
+            <div class={`grid grid-cols-4 min-w-[500px] ${i % 2 === 0 ? 'bg-surface-light/20' : ''} text-sm`}>
+              <div class="p-4 text-text-muted">{row[0]}</div>
+              {[row[1], row[2], row[3]].map((val, j) => (
+                <div class={`p-4 text-center ${j === 2 ? 'bg-primary/5' : ''}`}>
+                  {val ? (
+                    <svg class="w-5 h-5 text-success mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg class="w-5 h-5 text-text-dim mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING PREVIEW -->
+  <section class="py-24 relative" id="pricing">
+    <div class="section-container max-w-4xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center">Simple pricing</h2>
+        <p class="text-text-muted text-center text-lg mb-12">Free forever tier. Pay only if CostPilot saves you more than it costs.</p>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Free -->
+          <div class="glass-card p-8 flex flex-col">
+            <h3 class="text-2xl font-bold mb-2">Free</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black">$0</span>
+              <span class="text-text-dim">forever</span>
+            </div>
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                '7-day usage history',
+                'Basic dashboard',
+                'JSONL file upload',
+                '1 workspace',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a href="#waitlist" class="btn-secondary w-full text-center">Join waitlist</a>
+          </div>
+
+          <!-- Pro -->
+          <div class="glass-card glow-border p-8 flex flex-col relative border-primary/30">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
+              Recommended
+            </div>
+            <h3 class="text-2xl font-bold mb-2 mt-2">Pro</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black gradient-text">$29</span>
+              <span class="text-text-dim">/month</span>
+            </div>
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                '90-day history',
+                'Waste detection + tips',
+                'Budget alerts (email)',
+                'Cost projection',
+                'API key auto-sync',
+                'CSV export',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a href="#waitlist" class="btn-primary w-full text-center">Join waitlist</a>
+          </div>
+
+          <!-- Team -->
+          <div class="glass-card p-8 flex flex-col">
+            <h3 class="text-2xl font-bold mb-2">Team</h3>
+            <div class="flex items-baseline gap-1 mb-6">
+              <span class="text-4xl font-black">$49</span>
+              <span class="text-text-dim">/month</span>
+            </div>
+            <ul class="space-y-3 mb-8 flex-grow">
+              {[
+                'Everything in Pro',
+                'Unlimited workspaces',
+                'Per-developer breakdown',
+                'Cost allocation by project',
+                'Team management',
+                'Priority support',
+              ].map((item) => (
+                <li class="flex items-center gap-3 text-text-muted">
+                  <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a href="#waitlist" class="btn-secondary w-full text-center">Join waitlist</a>
+          </div>
+        </div>
+
+        <p class="text-center text-text-muted mt-8 text-lg">
+          If CostPilot saves you <strong class="text-text">one wasted session per month</strong>, it pays for itself.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section class="py-24 relative" id="waitlist">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/8 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="section-container max-w-2xl relative z-10">
+      <div class="fade-in">
+        <div class="glass-card glow-border p-10 md:p-14 text-center relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
+
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            Get early access to <span class="gradient-text">CostPilot</span>
+          </h2>
+
+          <p class="text-text-muted text-lg mb-2">
+            Be the first to try it. Early access users get Pro features free for 30 days.
+          </p>
+
+          <p class="text-text-dim text-sm mb-8">
+            Launching soon. We'll email you when it's ready.
+          </p>
+
+          <form class="max-w-md mx-auto" id="waitlist-form" name="costpilot-waitlist" data-netlify="true">
+            <input type="hidden" name="form-name" value="costpilot-waitlist" />
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="you@example.com"
+                class="flex-grow px-5 py-3.5 rounded-xl bg-surface-light border border-surface-lighter text-text placeholder:text-text-dim focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
+                id="waitlist-email"
+              />
+              <button type="submit" class="btn-primary !py-3.5 whitespace-nowrap" id="waitlist-btn">
+                Join waitlist
+                <svg class="w-5 h-5 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+            </div>
+            <div class="mt-3 flex items-start gap-2 max-w-md mx-auto">
+              <input type="checkbox" id="waitlist-consent" name="gdpr-consent" required class="mt-1 accent-primary" />
+              <label for="waitlist-consent" class="text-text-dim text-xs text-left">I agree to receive product updates about CostPilot from Nova Labs (AckNova Automations). Unsubscribe anytime. <a href="/terms" class="underline hover:text-text">Privacy policy</a></label>
+            </div>
+            <p class="mt-2 text-red-400 text-sm text-center hidden" id="waitlist-error"></p>
+            <p class="mt-2 text-success text-sm text-center hidden" id="waitlist-success"></p>
+          </form>
+
+          <script>
+            document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
+              e.preventDefault();
+              const email = document.getElementById('waitlist-email').value;
+              const btn = document.getElementById('waitlist-btn');
+              const errorEl = document.getElementById('waitlist-error');
+              const successEl = document.getElementById('waitlist-success');
+
+              btn.disabled = true;
+              btn.textContent = 'Joining...';
+              errorEl.classList.add('hidden');
+              successEl.classList.add('hidden');
+
+              if (typeof gtag === 'function') {
+                gtag('event', 'costpilot_waitlist_signup', {
+                  'event_category': 'lead_generation'
+                });
+              }
+
+              try {
+                const formData = new URLSearchParams();
+                formData.append('form-name', 'costpilot-waitlist');
+                formData.append('email', email);
+                formData.append('gdpr-consent', 'on');
+                const resp = await fetch('/cost-dashboard', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: formData.toString()
+                });
+                if (!resp.ok) throw new Error('Submit failed');
+
+                successEl.textContent = "You're on the list! We'll email you when CostPilot launches.";
+                successEl.classList.remove('hidden');
+                btn.textContent = 'Joined!';
+                document.getElementById('waitlist-email').value = '';
+              } catch (err) {
+                errorEl.textContent = 'Something went wrong. Please try again.';
+                errorEl.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Join waitlist';
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-24 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center">Questions</h2>
+
+        <div class="space-y-4">
+          {[
+            {
+              q: 'Is my API key safe?',
+              a: 'CostPilot uses read-only Admin API access. It can view usage reports but cannot make API calls, create keys, or modify anything in your account. Your key is encrypted and never logged.'
+            },
+            {
+              q: 'What if I use Claude Max (flat rate)?',
+              a: 'CostPilot still helps. You can upload your local session files to see which projects consume the most tokens, detect cache misses, and understand why your quota runs out faster some days.'
+            },
+            {
+              q: 'How is this different from the Anthropic Console?',
+              a: 'The Console shows aggregate totals. CostPilot breaks it down by project, session, and model. Plus waste detection, budget alerts, and cost projections that the Console doesn\'t offer.'
+            },
+            {
+              q: 'What about the free Claude Usage Tracker?',
+              a: 'Claude Usage Tracker is a great macOS desktop app. CostPilot is web-based (works on any OS), adds waste detection, budget alerts, team features, and cost projections. Different tools for different needs.'
+            },
+            {
+              q: 'Can Anthropic just build this themselves?',
+              a: 'They could. But platform companies rarely build the best analytics tools - Stripe has dozens of third-party analytics dashboards, AWS has CloudWatch but people still pay for Datadog. We move faster on features that matter to power users.'
+            },
+          ].map((item) => (
+            <details class="group glass-card p-6 cursor-pointer">
+              <summary class="flex items-center justify-between font-semibold text-lg list-none">
+                {item.q}
+                <svg class="w-5 h-5 text-text-dim group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p class="mt-4 text-text-muted leading-relaxed">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-text-dim text-sm">
+            <span class="text-primary-light font-semibold">CostPilot</span> by <a href="/" class="hover:text-text transition-colors">Nova Labs</a> (AckNova Automations)
+          </p>
+          <p class="text-text-dim/60 text-xs mt-1">
+            &copy; 2026 Nova Labs. All rights reserved.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-text-dim flex-wrap justify-center">
+          <a href="/" class="hover:text-text transition-colors">AI OS Blueprint</a>
+          <a href="/blog" class="hover:text-text transition-colors">Blog</a>
+          <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+          <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+          <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky navbar script -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+  </script>
+</Layout>
