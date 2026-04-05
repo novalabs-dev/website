@@ -1,0 +1,402 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Free Claude Code Cost Analyzer - Upload Your Session Files | CostPilot"
+  description="Upload your Claude Code session files and instantly see token usage, costs, and waste. Free, private, runs entirely in your browser."
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/cost-dashboard" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Cost</span><span class="text-text-dim">Pilot</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/cost-dashboard" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Overview</a>
+        <a href="/cost-dashboard#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">Get Pro features</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative min-h-screen pt-24 pb-16">
+    <div class="section-container max-w-5xl">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-6 text-sm text-success">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          100% private - all processing happens in your browser
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4 tracking-tight">
+          Free Claude Code <span class="gradient-text">Cost Analyzer</span>
+        </h1>
+        <p class="text-lg text-text-muted max-w-2xl mx-auto">
+          Upload your Claude Code session files and instantly see where your tokens go. No account needed. Nothing leaves your browser.
+        </p>
+      </div>
+
+      <!-- Upload Area -->
+      <div class="glass-card p-8 mb-8" id="upload-section">
+        <div class="text-center">
+          <h2 class="text-xl font-bold mb-2">Upload session files</h2>
+          <p class="text-text-muted text-sm mb-6">
+            Find your files at <code class="bg-surface-light px-2 py-0.5 rounded text-xs">~/.claude/projects/</code> - drag JSONL files here or click to browse.
+          </p>
+
+          <div
+            id="drop-zone"
+            class="border-2 border-dashed border-surface-lighter rounded-2xl p-12 transition-all hover:border-primary/50 cursor-pointer"
+          >
+            <svg class="w-12 h-12 text-text-dim mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="text-text-muted mb-2">Drop .jsonl files here</p>
+            <p class="text-text-dim text-sm">or click to select files</p>
+            <input type="file" id="file-input" multiple accept=".jsonl" class="hidden" />
+          </div>
+
+          <p class="mt-4 text-text-dim text-xs">
+            Tip: Run <code class="bg-surface-light px-1.5 py-0.5 rounded">ls ~/.claude/projects/</code> in your terminal to find session files.
+          </p>
+        </div>
+      </div>
+
+      <!-- Results (hidden until files uploaded) -->
+      <div id="results" class="hidden space-y-6">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-6 text-center">
+            <p class="text-3xl font-black gradient-text" id="total-tokens">0</p>
+            <p class="text-text-dim text-sm mt-1">Total tokens</p>
+          </div>
+          <div class="glass-card p-6 text-center">
+            <p class="text-3xl font-black text-primary-light" id="total-cost">$0.00</p>
+            <p class="text-text-dim text-sm mt-1">API-equivalent cost</p>
+          </div>
+          <div class="glass-card p-6 text-center">
+            <p class="text-3xl font-black text-warning" id="cache-miss-rate">0%</p>
+            <p class="text-text-dim text-sm mt-1">Cache miss rate</p>
+          </div>
+          <div class="glass-card p-6 text-center">
+            <p class="text-3xl font-black text-accent-light" id="total-sessions">0</p>
+            <p class="text-text-dim text-sm mt-1">Sessions analyzed</p>
+          </div>
+        </div>
+
+        <!-- Subscription disclaimer -->
+        <div class="glass-card p-4 border-primary/20 bg-primary/5 flex items-start gap-3">
+          <svg class="w-5 h-5 text-primary-light flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="text-sm text-text-muted">
+            <span class="text-text font-semibold">On Claude Max or Pro?</span> You didn't actually pay this. The number shows what your usage <em>would</em> cost at pay-as-you-go API rates &mdash; i.e. how much value you're extracting from your subscription. On API billing, this is your real spend.
+          </div>
+        </div>
+
+        <!-- Model Breakdown -->
+        <div class="glass-card p-8">
+          <h3 class="text-lg font-bold mb-4">Token usage by model</h3>
+          <div id="model-breakdown" class="space-y-3"></div>
+        </div>
+
+        <!-- Daily Usage -->
+        <div class="glass-card p-8">
+          <h3 class="text-lg font-bold mb-4">Daily usage</h3>
+          <div id="daily-chart" class="h-64 flex items-stretch gap-1"></div>
+          <div id="daily-labels" class="flex gap-1 mt-2 text-xs text-text-dim"></div>
+        </div>
+
+        <!-- Waste Detection -->
+        <div class="glass-card p-8">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Waste detection
+          </h3>
+          <div id="waste-tips" class="space-y-3"></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="glass-card p-8 border-primary/20 bg-primary/5 text-center">
+          <h3 class="text-xl font-bold mb-2">Want automated tracking + alerts?</h3>
+          <p class="text-text-muted mb-4">CostPilot Pro adds automatic daily sync, budget alerts, waste detection tips, and 90-day history.</p>
+          <a href="/cost-dashboard#waitlist" class="btn-primary inline-flex items-center gap-2">
+            Join the waitlist for Pro
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Claude Code JSONL Analyzer - runs entirely client-side
+    const PRICING = {
+      'claude-sonnet-4-20250514': { input: 3.0, output: 15.0, cacheWrite: 3.75, cacheRead: 0.30 },
+      'claude-opus-4-20250514': { input: 15.0, output: 75.0, cacheWrite: 18.75, cacheRead: 1.50 },
+      'claude-haiku-3-5-20241022': { input: 0.80, output: 4.0, cacheWrite: 1.0, cacheRead: 0.08 },
+      // Fallback for unknown models
+      'default': { input: 3.0, output: 15.0, cacheWrite: 3.75, cacheRead: 0.30 },
+    };
+
+    // Per 1M tokens
+    function getPrice(model) {
+      for (const key of Object.keys(PRICING)) {
+        if (key !== 'default' && model && model.includes(key.split('-').slice(0, 3).join('-'))) {
+          return PRICING[key];
+        }
+      }
+      // Try partial matching
+      if (model) {
+        if (model.includes('opus')) return PRICING['claude-opus-4-20250514'];
+        if (model.includes('haiku')) return PRICING['claude-haiku-3-5-20241022'];
+        if (model.includes('sonnet')) return PRICING['claude-sonnet-4-20250514'];
+      }
+      return PRICING['default'];
+    }
+
+    function formatNumber(n) {
+      if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return n.toString();
+    }
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-primary/50', 'bg-primary/5');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-primary/50', 'bg-primary/5');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    async function handleFiles(files) {
+      const allEntries = [];
+
+      for (const file of files) {
+        const text = await file.text();
+        const lines = text.split('\n').filter(l => l.trim());
+        for (const line of lines) {
+          try {
+            allEntries.push(JSON.parse(line));
+          } catch {}
+        }
+      }
+
+      if (allEntries.length === 0) {
+        dropZone.innerHTML = '<p class="text-red-400">No valid JSONL entries found. Make sure you\'re uploading Claude Code session files.</p>';
+        return;
+      }
+
+      analyzeEntries(allEntries, files.length);
+    }
+
+    function analyzeEntries(entries, fileCount) {
+      let totalInput = 0;
+      let totalOutput = 0;
+      let totalCacheWrite = 0;
+      let totalCacheRead = 0;
+      let totalCost = 0;
+      const modelUsage = {};
+      const dailyUsage = {};
+      let sessionCount = fileCount;
+
+      for (const entry of entries) {
+        // Look for usage data in various formats
+        const usage = entry.usage || entry.message?.usage || entry.result?.usage;
+        if (!usage) continue;
+
+        const model = entry.model || entry.message?.model || entry.result?.model || 'unknown';
+        const price = getPrice(model);
+
+        const inputTokens = usage.input_tokens || 0;
+        const outputTokens = usage.output_tokens || 0;
+        const cacheWrite = usage.cache_creation_input_tokens || 0;
+        const cacheRead = usage.cache_read_input_tokens || 0;
+
+        totalInput += inputTokens;
+        totalOutput += outputTokens;
+        totalCacheWrite += cacheWrite;
+        totalCacheRead += cacheRead;
+
+        const cost = (inputTokens * price.input + outputTokens * price.output +
+                     cacheWrite * price.cacheWrite + cacheRead * price.cacheRead) / 1e6;
+        totalCost += cost;
+
+        // Model breakdown
+        const modelKey = model.split('-').slice(0, 3).join('-') || model;
+        if (!modelUsage[modelKey]) modelUsage[modelKey] = { tokens: 0, cost: 0 };
+        modelUsage[modelKey].tokens += inputTokens + outputTokens;
+        modelUsage[modelKey].cost += cost;
+
+        // Daily usage
+        const date = entry.timestamp || entry.created_at || entry.date;
+        if (date) {
+          const day = new Date(date).toISOString().split('T')[0];
+          if (!dailyUsage[day]) dailyUsage[day] = { tokens: 0, cost: 0 };
+          dailyUsage[day].tokens += inputTokens + outputTokens;
+          dailyUsage[day].cost += cost;
+        }
+      }
+
+      const totalTokens = totalInput + totalOutput;
+      const totalCacheable = totalCacheWrite + totalCacheRead + totalInput;
+      const cacheMissRate = totalCacheable > 0
+        ? Math.round((1 - totalCacheRead / totalCacheable) * 100)
+        : 0;
+
+      // Update summary cards
+      document.getElementById('total-tokens').textContent = formatNumber(totalTokens);
+      document.getElementById('total-cost').textContent = '$' + totalCost.toFixed(2);
+      document.getElementById('cache-miss-rate').textContent = cacheMissRate + '%';
+      document.getElementById('total-sessions').textContent = sessionCount;
+
+      // Model breakdown
+      const modelContainer = document.getElementById('model-breakdown');
+      modelContainer.innerHTML = '';
+      const sortedModels = Object.entries(modelUsage).sort((a, b) => b[1].tokens - a[1].tokens);
+
+      for (const [model, data] of sortedModels) {
+        const pct = totalTokens > 0 ? (data.tokens / totalTokens * 100) : 0;
+        modelContainer.innerHTML += `
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-text-muted w-32 truncate">${model}</span>
+            <div class="flex-grow h-6 bg-surface-light rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style="width: ${pct}%"></div>
+            </div>
+            <span class="text-sm text-text-muted w-20 text-right">${formatNumber(data.tokens)}</span>
+            <span class="text-sm text-text-dim w-16 text-right">$${data.cost.toFixed(2)}</span>
+          </div>
+        `;
+      }
+
+      // Daily chart
+      const chartContainer = document.getElementById('daily-chart');
+      const labelsContainer = document.getElementById('daily-labels');
+      chartContainer.innerHTML = '';
+      labelsContainer.innerHTML = '';
+
+      const sortedDays = Object.entries(dailyUsage).sort((a, b) => a[0].localeCompare(b[0]));
+      if (sortedDays.length > 0) {
+        const maxTokens = Math.max(...sortedDays.map(d => d[1].tokens));
+        for (const [day, data] of sortedDays) {
+          const height = maxTokens > 0 ? (data.tokens / maxTokens * 100) : 0;
+          chartContainer.innerHTML += `
+            <div class="flex-1 flex flex-col items-center justify-end" title="${day}: ${formatNumber(data.tokens)} tokens ($${data.cost.toFixed(2)})">
+              <span class="text-xs text-text-dim mb-1">$${data.cost.toFixed(2)}</span>
+              <div class="w-full bg-gradient-to-t from-primary to-accent rounded-t-sm" style="height: ${Math.max(height, 2)}%"></div>
+            </div>
+          `;
+          labelsContainer.innerHTML += `<span class="flex-1 text-center truncate">${day.slice(5)}</span>`;
+        }
+      } else {
+        chartContainer.innerHTML = '<p class="text-text-dim text-center w-full">No timestamp data found in sessions. Daily breakdown requires timestamped entries.</p>';
+      }
+
+      // Waste tips
+      const wasteTips = document.getElementById('waste-tips');
+      wasteTips.innerHTML = '';
+      const tips = [];
+
+      if (cacheMissRate > 70) {
+        tips.push({
+          severity: 'high',
+          title: 'High cache miss rate (' + cacheMissRate + '%)',
+          desc: 'Most of your input tokens are not being cached. Use prompt caching by structuring your system prompts to be consistent across sessions. This alone could cut your costs by 50%+.'
+        });
+      } else if (cacheMissRate > 40) {
+        tips.push({
+          severity: 'medium',
+          title: 'Moderate cache miss rate (' + cacheMissRate + '%)',
+          desc: 'Your cache hit rate is decent but could improve. Check if your system prompts change between sessions - consistent prompts enable caching.'
+        });
+      }
+
+      if (totalInput > totalOutput * 5) {
+        tips.push({
+          severity: 'medium',
+          title: 'Input-heavy sessions',
+          desc: 'Your input tokens are ' + Math.round(totalInput / totalOutput) + 'x your output tokens. This suggests large context windows. Consider trimming context or using summarization to reduce input size.'
+        });
+      }
+
+      const opusUsage = Object.entries(modelUsage).find(([m]) => m.includes('opus'));
+      if (opusUsage && opusUsage[1].tokens > totalTokens * 0.5) {
+        tips.push({
+          severity: 'low',
+          title: 'Heavy Opus usage (' + Math.round(opusUsage[1].tokens / totalTokens * 100) + '% of tokens)',
+          desc: 'Opus is 5x more expensive than Sonnet. Consider using Sonnet for routine tasks (code formatting, simple edits) and reserving Opus for complex reasoning.'
+        });
+      }
+
+      if (tips.length === 0) {
+        tips.push({
+          severity: 'none',
+          title: 'No major waste detected',
+          desc: 'Your usage patterns look efficient. Keep an eye on cache hit rates and model selection as your usage grows.'
+        });
+      }
+
+      const severityColors = {
+        high: 'border-red-500/20 bg-red-500/5',
+        medium: 'border-warning/20 bg-warning/5',
+        low: 'border-primary/20 bg-primary/5',
+        none: 'border-success/20 bg-success/5'
+      };
+      const severityIcons = {
+        high: 'text-red-400',
+        medium: 'text-warning',
+        low: 'text-primary-light',
+        none: 'text-success'
+      };
+
+      for (const tip of tips) {
+        wasteTips.innerHTML += `
+          <div class="p-4 rounded-xl border ${severityColors[tip.severity]}">
+            <p class="font-semibold flex items-center gap-2">
+              <svg class="w-4 h-4 ${severityIcons[tip.severity]}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              ${tip.title}
+            </p>
+            <p class="text-text-muted text-sm mt-1">${tip.desc}</p>
+          </div>
+        `;
+      }
+
+      // Show results, update upload section
+      document.getElementById('results').classList.remove('hidden');
+      document.getElementById('upload-section').innerHTML = `
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold">Analysis complete</h2>
+            <p class="text-text-muted text-sm">${fileCount} file(s) analyzed, ${entries.length} entries processed</p>
+          </div>
+          <button onclick="window.location.reload()" class="btn-secondary !py-2 !px-4 !text-sm">Analyze more files</button>
+        </div>
+      `;
+
+      // GA4 tracking
+      if (typeof gtag === 'function') {
+        gtag('event', 'costpilot_analyze', {
+          'event_category': 'engagement',
+          'event_label': 'files_analyzed',
+          'value': fileCount
+        });
+      }
+    }
+  </script>
+</Layout>
