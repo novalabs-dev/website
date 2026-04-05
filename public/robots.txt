@@ -2,3 +2,6 @@ User-agent: *
 Allow: /
 
 Sitemap: https://nova-labs.dev/sitemap-index.xml
+
+# AI/LLM discovery
+Llms-txt: https://nova-labs.dev/llms.txt

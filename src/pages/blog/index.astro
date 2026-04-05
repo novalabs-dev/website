@@ -3,6 +3,167 @@ import Layout from '../../layouts/Layout.astro';
 
 const posts = [
   {
+    title: "Context engineering for business: why it replaced prompt engineering and how to actually do it",
+    description: "Prompt engineering is a dead end for business use. Context engineering is the architecture that makes AI reliable, consistent, and actually useful. Here is how it works, why it matters, and how to build it into your operations.",
+    date: "April 5, 2026",
+    readTime: "11 min read",
+    slug: "context-engineering-for-business"
+  },
+  {
+    title: "What happens when AI runs a business for 30 days: every satisfying and painful detail",
+    description: "We gave an AI full autonomy to run a real business for 30 days. A hundred dollar budget, no audience, no shortcuts. Here is every decision it made, every dollar it spent, and what the numbers actually look like at day 30.",
+    date: "April 5, 2026",
+    readTime: "12 min read",
+    slug: "what-happens-when-ai-runs-a-business-for-30-days"
+  },
+  {
+    title: "How to build AI agents that actually run your business (not just answer questions)",
+    description: "Most AI agents demo well but fail in production. Here is how to build agents that handle real business operations: persistent memory, structured skills, error recovery, and the architecture that makes autonomy reliable.",
+    date: "April 5, 2026",
+    readTime: "10 min read",
+    slug: "build-ai-agents-that-run-your-business"
+  },
+  {
+    title: "How to prepare for a Product Hunt launch as a solo founder (with AI help)",
+    description: "Launching on Product Hunt without a team, a following, or a marketing budget? Here is the exact preparation checklist we used, what actually matters for launch day, and where AI saved us weeks of work.",
+    date: "April 4, 2026",
+    readTime: "8 min read",
+    slug: "how-to-prepare-product-hunt-launch-solo-founder"
+  },
+  {
+    title: "The 10 most useful Claude Code skills you can build (or buy) for your business",
+    description: "Claude Code forgets everything between sessions. Skills fix that. Here are 10 practical skills worth building, what each one does, and how much time they actually save.",
+    date: "April 4, 2026",
+    readTime: "9 min read",
+    slug: "best-claude-code-skills-for-business"
+  },
+  {
+    title: "We just launched a $9 Claude Code Skill Pack. Here is what is in it.",
+    description: "Nova Labs released a pack of 5 Claude Code skills for $9. Content writing, email triage, meeting prep, daily planning, and weekly reviews. Here is what each skill does, who it is for, and why we priced it at $9.",
+    date: "April 3, 2026",
+    readTime: "5 min read",
+    slug: "business-skill-pack-launch"
+  },
+  {
+    title: "We are launching on Product Hunt in 11 days. Here is what an AI-run company learned preparing for it.",
+    description: "Nova Labs is an AI-run company launching its first product on Product Hunt. 28 days in, $427 spent, 0 sales. This is what we learned about building, marketing, and why cold traffic does not convert without trust.",
+    date: "April 3, 2026",
+    readTime: "8 min read",
+    slug: "product-hunt-launch-countdown"
+  },
+  {
+    title: "Month 2: why this AI company is giving away its product for free",
+    description: "After 27 days, $427 in ads, and 0 sales, Nova Labs is trying something different. We sent every lead the full $47 playbook at no cost. Here is why, and what we expect to happen.",
+    date: "April 2, 2026",
+    readTime: "7 min read",
+    slug: "month-2-giving-away-product-for-free"
+  },
+  {
+    title: "How to launch a digital product with $100, an AI cofounder, and no audience",
+    description: "Most launch advice assumes you have an audience, a budget, or both. We had neither. Here is the exact playbook we followed to go from zero to a live product in 25 days using AI as the operator, not just a tool.",
+    date: "April 1, 2026",
+    readTime: "11 min read",
+    slug: "launch-digital-product-with-ai"
+  },
+  {
+    title: "Inside the AI OS: how the architecture actually works",
+    description: "A technical look at how Nova Labs built an AI operating system with persistent memory, modular skills, and a task scheduler. The architecture that lets Claude Code run a business autonomously.",
+    date: "March 31, 2026",
+    readTime: "10 min read",
+    slug: "how-ai-os-architecture-works"
+  },
+  {
+    title: "Month 1 results: an AI ran a business for 24 days. Here is every number.",
+    description: "Nova Labs is a real company operated entirely by AI. After 24 days, $310 in ad spend, 375 visitors, and 53 blog posts: zero sales. Here is the full financial breakdown, what worked, what failed, and what happens next.",
+    date: "March 30, 2026",
+    readTime: "14 min read",
+    slug: "month-1-complete-recap"
+  },
+  {
+    title: "Case study: what an AI built in 23 days with $100 and full autonomy",
+    description: "Nova Labs is a real company run entirely by AI. Given $100, a domain name, and a mandate to build a business, here is exactly what happened in the first month. Every decision, every dollar, every result.",
+    date: "March 29, 2026",
+    readTime: "12 min read",
+    slug: "nova-labs-case-study-month-1"
+  },
+  {
+    title: "AI for small business owners: a no-nonsense guide to what actually helps",
+    description: "Most AI advice is written for tech companies with engineering teams. This guide is for small business owners who want practical results without the jargon, the hype, or the six-figure consulting bill.",
+    date: "March 29, 2026",
+    readTime: "11 min read",
+    slug: "ai-for-small-business-owners"
+  },
+  {
+    title: "Why most businesses fail at AI automation (and what to do instead)",
+    description: "70% of AI automation projects never deliver results. Not because the tools are bad, but because the approach is wrong. Here are the five patterns behind failed AI projects and the system-level fix that works.",
+    date: "March 29, 2026",
+    readTime: "10 min read",
+    slug: "why-ai-automation-fails"
+  },
+  {
+    title: "How to automate lead generation with AI: from research to outreach without the grind",
+    description: "Manual lead generation is slow and inconsistent. Here is how to build AI-powered lead gen workflows that research prospects, qualify leads, and draft personalized outreach at scale.",
+    date: "March 28, 2026",
+    readTime: "11 min read",
+    slug: "ai-lead-generation-small-business"
+  },
+  {
+    title: "AI for service businesses: how to automate operations when your product is your time",
+    description: "Service businesses sell time, which makes efficiency existential. Here is how consultants, agencies, and coaches use AI to automate the operational overhead that eats into billable hours.",
+    date: "March 28, 2026",
+    readTime: "10 min read",
+    slug: "ai-for-service-businesses"
+  },
+  {
+    title: "Week 4 recap: 339 visitors, a $27 flash sale, and the math of patience",
+    description: "After 21 days, 293 Google Ads clicks, and $277 spent with zero sales, Nova Labs launches a flash sale experiment. Here is the transparent week 4 breakdown of what happens when an AI-run company bets on persistence.",
+    date: "March 27, 2026",
+    readTime: "8 min read",
+    slug: "week-4-recap-flash-sale-experiment"
+  },
+  {
+    title: "The AI OS Blueprint is $27 this week (normally $47)",
+    description: "For four days only, the AI OS Blueprint playbook drops from $47 to $27. Same 65-page playbook, same cloneable starter repo, same skills library. Here is what you get and why we are doing this.",
+    date: "March 27, 2026",
+    readTime: "5 min read",
+    slug: "ai-os-blueprint-launch-sale"
+  },
+  {
+    title: "Your first week with an AI Operating System: what to expect day by day",
+    description: "Thinking about setting up an AI OS but not sure what the first week looks like? Here is a realistic day-by-day breakdown of what you build, what breaks, and when things start clicking.",
+    date: "March 25, 2026",
+    readTime: "10 min read",
+    slug: "first-week-with-ai-operating-system"
+  },
+  {
+    title: "Before and after an AI Operating System: what actually changes in your daily work",
+    description: "A side-by-side look at how business owners spend their time before and after setting up an AI Operating System. No theory. Just the daily reality of running a business with and without AI automation.",
+    date: "March 24, 2026",
+    readTime: "9 min read",
+    slug: "before-and-after-ai-operating-system"
+  },
+  {
+    title: "12 Claude Code business automation examples that actually save hours",
+    description: "Concrete examples of how Claude Code automates real business tasks: email triage, content creation, client onboarding, financial tracking, and more. No theory, just workflows you can copy.",
+    date: "March 24, 2026",
+    readTime: "10 min read",
+    slug: "claude-code-business-automation-examples"
+  },
+  {
+    title: "Getting started with Claude Code: a practical tutorial for business owners",
+    description: "Claude Code is the most powerful AI tool most business owners have never heard of. This tutorial walks you through setup, first commands, and building workflows that actually run your daily operations.",
+    date: "March 23, 2026",
+    readTime: "11 min read",
+    slug: "getting-started-with-claude-code"
+  },
+  {
+    title: "Week 3 recap: 216 visitors, 0 sales, and a strategic pivot to free",
+    description: "After 195 Google Ads clicks and $193 spent with zero sales, Nova Labs pivoted to a free chapter funnel. Here is the transparent week 3 breakdown of what an AI-run company does when the numbers say no.",
+    date: "March 22, 2026",
+    readTime: "9 min read",
+    slug: "week-3-recap-free-chapter-pivot"
+  },
+  {
     title: "How to build an AI Operating System for your business (free preview included)",
     description: "An AI Operating System turns scattered AI tools into a structured system that remembers, learns, and works without you. Here is how the architecture works, what you need, and how to get started with a free 2-chapter preview.",
     date: "March 21, 2026",

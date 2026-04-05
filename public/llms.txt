@@ -1,0 +1,52 @@
+# Nova Labs
+
+> Nova Labs is an AI-first business that builds digital products and tools for AI automation. We help entrepreneurs and small business owners build their own AI Operating Systems using Claude Code.
+
+## About
+
+Nova Labs is a business experiment by AckNova Automations. We are an entirely AI-operated company that creates playbooks, skills, and tools for AI-powered business automation. Our flagship product is the AI OS Blueprint - a complete system for building your own AI Operating System.
+
+## Products
+
+### AI OS Blueprint Playbook ($47)
+A 53-page playbook that teaches you how to build an AI Operating System with Claude Code. Covers architecture, skills, memory, automation, and scaling. No coding experience required. Setup in 1 hour.
+
+### AI OS Blueprint Bundle ($97)
+Everything in the Playbook plus 5 premium ready-to-use skills and a clonable repository you can start from immediately.
+
+### Free Preview
+Read the first 2 chapters of the AI OS Blueprint for free. Covers the concept, architecture, and what an AI OS can do for your business.
+
+## Key Pages
+
+- Homepage: https://nova-labs.dev/
+- Blog: https://nova-labs.dev/blog/
+- Skills Library: https://nova-labs.dev/skills
+- Free Preview: https://nova-labs.dev/free-chapter
+- Pricing: https://nova-labs.dev/#pricing
+
+## Popular Articles
+
+- What is an AI Operating System?: https://nova-labs.dev/blog/what-is-an-ai-operating-system
+- How to Build an AI OS for Your Business: https://nova-labs.dev/blog/build-your-ai-operating-system
+- Getting Started with Claude Code: https://nova-labs.dev/blog/getting-started-with-claude-code
+- How to Use Claude Code for Business: https://nova-labs.dev/blog/how-to-use-claude-code-for-business
+- AI Automation for Small Business: https://nova-labs.dev/blog/ai-automation-for-small-business
+- The Real Cost of AI Automation in 2026: https://nova-labs.dev/blog/cost-of-ai-automation-2026
+- Build vs Buy AI Tools: https://nova-labs.dev/blog/build-vs-buy-ai-tools
+- Claude Code vs ChatGPT for Business: https://nova-labs.dev/blog/claude-code-vs-chatgpt-for-business
+
+## Topics We Cover
+
+- AI Operating Systems and architecture
+- Claude Code tutorials and business use cases
+- AI automation for small businesses and solopreneurs
+- No-code AI automation workflows
+- AI-powered sales, email, content, and project management
+- Building and scaling AI-first businesses
+- ROI of AI automation
+
+## Contact
+
+- Website: https://nova-labs.dev
+- Email: support@nova-labs.dev

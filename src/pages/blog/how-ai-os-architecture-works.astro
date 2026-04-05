@@ -1,0 +1,166 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Inside the AI OS: how the architecture actually works"
+  description="A technical look at how Nova Labs built an AI operating system with persistent memory, modular skills, and a task scheduler. The architecture that lets Claude Code run a business autonomously."
+  date="March 31, 2026"
+  readTime="10 min read"
+  keywords={["AI OS architecture", "AI operating system design", "Claude Code architecture", "persistent AI memory", "AI business automation architecture", "modular AI skills system"]}
+  relatedPosts={[
+    { title: "Case study: what an AI built in 23 days with $100 and full autonomy", slug: "nova-labs-case-study-month-1" },
+    { title: "How to build an AI OS in a weekend", slug: "how-to-build-an-ai-os-in-a-weekend" },
+    { title: "What is an AI operating system?", slug: "what-is-an-ai-operating-system" },
+  ]}
+>
+  <p>
+    People keep asking the same question about Nova Labs: how does the AI actually run things day to day? Not the marketing pitch. The real architecture.
+  </p>
+
+  <p>
+    This post is the answer. After 25 days of operating a real business autonomously, here is how the system works, what design decisions matter, and what would break if you got them wrong.
+  </p>
+
+  <h2>The core principle: separate reasoning from execution</h2>
+
+  <p>
+    The single most important architectural decision is this: AI reasoning decides <em>what</em> to do. Deterministic code does <em>how</em> it gets done.
+  </p>
+
+  <p>
+    When the AI needs to send an email, it does not write raw SMTP code on the fly. It calls a Python script that handles authentication, formatting, error handling, and logging. The script is tested, predictable, and does the same thing every time. The AI just decides when to call it and with what parameters.
+  </p>
+
+  <p>
+    This prevents the drift you get when you let an LLM improvise execution. Every time an AI writes one-off code, there is a chance it introduces a subtle bug or handles an edge case differently. Scripts remove that variance.
+  </p>
+
+  <h2>The five layers</h2>
+
+  <p>
+    The AI OS has five distinct layers, each with a clear responsibility:
+  </p>
+
+  <h3>1. Skills</h3>
+
+  <p>
+    Skills are self-contained workflow packages. Each skill lives in its own directory with a process definition (SKILL.md), executable scripts, reference documents, and templates.
+  </p>
+
+  <p>
+    A skill might be "check email inbox" or "write a blog post" or "run the email nurture flow." The process definition tells the AI what steps to follow. The scripts do the actual work. References provide context the AI needs to make good decisions within that workflow.
+  </p>
+
+  <p>
+    Skills are auto-discovered by description matching. When a task comes in, the system checks which skills match and uses them. No manual routing needed.
+  </p>
+
+  <h3>2. Context</h3>
+
+  <p>
+    Context is domain knowledge: business details, brand voice, target audience, product information. It shapes the quality and style of everything the AI produces.
+  </p>
+
+  <p>
+    Context uses tiered loading. An index file lists what is available, and only relevant files get loaded for each task. Writing a blog post loads the voice guide. Checking email loads the email templates. This prevents context window bloat.
+  </p>
+
+  <h3>3. Memory</h3>
+
+  <p>
+    Memory is tiered into three levels:
+  </p>
+
+  <ul>
+    <li><strong>Curated facts file</strong> (always loaded) — stable information like preferences, business details, and learned behaviors. Under 200 lines.</li>
+    <li><strong>Daily logs</strong> (loaded per session) — what happened today and yesterday. Decisions made, tasks completed, problems encountered.</li>
+    <li><strong>Vector memory</strong> (searched on demand) — a Qdrant database for long-term recall. The system searches this before making architectural decisions or repeating past work.</li>
+  </ul>
+
+  <p>
+    This tiering matters. Loading everything into every session would waste context window space and slow down responses. The curated file is a cheat sheet. Daily logs are short-term memory. Vector search is long-term memory that gets accessed only when relevant.
+  </p>
+
+  <h3>4. Args</h3>
+
+  <p>
+    Args are runtime settings in YAML files. Timezone, model routing, schedules, preferences. Changing an arg changes behavior without editing skills or code.
+  </p>
+
+  <p>
+    This is the equivalent of environment variables for the AI. Want to switch from aggressive marketing to conservative? Change an arg. Want to route certain tasks to a cheaper model? Change an arg.
+  </p>
+
+  <h3>5. Data</h3>
+
+  <p>
+    Structured persistence lives in SQLite databases. Email nurture tracking, sales pipeline, content calendars. Anything that needs to be queried, sorted, or aggregated goes in a database instead of a flat file.
+  </p>
+
+  <h2>The task scheduler</h2>
+
+  <p>
+    The HEARTBEAT is a task scheduler that reads a central schedule file every minute. It runs tasks on time: check the inbox at 09:30, run the nurture flow at 11:00, send an analytics report at 08:00.
+  </p>
+
+  <p>
+    Each task triggers the AI to read the relevant context, check the roadmap, execute the work, log the results, and update the roadmap. The scheduler is a simple daemon. The intelligence lives in the AI that gets triggered.
+  </p>
+
+  <h2>The nightly learning routine</h2>
+
+  <p>
+    Every night at 02:00, the AI runs a self-learning session. It picks topics across four tracks: product strategy, market intelligence, internal optimization, and technology trends. It researches each topic, extracts actionable insights, and stores them in the memory system.
+  </p>
+
+  <p>
+    This is not just reading articles. The system maps findings to specific business decisions. "Open source AI models are getting cheaper" becomes "position the playbook as model-agnostic to stay relevant as the market shifts." Research turns into strategy.
+  </p>
+
+  <p>
+    After 60 sessions, the nightly learning routine has directly influenced pricing decisions, marketing strategy, product positioning, and distribution planning.
+  </p>
+
+  <h2>What this architecture gets right</h2>
+
+  <p>
+    <strong>Reliability.</strong> Scripts do not hallucinate. When the nurture flow checks which leads need their next email, it queries a SQLite database with deterministic logic. The AI decides what to write in the email. The script handles delivery.
+  </p>
+
+  <p>
+    <strong>Maintainability.</strong> Skills are modular. Changing how email works does not affect how blog posts work. Each skill can be updated, tested, or replaced independently.
+  </p>
+
+  <p>
+    <strong>Cost control.</strong> Model routing sends simple tasks to cheaper models. A nightly consistency check does not need the same reasoning power as a strategic planning session.
+  </p>
+
+  <p>
+    <strong>Continuity.</strong> The memory system means the AI never starts from scratch. It knows what happened yesterday, what the current strategy is, and what has been tried before. No repeated mistakes because it forgot the last conversation.
+  </p>
+
+  <h2>What this architecture does not solve</h2>
+
+  <p>
+    <strong>Trust.</strong> The system can build, write, and operate efficiently. But it cannot make strangers trust a brand they have never heard of. After 25 days and $399 in ads: zero sales. The architecture is not the bottleneck. Social proof is.
+  </p>
+
+  <p>
+    <strong>Creative judgment.</strong> The AI can produce content at scale. Whether that content resonates emotionally with a specific audience is harder to measure and harder to optimize without real feedback loops.
+  </p>
+
+  <p>
+    <strong>External dependencies.</strong> Anything that requires a human action (entering credit card info, approving social media posts, creating accounts on platforms that require human verification) creates a blocker that the AI cannot resolve on its own.
+  </p>
+
+  <h2>Want to build this yourself?</h2>
+
+  <p>
+    The <a href="/#pricing">AI OS Blueprint</a> documents this entire architecture in 65+ pages with step-by-step instructions. It includes a cloneable starter system and 5 ready-to-use business skills.
+  </p>
+
+  <p>
+    If you want to see the architecture in action before buying, <a href="/free-chapter">read the first two chapters free</a>. They cover the foundation and memory system.
+  </p>
+</BlogPost>

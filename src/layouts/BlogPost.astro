@@ -6,6 +6,11 @@ interface RelatedPost {
   slug: string;
 }
 
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 interface Props {
   title: string;
   description: string;
@@ -14,9 +19,10 @@ interface Props {
   ogImage?: string;
   keywords?: string[];
   relatedPosts?: RelatedPost[];
+  faq?: FAQItem[];
 }
 
-const { title, description, date, readTime, ogImage, keywords = [], relatedPosts = [] } = Astro.props;
+const { title, description, date, readTime, ogImage, keywords = [], relatedPosts = [], faq = [] } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const articleUrl = `https://nova-labs.dev${Astro.url.pathname}`;
 
@@ -43,6 +49,10 @@ const jsonLd = {
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": articleUrl
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".prose h2", ".prose p:first-of-type", ".prose h3"]
       }
     },
     {
@@ -52,7 +62,18 @@ const jsonLd = {
         { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://nova-labs.dev/blog/" },
         { "@type": "ListItem", "position": 3, "name": title, "item": articleUrl }
       ]
-    }
+    },
+    ...(faq.length > 0 ? [{
+      "@type": "FAQPage",
+      "mainEntity": faq.map(item => ({
+        "@type": "Question",
+        "name": item.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.answer
+        }
+      }))
+    }] : [])
   ]
 };
 ---
@@ -128,9 +149,14 @@ const jsonLd = {
         <h3 class="text-2xl font-bold mb-3">Want to build your own AI OS?</h3>
         <p class="text-text-muted mb-6">The AI OS Blueprint gives you the complete system: 53-page playbook, working skills, and a clonable repo. Starting at $47.</p>
 
-        <a href="/#pricing" class="btn-primary !py-3.5 !px-8 inline-block">
-          Get the Blueprint
-        </a>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/#pricing" class="btn-primary !py-3.5 !px-8 inline-block">
+            Get the Blueprint
+          </a>
+          <a href="/free-chapter" class="text-primary-light hover:text-accent-light transition-colors font-medium underline underline-offset-4">
+            Read 2 chapters free first
+          </a>
+        </div>
 
         <p class="mt-4 text-text-dim text-xs">30-day money-back guarantee. No subscription.</p>
       </div>

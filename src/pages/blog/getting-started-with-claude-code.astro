@@ -1,0 +1,235 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Getting started with Claude Code: a practical tutorial for business owners"
+  description="Claude Code is the most powerful AI tool most business owners have never heard of. This tutorial walks you through setup, first commands, and building workflows that actually run your daily operations."
+  date="March 23, 2026"
+  readTime="11 min read"
+  keywords={["getting started with Claude Code", "Claude Code tutorial", "Claude Code beginner guide", "Claude Code for business", "Claude Code setup", "how to use Claude Code"]}
+  relatedPosts={[
+    { title: "How to use Claude Code for business: the complete guide", slug: "how-to-use-claude-code-for-business" },
+    { title: "Claude Code vs ChatGPT for business automation", slug: "claude-code-vs-chatgpt-for-business" },
+    { title: "How to build an AI Operating System for your business", slug: "build-your-ai-operating-system" },
+  ]}
+>
+  <p>
+    You have probably heard about Claude Code by now. Anthropic's command-line AI tool that reads your files, writes code, manages projects, and runs shell commands. Developers love it. But here is the thing most people miss: Claude Code is not just a coding tool. It is the foundation for building an AI system that runs your entire business.
+  </p>
+
+  <p>
+    This is not another "top 10 AI tools" list. This is a step-by-step walkthrough of how to install Claude Code, give it your first task, and start building toward a system that handles your content, email, planning, and client management without you babysitting every prompt.
+  </p>
+
+  <h2>What Claude Code actually is (and why it matters for non-developers)</h2>
+
+  <p>
+    Claude Code is a terminal-based AI assistant made by Anthropic. Unlike ChatGPT or the regular Claude chat interface, it does not live in a browser tab. It runs in your terminal, which means it can:
+  </p>
+
+  <ul>
+    <li>Read and write files on your computer</li>
+    <li>Run commands and scripts</li>
+    <li>Remember context across sessions through files it creates</li>
+    <li>Follow complex multi-step instructions</li>
+    <li>Work with your actual business data, not hypothetical examples</li>
+  </ul>
+
+  <p>
+    The browser version of Claude is like texting someone for help. Claude Code is like hiring that person and giving them a desk in your office. They can see your files, access your tools, and get things done without you copy-pasting everything back and forth.
+  </p>
+
+  <h2>What you need before you start</h2>
+
+  <p>
+    The setup requires three things:
+  </p>
+
+  <ul>
+    <li><strong>A Mac, Linux, or Windows machine with WSL</strong> (most modern laptops work fine)</li>
+    <li><strong>Node.js installed</strong> (version 18 or higher)</li>
+    <li><strong>A Claude subscription</strong> (Pro at $20/month or Max at $100/month)</li>
+  </ul>
+
+  <p>
+    If you already have Node.js, the actual installation takes about 2 minutes. If you need to install Node.js first, add another 5 minutes.
+  </p>
+
+  <h2>Step 1: Install Claude Code</h2>
+
+  <p>
+    Open your terminal (on Mac, search for "Terminal" in Spotlight). Then run:
+  </p>
+
+  <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+
+  <p>
+    That is it. One command. Now you can start Claude Code from any directory by typing:
+  </p>
+
+  <pre><code>claude</code></pre>
+
+  <p>
+    The first time you run it, Claude Code will ask you to log in with your Anthropic account. Follow the browser prompt, authorize, and you are connected.
+  </p>
+
+  <h2>Step 2: Give it your first real task</h2>
+
+  <p>
+    Here is where most tutorials go wrong. They show you how to write a Python script or fix a bug. That is fine if you are a developer. But if you are a business owner, your first task should be something you actually need done.
+  </p>
+
+  <p>
+    Create a folder for your business:
+  </p>
+
+  <pre><code>mkdir my-business && cd my-business
+claude</code></pre>
+
+  <p>
+    Now try something like this:
+  </p>
+
+  <blockquote>
+    "Create a file called ABOUT.md that describes my business. I run a marketing agency called Bright Ideas. We have 3 employees and focus on social media management for restaurants. Our main challenge is that content creation takes too much time."
+  </blockquote>
+
+  <p>
+    Claude Code will create the file, and now it knows about your business. Every time you start a new session in this folder, it can read that file and pick up where you left off.
+  </p>
+
+  <h2>Step 3: Build your first workflow</h2>
+
+  <p>
+    A workflow in Claude Code is just a set of instructions saved in a file. Instead of typing "write me a LinkedIn post about X" every time, you create a file that tells Claude Code how you want your posts written, in your voice, with your formatting preferences, targeting your audience.
+  </p>
+
+  <p>
+    Try this prompt:
+  </p>
+
+  <blockquote>
+    "Create a file called content-guide.md with instructions for writing LinkedIn posts. The tone should be casual but professional. Short paragraphs, max 3 sentences each. Always start with a hook question or bold statement. End with a call to action. Target audience: restaurant owners who are too busy to think about marketing."
+  </blockquote>
+
+  <p>
+    Now every time you ask Claude Code to write a post, you can reference this guide:
+  </p>
+
+  <blockquote>
+    "Read content-guide.md and write a LinkedIn post about why restaurants should post 3 times a week on Instagram."
+  </blockquote>
+
+  <p>
+    The post will follow your rules. Every time. Without you re-explaining everything.
+  </p>
+
+  <h2>Step 4: Add memory</h2>
+
+  <p>
+    The real power of Claude Code is persistent context. Unlike a chat window that forgets everything when you close the tab, Claude Code works with files. Those files stay on your computer. That means your AI remembers.
+  </p>
+
+  <p>
+    Create a CLAUDE.md file in your project root. This is a special file that Claude Code reads automatically at the start of every session:
+  </p>
+
+  <blockquote>
+    "Create a CLAUDE.md file that contains: my business name, my target audience, my writing style preferences, and the key services I offer. This should serve as the instruction manual for any AI assistant working in this folder."
+  </blockquote>
+
+  <p>
+    From now on, every conversation in this folder starts with Claude Code already knowing who you are, what you do, and how you like things done.
+  </p>
+
+  <h2>Step 5: Start automating real tasks</h2>
+
+  <p>
+    Once you have context files in place, Claude Code becomes dramatically more useful. Here are five tasks most business owners can hand off immediately:
+  </p>
+
+  <p>
+    <strong>Weekly content planning.</strong> "Read my content guide and create a content plan for next week. 3 LinkedIn posts, 2 Instagram captions, and 1 email newsletter topic. Based on what my audience cares about."
+  </p>
+
+  <p>
+    <strong>Email drafting.</strong> "Here is an email from a potential client asking about pricing. Draft a response that explains our packages, addresses their specific questions, and ends with a clear next step."
+  </p>
+
+  <p>
+    <strong>Meeting preparation.</strong> "I have a call with a restaurant chain tomorrow. Research what they have been posting on social media recently and prepare 5 talking points about how we could help them."
+  </p>
+
+  <p>
+    <strong>Proposal writing.</strong> "Create a proposal for a 3-month social media management package for a mid-size restaurant. Include deliverables, timeline, pricing, and terms."
+  </p>
+
+  <p>
+    <strong>Weekly review.</strong> "Read through everything we worked on this week and create a summary: what got done, what is pending, and what should be the priority for next week."
+  </p>
+
+  <h2>The difference between this and ChatGPT</h2>
+
+  <p>
+    People ask this constantly, so here is the honest answer. ChatGPT is great for quick questions and one-off tasks. Claude Code is for building systems.
+  </p>
+
+  <p>
+    With ChatGPT, you start every conversation from scratch. You paste in context, explain what you want, get a response, copy it somewhere. If you want a follow-up tomorrow, you explain everything again.
+  </p>
+
+  <p>
+    With Claude Code, your context lives in files. Your preferences are saved. Your workflows are documented. Every session builds on the last one. After a week, your AI knows more about your business than most new employees would after a month.
+  </p>
+
+  <p>
+    The trade-off is that Claude Code runs in a terminal. It is not as visually friendly as a chat interface. But once you get past that 10-minute learning curve, the productivity difference is massive.
+  </p>
+
+  <h2>Where to go from here</h2>
+
+  <p>
+    What I have described is the starting point. A folder with some context files and manual prompts. That already puts you ahead of 95% of people using AI for business.
+  </p>
+
+  <p>
+    The next level is building what is called an AI Operating System: a structured set of skills, context, and memory that turns Claude Code from a smart assistant into an autonomous system. Skills are reusable workflows that Claude Code can execute on command. Memory means it tracks decisions, preferences, and history across weeks and months.
+  </p>
+
+  <p>
+    We built exactly this at Nova Labs. Our AI writes blog posts, manages email, tracks sales, runs analytics, and plans content. All autonomously. The architecture behind it is documented in our <a href="/free-chapter">free 2-chapter preview</a> of the AI OS Blueprint.
+  </p>
+
+  <p>
+    If you just want to get started with the basics, everything in this post is enough to save you hours per week. If you want to build the full system, <a href="/free-chapter">grab the free preview</a> and see if the approach makes sense for your business.
+  </p>
+
+  <h2>Common mistakes to avoid</h2>
+
+  <p>
+    <strong>Do not try to automate everything on day one.</strong> Start with one task you do every week. Get that working. Then add another. Building too fast leads to a mess of half-finished workflows.
+  </p>
+
+  <p>
+    <strong>Do not skip the context files.</strong> The difference between a mediocre AI response and a great one is almost always context. Spend 15 minutes writing down who your customers are, how you sound, and what you care about. It pays off every single session.
+  </p>
+
+  <p>
+    <strong>Do not treat Claude Code like a search engine.</strong> It is not Google. It is a worker. Give it tasks, not questions. "Write a follow-up email to the client who asked about pricing" is better than "What should I say in a follow-up email?"
+  </p>
+
+  <p>
+    <strong>Do not forget to review output.</strong> Claude Code is fast and capable, but it is not perfect. Review what it produces, especially in the first week while it is still learning your preferences. As your context files get better, the output gets better too.
+  </p>
+
+  <h2>The bottom line</h2>
+
+  <p>
+    Claude Code is probably the most underrated business tool available right now. Most people think it is for developers. It is not. It is for anyone who wants an AI that actually knows their business and gets better over time.
+  </p>
+
+  <p>
+    Install it. Give it your business context. Start with one weekly task. Within a week, you will wonder how you worked without it.
+  </p>
+</BlogPost>

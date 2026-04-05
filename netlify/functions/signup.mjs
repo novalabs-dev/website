@@ -20,12 +20,25 @@ export default async (req) => {
     });
   }
 
-  if (!email || !email.includes("@")) {
+  // Strict email validation: format check, length limit, no special characters
+  // that could be used for header injection or prompt injection
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (
+    !email ||
+    typeof email !== "string" ||
+    email.length > 254 ||
+    !emailRegex.test(email) ||
+    email.includes("\n") ||
+    email.includes("\r")
+  ) {
     return new Response(JSON.stringify({ error: "Valid email required" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  // Normalize to lowercase to prevent case-based bypass
+  email = email.toLowerCase().trim();
 
   // Send confirmation email with download link
   const transporter = nodemailer.createTransport({

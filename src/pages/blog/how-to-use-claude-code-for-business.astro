@@ -13,6 +13,12 @@ import BlogPost from '../../layouts/BlogPost.astro';
     { title: "Claude Code vs ChatGPT for business automation", slug: "claude-code-vs-chatgpt-for-business" },
     { title: "How to build an AI OS in a weekend", slug: "how-to-build-an-ai-os-in-a-weekend" },
   ]}
+  faq={[
+    { question: "Is it safe to give Claude Code access to my files and email?", answer: "Claude Code runs locally on your machine. Your data does not go to a third-party server beyond the API calls to Anthropic for processing. You control exactly what files it can access and can set up guardrails that require your approval before any external action." },
+    { question: "Do I need to be technical to use Claude Code for business?", answer: "You need to be comfortable opening a terminal and running commands. You do not need to write code. Claude Code writes the code for you. The setup involves creating text files and running a few commands." },
+    { question: "What if Claude Code makes a mistake?", answer: "It will. The system is designed for that. Guardrails prevent the AI from taking destructive actions without your approval. Memory captures what went wrong so it does not repeat the mistake. Everything is file-based, so you can always review, undo, or adjust." },
+    { question: "How much does Claude Code cost for business use?", answer: "Claude Code requires a Claude Pro or Max subscription ($20-200/month depending on usage). The business automation setup itself costs nothing beyond that. No additional SaaS tools, no monthly fees, no per-seat pricing." },
+  ]}
 >
   <p>
     You have probably tried Claude Code. Maybe you used it to write a script, debug some code, or generate a document. It worked. Then you closed the terminal and moved on with your day.

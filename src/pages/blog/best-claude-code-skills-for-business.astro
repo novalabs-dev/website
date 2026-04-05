@@ -1,0 +1,209 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="The 10 most useful Claude Code skills you can build (or buy) for your business"
+  description="Claude Code forgets everything between sessions. Skills fix that. Here are 10 practical skills worth building, what each one does, and how much time they actually save."
+  date="April 4, 2026"
+  readTime="9 min read"
+  keywords={["claude code skills", "best claude code skills", "claude code automation", "claude code for business", "claude code skill pack"]}
+  relatedPosts={[
+    { title: "We just launched a $9 Claude Code Skill Pack. Here is what is in it.", slug: "business-skill-pack-launch" },
+    { title: "Getting started with Claude Code: a practical tutorial for business owners", slug: "getting-started-with-claude-code" },
+    { title: "12 Claude Code business automation examples that actually save hours", slug: "claude-code-business-automation-examples" },
+  ]}
+>
+  <p>
+    Every session with Claude Code starts cold. It does not remember your business, your clients, your voice, or the context you painstakingly explained last week. You either re-explain everything, or you accept that the output will be generic.
+  </p>
+
+  <p>
+    Skills solve this. A skill is a folder inside your Claude Code project that contains a process definition, context files, and optionally some scripts. When Claude picks up a task, it reads the skill and follows the process. Same setup, same quality, every time. No re-explaining.
+  </p>
+
+  <p>
+    Below are 10 skills worth building. Five are included in our <a href="/#pricing" class="text-primary-light hover:underline">Business Skill Pack</a>. Five you can build yourself. For all of them, I will explain what the skill does, what a typical task looks like, and roughly how much time it saves per week.
+  </p>
+
+  <h2>Skills you can get today</h2>
+
+  <p>
+    These five are part of the $9 Business Skill Pack we built for Nova Labs. They cover the most common time sinks for solo operators and small teams.
+  </p>
+
+  <h3>1. Content Writer</h3>
+
+  <p>
+    This skill writes in your voice, not Claude's default voice. It reads your voice guide, ICP file, and business context before drafting anything, so the output already matches your tone without manual editing.
+  </p>
+
+  <p>
+    A typical use: "Write a LinkedIn post about our new onboarding process." Without the skill, you spend 10 minutes prompting, 10 minutes editing, and still end up with something that sounds slightly off. With the skill, you get a first draft that reads like you wrote it. Most of the time it is publish-ready after one quick read.
+  </p>
+
+  <p>
+    Good for: anyone who produces written content regularly and wastes more time on tone corrections than on the actual ideas. Blog posts, emails, ad copy, LinkedIn posts, proposals. Time saved: 2 to 4 hours per week if you publish consistently.
+  </p>
+
+  <h3>2. Email Triage</h3>
+
+  <p>
+    Scans your inbox, groups messages by urgency and topic, and drafts short responses for the routine ones. The skill knows what "urgent" means for your business because you define it in the setup.
+  </p>
+
+  <p>
+    A typical session: you open it at 9am, it returns a prioritized list. Three things need your attention today. Eight can wait. Four already have draft responses ready for review. You spend 8 minutes instead of 35.
+  </p>
+
+  <p>
+    Good for: anyone who gets more than 30 emails per day and finds inbox management eating into focused work time. Time saved: 1 to 2 hours per day for heavy email users.
+  </p>
+
+  <h3>3. Meeting Prep</h3>
+
+  <p>
+    Give it a name, a company, or a meeting agenda. It builds a one-page briefing with relevant background, key talking points, and open questions. It pulls from your CRM notes, past interaction logs, and any public information it can find.
+  </p>
+
+  <p>
+    Example: you have a call with a potential client in 20 minutes. You run the meeting prep skill. It pulls up their website, your previous email exchange, and the context around why they reached out. You walk in knowing their situation, their possible objections, and what you want to get out of the call.
+  </p>
+
+  <p>
+    Good for: consultants, sales people, and anyone who takes frequent discovery or client calls. Time saved: 15 to 30 minutes per meeting, plus the confidence boost of being genuinely prepared.
+  </p>
+
+  <h3>4. Daily Planner</h3>
+
+  <p>
+    A morning briefing that looks at your task list, calendar events, and yesterday's log to surface your top three priorities for the day. It creates a daily log file automatically so you have a record of decisions and completed work without writing anything manually.
+  </p>
+
+  <p>
+    Practical example: it notices you have a 2pm call that needs 30 minutes of prep, three tasks that are overdue from yesterday, and a deadline tomorrow. It reorders your day accordingly and flags the conflict before you hit it yourself at 1:45pm.
+  </p>
+
+  <p>
+    Good for: solopreneurs and small team leads who juggle many tasks with no assistant. Time saved: the planning itself is maybe 10 minutes. The value is in not spending the first hour of your day figuring out what to do.
+  </p>
+
+  <h3>5. Weekly Review</h3>
+
+  <p>
+    Runs at the end of the week. It pulls from your daily logs, completed tasks, and any notes you made during the week, then writes a structured summary. It spots patterns you probably missed, like which types of tasks are eating your time or which goals are consistently slipping.
+  </p>
+
+  <p>
+    What it actually produces: a short report with what you accomplished, what carried over, where time went, and three priorities for the week ahead. Something you would normally skip because it takes an hour to do manually. With the skill, it takes five minutes to review.
+  </p>
+
+  <p>
+    Good for: anyone trying to build better working habits or manage a business without a management team. Time saved: 45 to 90 minutes of reflection that most people skip entirely.
+  </p>
+
+  <h2>Skills worth building yourself</h2>
+
+  <p>
+    These five require more setup because they depend heavily on your specific tools, data, and workflows. But the underlying structure is the same: a SKILL.md with the process, reference files with context, and optionally a script for the repetitive parts.
+  </p>
+
+  <h3>6. Client Onboarding</h3>
+
+  <p>
+    A step-by-step process for onboarding new clients consistently. The skill holds your checklist, your welcome email template, your contract terms, and your kickoff questionnaire. When you get a new client, you run the skill and it walks you through every step without you needing to remember what you forgot last time.
+  </p>
+
+  <p>
+    Concrete example: a new client signs. You trigger the skill with their name and project type. It generates the welcome email (in your voice), pre-fills the project folder structure, drafts the kickoff agenda, and reminds you to send the questionnaire. Nothing falls through the cracks.
+  </p>
+
+  <p>
+    Good for: consultants, agencies, or any service business that takes on new clients regularly. Even if onboarding only happens twice a month, the consistency alone is worth it.
+  </p>
+
+  <h3>7. Sales Pipeline</h3>
+
+  <p>
+    Tracks your active deals, surfaces the ones that have gone quiet, and drafts follow-up messages for leads that have not heard from you in a while. You define what "too long" means and what information matters for each stage.
+  </p>
+
+  <p>
+    What this looks like in practice: every Monday morning you run the skill. It tells you that lead A has not been contacted in 12 days and is probably cooling off, lead B is ready to move to proposal, and lead C needs a quick check-in. It drafts the follow-up messages. You edit and send.
+  </p>
+
+  <p>
+    Good for: anyone managing their own sales who does not use a full CRM or finds CRMs too heavy for their volume. Time saved depends on how many active leads you have, but avoiding a single dropped deal pays for the setup time many times over.
+  </p>
+
+  <h3>8. Research Brief</h3>
+
+  <p>
+    Structured deep-dive research on a topic, competitor, market, or idea. You define what you want to know, the skill defines how to structure the output, and Claude does the research and formats it into a usable document.
+  </p>
+
+  <p>
+    Example: you are considering entering a new market. You trigger the research brief skill with the topic and target audience. It returns a document with market size, key players, common objections, pricing landscape, and open questions to investigate further. Not a Wikipedia summary but a working document you can actually use.
+  </p>
+
+  <p>
+    Good for: founders, consultants, and content creators who do a lot of background research before writing, pitching, or deciding. Time saved: a research brief that takes 3 hours manually takes 30 to 45 minutes with the skill handling structure and first pass.
+  </p>
+
+  <h3>9. Invoice Tracker</h3>
+
+  <p>
+    Monitors outstanding invoices, flags overdue ones, and drafts polite payment reminders. The skill connects to your invoicing data (even if that is just a spreadsheet or a simple database) and knows your payment terms.
+  </p>
+
+  <p>
+    Real scenario: you have 11 active clients. Three invoices are past due. The skill notices, drafts a follow-up for each one based on the age of the invoice and the client relationship (a 3-day overdue reminder sounds different from a 30-day overdue reminder), and flags the oldest one for a phone call instead of an email.
+  </p>
+
+  <p>
+    Good for: freelancers and small service businesses where late payments are a real problem but you do not want to pay for accounting software to handle it. Setup takes a few hours but the cash flow benefit is immediate.
+  </p>
+
+  <h3>10. Social Media Scheduler</h3>
+
+  <p>
+    Writes and queues platform-specific posts based on your content calendar. It knows the difference between how you write on LinkedIn versus how you write on X, and it adjusts tone, length, and format accordingly. It can also repurpose a blog post or a completed project into three different posts.
+  </p>
+
+  <p>
+    Example: you finish a project for a client. You run the skill with a one-paragraph description of what you did. It produces a LinkedIn post for thought leadership, a shorter X post with a hook, and a brief case study snippet you can use later. Three pieces of content from one input, formatted correctly for each platform.
+  </p>
+
+  <p>
+    Good for: solopreneurs who know they should be posting consistently but keep deprioritizing it. Time saved: 1 to 3 hours per week, depending on your current posting frequency and how much editing your drafts normally need.
+  </p>
+
+  <h2>How to build your own</h2>
+
+  <p>
+    Every skill follows the same structure. A SKILL.md that defines the process, a <code>references/</code> folder for supporting context (voice guide, templates, examples), and optionally a <code>scripts/</code> folder for Python automation.
+  </p>
+
+  <p>
+    The SKILL.md is the most important piece. It tells Claude exactly what to do, in what order, with what inputs, and how to format the output. The better your SKILL.md, the less you need to prompt. Claude reads it before starting and follows it like a checklist.
+  </p>
+
+  <p>
+    If you want the full architecture explained with examples, the <a href="/free-chapter" class="text-primary-light hover:underline">free Quick Start Guide</a> covers skills, context files, and memory in detail. It is the same foundation the Business Skill Pack is built on.
+  </p>
+
+  <h2>Or skip the setup</h2>
+
+  <p>
+    Building skills takes time. If the five skills we covered above are what you need right now, the <a href="/#pricing" class="text-primary-light hover:underline">Business Skill Pack</a> is $9 one-time. You get the Content Writer, Email Triage, Meeting Prep, Daily Planner, and Weekly Review as ready-to-install folders with setup instructions included.
+  </p>
+
+  <p>
+    The pack is not a shortcut around understanding how skills work. But it gives you five working examples to learn from and use immediately, rather than starting from a blank folder and figuring it out as you go.
+  </p>
+
+  <p>
+    Either way, start with the <a href="/free-chapter" class="text-primary-light hover:underline">Quick Start Guide</a> if you have not already. It takes 20 minutes to read and answers most of the setup questions before you hit them.
+  </p>
+
+</BlogPost>
