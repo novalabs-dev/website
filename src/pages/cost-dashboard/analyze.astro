@@ -55,9 +55,18 @@ import Layout from '../../layouts/Layout.astro';
             <input type="file" id="file-input" multiple accept=".jsonl" class="hidden" />
           </div>
 
-          <p class="mt-4 text-text-dim text-xs">
-            Tip: Run <code class="bg-surface-light px-1.5 py-0.5 rounded">ls ~/.claude/projects/</code> in your terminal to find session files.
-          </p>
+          <div class="mt-5 p-4 rounded-xl bg-surface-light/40 border border-surface-lighter/50 text-left max-w-2xl mx-auto">
+            <p class="text-text text-xs font-semibold mb-2 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Can't find the <code class="bg-surface-light px-1 py-0.5 rounded text-[10px]">.claude</code> folder?
+            </p>
+            <ul class="text-text-dim text-xs space-y-1 list-none">
+              <li><span class="text-text-muted">macOS Finder:</span> press <kbd class="bg-surface-light px-1.5 py-0.5 rounded border border-surface-lighter text-[10px]">⌘</kbd> <kbd class="bg-surface-light px-1.5 py-0.5 rounded border border-surface-lighter text-[10px]">⇧</kbd> <kbd class="bg-surface-light px-1.5 py-0.5 rounded border border-surface-lighter text-[10px]">.</kbd> to toggle hidden files</li>
+              <li><span class="text-text-muted">Windows Explorer:</span> View → Show → Hidden items</li>
+              <li><span class="text-text-muted">Linux file managers:</span> press <kbd class="bg-surface-light px-1.5 py-0.5 rounded border border-surface-lighter text-[10px]">Ctrl</kbd> <kbd class="bg-surface-light px-1.5 py-0.5 rounded border border-surface-lighter text-[10px]">H</kbd></li>
+              <li><span class="text-text-muted">Terminal:</span> <code class="bg-surface-light px-1.5 py-0.5 rounded text-[10px]">open ~/.claude/projects/</code> (mac) or <code class="bg-surface-light px-1.5 py-0.5 rounded text-[10px]">ls ~/.claude/projects/</code></li>
+            </ul>
+          </div>
         </div>
       </div>
 
