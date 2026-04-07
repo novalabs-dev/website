@@ -1,0 +1,202 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to track and reduce your Claude Code costs (the complete guide)"
+  description="Claude Code bills by the token, and costs can spiral fast if you are not watching. Here is how to check your actual usage, understand what you are paying for, and five practical changes that cut spending without cutting capability."
+  date="April 5, 2026"
+  readTime="10 min read"
+  keywords={["claude code costs", "claude code token usage", "reduce claude code spending", "claude code cost tracker", "claude code pricing", "claude code billing"]}
+  relatedPosts={[
+    { title: "Getting started with Claude Code: a practical tutorial for business owners", slug: "getting-started-with-claude-code" },
+    { title: "Claude Code hooks explained: how to make your AI actually do what you tell it", slug: "claude-code-hooks-for-business" },
+    { title: "Context engineering for business: why it replaced prompt engineering and how to actually do it", slug: "context-engineering-for-business" },
+  ]}
+>
+  <p>
+    Claude Code does not have a built-in cost dashboard. There is no monthly summary email, no spending alert, no bar chart showing which sessions burned the most tokens. You find out what you spent when the bill arrives.
+  </p>
+
+  <p>
+    For light users this is fine. For anyone running Claude Code on real workflows, with scheduled tasks, large codebases, and long context windows, the bill can surprise you. This guide covers exactly how to find your usage data, what you are actually paying for, and five concrete changes that reduce costs without breaking the workflows you have built.
+  </p>
+
+  <h2>Why Claude Code costs spiral</h2>
+
+  <p>
+    Token costs seem small per request. The problem is volume and context size, not any single interaction.
+  </p>
+
+  <h3>Token drain from large contexts</h3>
+
+  <p>
+    Every time Claude reads a file, that file's contents go into the context window as input tokens. If you have a CLAUDE.md with 500 lines, a memory file, a skill definition, and two or three reference files, you might be sending 8,000 tokens of context before you even ask your question. Multiply that by 50 sessions per day on a scheduled workflow and the input token count compounds fast.
+  </p>
+
+  <h3>Cache misses</h3>
+
+  <p>
+    Claude's prompt caching can dramatically reduce costs on repeated context, but only when the cached portion is stable. If your context files change frequently, or if you are running short enough sessions that the cache expires between runs, you pay full input token prices on every call. Cache reads cost roughly 10x less than cache writes. A workflow that should cost $0.10 can cost $1.00 if you are constantly missing cache.
+  </p>
+
+  <h3>Output token inflation</h3>
+
+  <p>
+    Output tokens cost more than input tokens on most Claude models. If your prompts are open-ended ("write me a thorough analysis of..."), Claude will write thoroughly. Specific prompts with defined output constraints produce shorter, more useful responses and cost less. The quality often goes up too, because the model is not padding.
+  </p>
+
+  <h3>Agentic loops</h3>
+
+  <p>
+    When Claude runs multi-step tasks, each step in the loop is a new API call with a new context. A workflow that calls Claude ten times with 10,000 tokens each costs ten times more than one that calls it twice. Poorly structured skills that ask Claude to plan, then execute, then review, then rewrite each add cost without proportional value.
+  </p>
+
+  <h2>How to check your actual usage</h2>
+
+  <p>
+    There are three places to look, depending on how you are running Claude Code.
+  </p>
+
+  <h3>The JSONL files on your machine</h3>
+
+  <p>
+    Claude Code logs every conversation to local JSONL files. On macOS and Linux they live at <code>~/.claude/projects/</code>. Each project gets its own directory, and each conversation is a separate file.
+  </p>
+
+  <p>
+    Each entry in the JSONL includes the model used, the number of input tokens, output tokens, and cache read and write tokens. You can parse these files with any script. A simple Python script that sums <code>input_tokens</code>, <code>output_tokens</code>, <code>cache_creation_input_tokens</code>, and <code>cache_read_input_tokens</code> across all files gives you the full picture.
+  </p>
+
+  <p>
+    If you want to skip writing the script, the free <a href="/cost-dashboard/analyze" class="text-primary-light hover:underline">CostPilot analyzer</a> reads your local JSONL files and breaks down your spending by session, model, and project. You point it at your <code>~/.claude/projects/</code> folder and it does the rest.
+  </p>
+
+  <h3>The Anthropic Console</h3>
+
+  <p>
+    If you are on a paid API plan (not Claude Max), you can see usage in the <a href="https://console.anthropic.com" class="text-primary-light hover:underline" target="_blank" rel="noopener">Anthropic Console</a> under Usage. It shows daily token counts by model but does not break down by individual prompt or project. Useful for month-over-month comparisons, not for debugging a specific expensive workflow.
+  </p>
+
+  <h3>The Admin API</h3>
+
+  <p>
+    If you are running Claude Code on behalf of a team using the API, Anthropic's Admin API has a usage endpoint. You can query it programmatically to pull daily usage by workspace or API key. The endpoint returns token counts broken down by type, which is useful for building your own internal dashboards.
+  </p>
+
+  <h2>The pricing model, explained clearly</h2>
+
+  <p>
+    Claude Code uses Anthropic's API pricing. The model you are using matters a lot, and so does cache behavior.
+  </p>
+
+  <p>
+    As of early 2026, Claude Sonnet 3.7 is the default model in Claude Code. Pricing is per million tokens:
+  </p>
+
+  <ul>
+    <li><strong>Input tokens:</strong> $3.00 per million</li>
+    <li><strong>Output tokens:</strong> $15.00 per million</li>
+    <li><strong>Cache write tokens:</strong> $3.75 per million (costs slightly more than a standard input)</li>
+    <li><strong>Cache read tokens:</strong> $0.30 per million (ten times cheaper than standard input)</li>
+  </ul>
+
+  <p>
+    The ratio between output and input costs is the most important thing to internalize. Output tokens cost five times more than input tokens. A response that is twice as long costs twice as much in output, but the input cost is the same. This is why output verbosity is such a significant cost lever.
+  </p>
+
+  <p>
+    Cache read tokens at $0.30/M are almost free compared to everything else. A workflow that successfully caches a 10,000-token context and reads it 100 times costs $0.30 total for those reads. Without caching, the same reads would cost $30.00. Building for cache efficiency is the single highest-leverage cost reduction strategy.
+  </p>
+
+  <p>
+    Claude Max subscribers pay a flat monthly fee instead of per-token. If you are spending more than roughly $100/month on API usage, Claude Max at $100/month likely saves you money. Track your monthly token spend for a week and extrapolate.
+  </p>
+
+  <h2>5 practical ways to reduce your Claude Code costs</h2>
+
+  <h3>1. Use tiered context loading instead of loading everything</h3>
+
+  <p>
+    The most common cost mistake: loading every context file at the start of every session. A voice guide, business context, ICP, memory file, and strategy doc might total 15,000 tokens. If only one task in ten actually needs all of that, you are wasting 90% of your context loading costs.
+  </p>
+
+  <p>
+    Instead, maintain an index file that describes what each context file contains and when it is relevant. Load only what the current task needs. A blog post task needs the voice guide. A pricing task needs the business context. A code task needs neither. One index read versus five full file reads saves thousands of tokens per session.
+  </p>
+
+  <h3>2. Keep system prompts and context stable to hit cache</h3>
+
+  <p>
+    Prompt caching only works when the beginning of the context is identical across requests. If your CLAUDE.md changes every day, or if your memory file gets appended to after every task (making it longer each time), you will miss cache on the portions that changed.
+  </p>
+
+  <p>
+    Separate stable content from dynamic content. Your business description, voice guide, and guardrails rarely change. Put those at the top of your context so they can cache. Your daily notes, recent decisions, and task-specific context change frequently. Load those separately at the end. The stable portions cache. The dynamic portions do not, but they are smaller.
+  </p>
+
+  <h3>3. Set explicit output constraints</h3>
+
+  <p>
+    Tell Claude what format and length the output should be. "Write a 200-word summary" costs a fraction of "write a thorough summary." Both can produce equally useful results. The difference is that one lets Claude decide how much to write, and it will often default to more.
+  </p>
+
+  <p>
+    For skills that run on a schedule, embed output constraints directly in the skill definition. A daily report skill should specify the exact sections and target length. A draft email skill should cap at 150 words. These constraints have the side effect of producing tighter, more usable outputs anyway.
+  </p>
+
+  <h3>4. Route tasks to cheaper models</h3>
+
+  <p>
+    Not every task needs Sonnet 3.7. Classification, formatting, extraction, and simple transformations work well on Claude Haiku at a fraction of the cost. Haiku input tokens cost $0.80/M versus $3.00/M for Sonnet. For high-volume routine tasks, that is a 3-4x cost reduction.
+  </p>
+
+  <p>
+    In your skill definitions, add a model preference. Simple tasks (categorize this email, format this data, extract these fields) get Haiku. Complex reasoning tasks (write a proposal, analyze this situation, debug this architecture) get Sonnet. The quality difference for simple tasks is negligible. The cost difference is not.
+  </p>
+
+  <h3>5. Audit your agentic workflows for unnecessary steps</h3>
+
+  <p>
+    Look at any workflow that calls Claude more than twice. Ask whether each step is adding value proportional to its cost. Common culprits:
+  </p>
+
+  <ul>
+    <li><strong>Separate planning and execution steps</strong> that could be combined into one call</li>
+    <li><strong>Review steps that repeat the full context</strong> when only the output needs reviewing</li>
+    <li><strong>Confirmation steps</strong> that ask Claude to confirm what it just did, in full detail</li>
+    <li><strong>Logging steps</strong> that use a full model call when a simple string append would do</li>
+  </ul>
+
+  <p>
+    A four-step workflow that becomes two steps cuts your call count and context repetition in half. The savings add up quickly on workflows that run daily.
+  </p>
+
+  <h2>What a realistic monthly spend looks like</h2>
+
+  <p>
+    For context: Nova Labs runs Claude Code for roughly 8-10 hours of active and scheduled work per day. Blog post writing, email triage, social media, daily reports, nightly learning tasks. Monthly API spend before optimization was running around $80-120. After applying the context loading and model routing changes above, it dropped to $30-50. The work output did not change.
+  </p>
+
+  <p>
+    Most of the savings came from two things: not loading all context files on every call, and routing the high-volume daily report and email classification tasks to Haiku. The cache efficiency improvements helped on blog writing tasks where the voice guide is large and stable.
+  </p>
+
+  <h2>Track it before you optimize it</h2>
+
+  <p>
+    You cannot cut costs you cannot see. Before trying any of the above, spend a week tracking your actual usage. Parse the JSONL files, look at which workflows are the most expensive, and identify whether the cost is coming from input volume, output verbosity, or cache misses.
+  </p>
+
+  <p>
+    The free <a href="/cost-dashboard/analyze" class="text-primary-light hover:underline">CostPilot analyzer</a> handles the JSONL parsing and gives you a breakdown by project and session. Point it at your Claude projects folder and you will have a clear picture of where the money is going within a few minutes.
+  </p>
+
+  <p>
+    If you want ongoing monitoring with usage alerts and per-workflow cost tracking, the Pro version is in development. You can join the <a href="/cost-dashboard#waitlist" class="text-primary-light hover:underline">Pro waitlist</a> to get early access and be notified when it ships.
+  </p>
+
+  <p>
+    For everything else about running Claude Code as a real business tool, the <a href="/free-chapter" class="text-primary-light hover:underline">free chapter of the AI OS Blueprint</a> covers the full architecture: context engineering, skill design, scheduling, and the system structure that makes Claude Code reliable instead of expensive.
+  </p>
+</BlogPost>

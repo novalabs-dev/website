@@ -126,6 +126,183 @@ import Layout from '../../layouts/Layout.astro';
           <div id="waste-tips" class="space-y-3"></div>
         </div>
 
+        <!-- Export + Save Actions -->
+        <div class="flex flex-wrap gap-3 justify-center">
+          <button id="btn-export-csv" class="btn-secondary !py-2.5 !px-5 !text-sm inline-flex items-center gap-2 hidden">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Export CSV
+          </button>
+          <button id="btn-export-json" class="btn-secondary !py-2.5 !px-5 !text-sm inline-flex items-center gap-2 hidden">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Export JSON
+          </button>
+        </div>
+
+        <!-- History & Trends -->
+        <div id="history-section" class="glass-card p-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold flex items-center gap-2">
+              <svg class="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Usage History
+            </h3>
+            <button id="btn-clear-history" class="text-xs text-text-dim hover:text-red-400 transition-colors hidden">Clear all history</button>
+          </div>
+
+          <div id="history-empty" class="text-center py-8">
+            <p class="text-text-dim">No saved analyses yet. Upload files above — each analysis is automatically saved to your browser.</p>
+          </div>
+
+          <!-- Trend Chart -->
+          <div id="trend-section" class="hidden mb-6">
+            <h4 class="text-sm font-semibold text-text-muted mb-3">Cost trend (API-equivalent)</h4>
+            <div id="trend-chart" class="h-40 flex items-end gap-1"></div>
+            <div id="trend-labels" class="flex gap-1 mt-2 text-xs text-text-dim"></div>
+          </div>
+
+          <!-- History List -->
+          <div id="history-list" class="hidden space-y-2"></div>
+        </div>
+
+        <!-- Budget Alert -->
+        <div id="budget-section" class="glass-card p-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold flex items-center gap-2">
+              <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Budget Tracker
+            </h3>
+          </div>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+            <div class="flex items-center gap-2">
+              <label for="budget-input" class="text-sm text-text-muted whitespace-nowrap">Monthly budget:</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-dim text-sm">$</span>
+                <input type="number" id="budget-input" min="0" step="10" placeholder="200"
+                  class="w-28 pl-7 pr-3 py-2 bg-surface-light border border-surface-lighter rounded-lg text-sm text-text focus:outline-none focus:border-primary/50" />
+              </div>
+            </div>
+            <button id="btn-set-budget" class="text-xs text-primary-light hover:text-primary transition-colors font-semibold">Save</button>
+            <span id="budget-status" class="text-xs text-text-dim"></span>
+          </div>
+          <div id="budget-bar-container" class="hidden">
+            <div class="flex justify-between text-xs text-text-dim mb-1">
+              <span id="budget-spent-label">$0</span>
+              <span id="budget-limit-label">$0</span>
+            </div>
+            <div class="w-full h-4 bg-surface-light rounded-full overflow-hidden">
+              <div id="budget-bar" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p id="budget-message" class="text-sm mt-2"></p>
+          </div>
+        </div>
+
+        <!-- Session-Level Breakdown -->
+        <div id="session-breakdown" class="glass-card p-8 hidden">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+            Per-File Breakdown
+          </h3>
+          <p class="text-text-dim text-sm mb-4">See exactly how each uploaded file contributed to your total cost.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-text-dim border-b border-surface-lighter">
+                  <th class="pb-2 pr-4">File</th>
+                  <th class="pb-2 pr-4 text-right">Input</th>
+                  <th class="pb-2 pr-4 text-right">Output</th>
+                  <th class="pb-2 pr-4 text-right">Cache hits</th>
+                  <th class="pb-2 pr-4 text-right">Cost</th>
+                  <th class="pb-2 text-right">Top model</th>
+                </tr>
+              </thead>
+              <tbody id="session-table-body" class="divide-y divide-surface-lighter/50"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Compare Analyses -->
+        <div id="compare-section" class="glass-card p-8 hidden">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            Compare Analyses
+          </h3>
+          <p class="text-text-dim text-sm mb-4">Select two saved analyses to see what changed.</p>
+          <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <select id="compare-a" class="flex-1 bg-surface-light border border-surface-lighter rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-primary/50">
+              <option value="">Select baseline...</option>
+            </select>
+            <span class="text-text-dim self-center">vs</span>
+            <select id="compare-b" class="flex-1 bg-surface-light border border-surface-lighter rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-primary/50">
+              <option value="">Select comparison...</option>
+            </select>
+            <button id="btn-compare" class="btn-primary !py-2 !px-5 !text-sm">Compare</button>
+          </div>
+          <div id="compare-results" class="hidden"></div>
+        </div>
+
+        <!-- Session Timeline (hourly heatmap) -->
+        <div id="timeline-section" class="glass-card p-8 hidden">
+          <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Usage Timeline
+          </h3>
+          <p class="text-text-dim text-sm mb-4">When do you use Claude Code the most? Darker cells = higher token usage.</p>
+          <div class="overflow-x-auto">
+            <div id="timeline-grid" class="inline-grid gap-[2px]" style="grid-template-columns: 60px repeat(24, 1fr);"></div>
+          </div>
+          <div class="flex items-center gap-2 mt-3 text-xs text-text-dim justify-end">
+            <span>Less</span>
+            <div class="flex gap-[2px]">
+              <div class="w-3 h-3 rounded-sm bg-surface-light"></div>
+              <div class="w-3 h-3 rounded-sm" style="background: rgba(99,102,241,0.25)"></div>
+              <div class="w-3 h-3 rounded-sm" style="background: rgba(99,102,241,0.50)"></div>
+              <div class="w-3 h-3 rounded-sm" style="background: rgba(99,102,241,0.75)"></div>
+              <div class="w-3 h-3 rounded-sm" style="background: rgba(99,102,241,1)"></div>
+            </div>
+            <span>More</span>
+          </div>
+        </div>
+
+        <!-- Model Cost Optimizer -->
+        <div id="optimizer-section" class="glass-card p-8 hidden">
+          <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            Model Cost Optimizer
+          </h3>
+          <p class="text-text-dim text-sm mb-4">See how much you could save by switching models for certain tasks.</p>
+          <div id="optimizer-results" class="space-y-4"></div>
+        </div>
+
+        <!-- Share Report -->
+        <div id="share-section" class="flex justify-center hidden">
+          <button id="btn-share" class="btn-secondary !py-2.5 !px-5 !text-sm inline-flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+            Share this report
+          </button>
+          <div id="share-toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-success/20 border border-success/30 text-success text-sm z-50">
+            Link copied to clipboard!
+          </div>
+        </div>
+
+        <!-- Shared Report Banner (shown when viewing a shared link) -->
+        <div id="shared-banner" class="glass-card p-4 border-accent/20 bg-accent/5 text-center hidden">
+          <p class="text-sm text-text-muted">
+            <span class="text-accent-light font-semibold">Shared report</span> — this is a snapshot shared by another user.
+            <a href="/cost-dashboard/analyze" class="text-primary-light hover:underline ml-1">Analyze your own files</a>
+          </p>
+        </div>
+
         <!-- CTA -->
         <div class="glass-card p-8 border-primary/20 bg-primary/5 text-center">
           <h3 class="text-xl font-bold mb-2">Want automated tracking + alerts?</h3>
@@ -143,22 +320,21 @@ import Layout from '../../layouts/Layout.astro';
 
   <script>
     // Claude Code JSONL Analyzer - runs entirely client-side
+    // Enhanced with IndexedDB history, trend charts, and export
+
     const PRICING = {
       'claude-sonnet-4-20250514': { input: 3.0, output: 15.0, cacheWrite: 3.75, cacheRead: 0.30 },
       'claude-opus-4-20250514': { input: 15.0, output: 75.0, cacheWrite: 18.75, cacheRead: 1.50 },
       'claude-haiku-3-5-20241022': { input: 0.80, output: 4.0, cacheWrite: 1.0, cacheRead: 0.08 },
-      // Fallback for unknown models
       'default': { input: 3.0, output: 15.0, cacheWrite: 3.75, cacheRead: 0.30 },
     };
 
-    // Per 1M tokens
     function getPrice(model) {
       for (const key of Object.keys(PRICING)) {
         if (key !== 'default' && model && model.includes(key.split('-').slice(0, 3).join('-'))) {
           return PRICING[key];
         }
       }
-      // Try partial matching
       if (model) {
         if (model.includes('opus')) return PRICING['claude-opus-4-20250514'];
         if (model.includes('haiku')) return PRICING['claude-haiku-3-5-20241022'];
@@ -174,6 +350,202 @@ import Layout from '../../layouts/Layout.astro';
       return n.toString();
     }
 
+    // --- IndexedDB History ---
+    const DB_NAME = 'costpilot';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'analyses';
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            store.createIndex('date', 'date', { unique: false });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveAnalysis(snapshot) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).add(snapshot);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function getAllAnalyses() {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).index('date').getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function deleteAnalysis(id) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function clearAllAnalyses() {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).clear();
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    // --- Export ---
+    let lastAnalysisData = null;
+    let perFileData = [];
+
+    function exportCSV() {
+      if (!lastAnalysisData) return;
+      const d = lastAnalysisData;
+      const rows = [['Metric', 'Value']];
+      rows.push(['Date', d.date]);
+      rows.push(['Total Tokens', d.totalTokens]);
+      rows.push(['Input Tokens', d.totalInput]);
+      rows.push(['Output Tokens', d.totalOutput]);
+      rows.push(['Cache Write Tokens', d.totalCacheWrite]);
+      rows.push(['Cache Read Tokens', d.totalCacheRead]);
+      rows.push(['API-equivalent Cost (USD)', d.totalCost.toFixed(4)]);
+      rows.push(['Cache Miss Rate (%)', d.cacheMissRate]);
+      rows.push(['Sessions Analyzed', d.sessionCount]);
+      rows.push([]);
+      rows.push(['Model', 'Tokens', 'Cost (USD)']);
+      for (const [model, data] of Object.entries(d.modelUsage)) {
+        rows.push([model, data.tokens, data.cost.toFixed(4)]);
+      }
+      if (Object.keys(d.dailyUsage).length > 0) {
+        rows.push([]);
+        rows.push(['Date', 'Tokens', 'Cost (USD)']);
+        for (const [day, data] of Object.entries(d.dailyUsage).sort((a, b) => a[0].localeCompare(b[0]))) {
+          rows.push([day, data.tokens, data.cost.toFixed(4)]);
+        }
+      }
+      const csv = rows.map(r => r.join(',')).join('\n');
+      downloadFile(csv, `costpilot-analysis-${d.date}.csv`, 'text/csv');
+    }
+
+    function exportJSON() {
+      if (!lastAnalysisData) return;
+      const json = JSON.stringify(lastAnalysisData, null, 2);
+      downloadFile(json, `costpilot-analysis-${lastAnalysisData.date}.json`, 'application/json');
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- History rendering ---
+    async function renderHistory() {
+      const analyses = await getAllAnalyses();
+      const emptyEl = document.getElementById('history-empty');
+      const listEl = document.getElementById('history-list');
+      const trendEl = document.getElementById('trend-section');
+      const clearBtn = document.getElementById('btn-clear-history');
+
+      if (analyses.length === 0) {
+        emptyEl.classList.remove('hidden');
+        listEl.classList.add('hidden');
+        trendEl.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      listEl.classList.remove('hidden');
+      clearBtn.classList.remove('hidden');
+
+      // Trend chart (show if 2+ analyses)
+      if (analyses.length >= 2) {
+        trendEl.classList.remove('hidden');
+        const trendChart = document.getElementById('trend-chart');
+        const trendLabels = document.getElementById('trend-labels');
+        trendChart.innerHTML = '';
+        trendLabels.innerHTML = '';
+
+        const maxCost = Math.max(...analyses.map(a => a.totalCost));
+        for (const a of analyses) {
+          const height = maxCost > 0 ? (a.totalCost / maxCost * 100) : 0;
+          const dateLabel = a.date.slice(5);
+          trendChart.innerHTML += `
+            <div class="flex-1 flex flex-col items-center justify-end" title="${a.date}: $${a.totalCost.toFixed(2)} | ${formatNumber(a.totalTokens)} tokens">
+              <span class="text-xs text-text-dim mb-1">$${a.totalCost.toFixed(2)}</span>
+              <div class="w-full rounded-t-sm transition-all" style="height: ${Math.max(height, 4)}%; background: linear-gradient(to top, #6366f1, #8b5cf6)"></div>
+            </div>
+          `;
+          trendLabels.innerHTML += `<span class="flex-1 text-center truncate">${dateLabel}</span>`;
+        }
+      } else {
+        trendEl.classList.add('hidden');
+      }
+
+      // History list (newest first)
+      listEl.innerHTML = '';
+      const reversed = [...analyses].reverse();
+      for (const a of reversed.slice(0, 30)) {
+        const costChange = analyses.length >= 2 ? getCostChange(a, analyses) : null;
+        const changeHtml = costChange !== null
+          ? `<span class="text-xs ${costChange >= 0 ? 'text-red-400' : 'text-success'}">${costChange >= 0 ? '+' : ''}${costChange.toFixed(0)}%</span>`
+          : '';
+
+        listEl.innerHTML += `
+          <div class="flex items-center justify-between p-3 rounded-lg bg-surface-light/30 hover:bg-surface-light/50 transition-colors group">
+            <div class="flex items-center gap-4 min-w-0">
+              <span class="text-sm text-text-muted font-mono">${a.date}</span>
+              <span class="text-sm text-text">${formatNumber(a.totalTokens)} tokens</span>
+              <span class="text-sm font-semibold text-primary-light">$${a.totalCost.toFixed(2)}</span>
+              ${changeHtml}
+              <span class="text-xs text-text-dim">${a.sessionCount} file${a.sessionCount !== 1 ? 's' : ''}</span>
+            </div>
+            <button data-delete-id="${a.id}" class="text-text-dim hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all" title="Delete">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        `;
+      }
+
+      // Bind delete buttons
+      listEl.querySelectorAll('[data-delete-id]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await deleteAnalysis(Number(btn.dataset.deleteId));
+          renderHistory();
+        });
+      });
+    }
+
+    function getCostChange(current, allAnalyses) {
+      const idx = allAnalyses.findIndex(a => a.id === current.id);
+      if (idx <= 0) return null;
+      const prev = allAnalyses[idx - 1];
+      if (prev.totalCost === 0) return null;
+      return ((current.totalCost - prev.totalCost) / prev.totalCost) * 100;
+    }
+
+    // --- File handling ---
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
 
@@ -194,15 +566,20 @@ import Layout from '../../layouts/Layout.astro';
 
     async function handleFiles(files) {
       const allEntries = [];
+      perFileData = [];
 
       for (const file of files) {
         const text = await file.text();
         const lines = text.split('\n').filter(l => l.trim());
+        const fileData = { file, entries: [] };
         for (const line of lines) {
           try {
-            allEntries.push(JSON.parse(line));
+            const parsed = JSON.parse(line);
+            allEntries.push(parsed);
+            fileData.entries.push(parsed);
           } catch {}
         }
+        perFileData.push(fileData);
       }
 
       if (allEntries.length === 0) {
@@ -211,6 +588,8 @@ import Layout from '../../layouts/Layout.astro';
       }
 
       analyzeEntries(allEntries, files.length);
+      renderSessionBreakdown();
+      updateBudgetDisplay();
     }
 
     function analyzeEntries(entries, fileCount) {
@@ -224,7 +603,6 @@ import Layout from '../../layouts/Layout.astro';
       let sessionCount = fileCount;
 
       for (const entry of entries) {
-        // Look for usage data in various formats
         const usage = entry.usage || entry.message?.usage || entry.result?.usage;
         if (!usage) continue;
 
@@ -245,19 +623,22 @@ import Layout from '../../layouts/Layout.astro';
                      cacheWrite * price.cacheWrite + cacheRead * price.cacheRead) / 1e6;
         totalCost += cost;
 
-        // Model breakdown
         const modelKey = model.split('-').slice(0, 3).join('-') || model;
         if (!modelUsage[modelKey]) modelUsage[modelKey] = { tokens: 0, cost: 0 };
         modelUsage[modelKey].tokens += inputTokens + outputTokens;
         modelUsage[modelKey].cost += cost;
 
-        // Daily usage
         const date = entry.timestamp || entry.created_at || entry.date;
         if (date) {
-          const day = new Date(date).toISOString().split('T')[0];
-          if (!dailyUsage[day]) dailyUsage[day] = { tokens: 0, cost: 0 };
-          dailyUsage[day].tokens += inputTokens + outputTokens;
-          dailyUsage[day].cost += cost;
+          try {
+            const parsed = new Date(date);
+            if (!isNaN(parsed.getTime())) {
+              const day = parsed.toISOString().split('T')[0];
+              if (!dailyUsage[day]) dailyUsage[day] = { tokens: 0, cost: 0 };
+              dailyUsage[day].tokens += inputTokens + outputTokens;
+              dailyUsage[day].cost += cost;
+            }
+          } catch {}
         }
       }
 
@@ -266,6 +647,15 @@ import Layout from '../../layouts/Layout.astro';
       const cacheMissRate = totalCacheable > 0
         ? Math.round((1 - totalCacheRead / totalCacheable) * 100)
         : 0;
+
+      // Store for export
+      lastAnalysisData = {
+        date: new Date().toISOString().split('T')[0],
+        totalTokens, totalInput, totalOutput,
+        totalCacheWrite, totalCacheRead,
+        totalCost, cacheMissRate, sessionCount,
+        modelUsage, dailyUsage
+      };
 
       // Update summary cards
       document.getElementById('total-tokens').textContent = formatNumber(totalTokens);
@@ -386,8 +776,10 @@ import Layout from '../../layouts/Layout.astro';
         `;
       }
 
-      // Show results, update upload section
+      // Show results, show export buttons, update upload section
       document.getElementById('results').classList.remove('hidden');
+      document.getElementById('btn-export-csv').classList.remove('hidden');
+      document.getElementById('btn-export-json').classList.remove('hidden');
       document.getElementById('upload-section').innerHTML = `
         <div class="flex items-center justify-between">
           <div>
@@ -398,6 +790,9 @@ import Layout from '../../layouts/Layout.astro';
         </div>
       `;
 
+      // Auto-save to IndexedDB
+      saveAnalysis(lastAnalysisData).then(() => renderHistory()).catch(err => { console.warn('Failed to save analysis:', err); renderHistory(); });
+
       // GA4 tracking
       if (typeof gtag === 'function') {
         gtag('event', 'costpilot_analyze', {
@@ -406,6 +801,535 @@ import Layout from '../../layouts/Layout.astro';
           'value': fileCount
         });
       }
+    }
+
+    // --- Wire up buttons ---
+    document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+    document.getElementById('btn-export-json').addEventListener('click', exportJSON);
+    document.getElementById('btn-clear-history').addEventListener('click', async () => {
+      if (confirm('Delete all saved analyses? This cannot be undone.')) {
+        await clearAllAnalyses();
+        renderHistory();
+      }
+    });
+
+    // --- Budget Tracker ---
+    const BUDGET_KEY = 'costpilot_budget';
+
+    function loadBudget() {
+      return parseFloat(localStorage.getItem(BUDGET_KEY) || '0');
+    }
+
+    function saveBudget(val) {
+      localStorage.setItem(BUDGET_KEY, val.toString());
+    }
+
+    function updateBudgetDisplay() {
+      const budget = loadBudget();
+      const input = document.getElementById('budget-input');
+      const barContainer = document.getElementById('budget-bar-container');
+      const bar = document.getElementById('budget-bar');
+      const spentLabel = document.getElementById('budget-spent-label');
+      const limitLabel = document.getElementById('budget-limit-label');
+      const message = document.getElementById('budget-message');
+      const status = document.getElementById('budget-status');
+
+      if (budget > 0) {
+        input.value = budget;
+        status.textContent = `Budget set: $${budget}/mo`;
+      }
+
+      if (budget > 0 && lastAnalysisData) {
+        barContainer.classList.remove('hidden');
+        const spent = lastAnalysisData.totalCost;
+        const pct = Math.min((spent / budget) * 100, 100);
+
+        spentLabel.textContent = `$${spent.toFixed(2)} used`;
+        limitLabel.textContent = `$${budget} budget`;
+        bar.style.width = pct + '%';
+
+        if (pct >= 100) {
+          bar.className = 'h-full rounded-full transition-all duration-500 bg-red-500';
+          message.innerHTML = `<span class="text-red-400 font-semibold">Over budget!</span> You've exceeded your monthly budget by $${(spent - budget).toFixed(2)}.`;
+        } else if (pct >= 80) {
+          bar.className = 'h-full rounded-full transition-all duration-500 bg-warning';
+          message.innerHTML = `<span class="text-warning font-semibold">Warning:</span> ${pct.toFixed(0)}% of budget used. $${(budget - spent).toFixed(2)} remaining.`;
+        } else {
+          bar.className = 'h-full rounded-full transition-all duration-500 bg-success';
+          message.textContent = `${pct.toFixed(0)}% of budget used. $${(budget - spent).toFixed(2)} remaining.`;
+        }
+      }
+    }
+
+    document.getElementById('btn-set-budget').addEventListener('click', () => {
+      const val = parseFloat(document.getElementById('budget-input').value);
+      if (val > 0) {
+        saveBudget(val);
+        updateBudgetDisplay();
+      }
+    });
+
+    document.getElementById('budget-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('btn-set-budget').click();
+    });
+
+    // --- Session-Level Breakdown ---
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderSessionBreakdown() {
+      if (perFileData.length === 0) return;
+      const section = document.getElementById('session-breakdown');
+      const tbody = document.getElementById('session-table-body');
+      section.classList.remove('hidden');
+      tbody.innerHTML = '';
+
+      for (const pf of perFileData) {
+        let inputT = 0, outputT = 0, cacheReadT = 0, cost = 0;
+        const models = {};
+
+        for (const entry of pf.entries) {
+          const usage = entry.usage || entry.message?.usage || entry.result?.usage;
+          if (!usage) continue;
+          const model = entry.model || entry.message?.model || entry.result?.model || 'unknown';
+          const price = getPrice(model);
+          const inp = usage.input_tokens || 0;
+          const out = usage.output_tokens || 0;
+          const cw = usage.cache_creation_input_tokens || 0;
+          const cr = usage.cache_read_input_tokens || 0;
+          inputT += inp;
+          outputT += out;
+          cacheReadT += cr;
+          cost += (inp * price.input + out * price.output + cw * price.cacheWrite + cr * price.cacheRead) / 1e6;
+          const mk = model.split('-').slice(0, 3).join('-') || model;
+          models[mk] = (models[mk] || 0) + inp + out;
+        }
+
+        const topModel = Object.entries(models).sort((a, b) => b[1] - a[1])[0];
+        const rawName = pf.file.name;
+        const fname = rawName.length > 30 ? rawName.slice(0, 27) + '...' : rawName;
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-surface-light/30 transition-colors">
+            <td class="py-2.5 pr-4 text-text font-mono text-xs" title="${escapeHtml(rawName)}">${escapeHtml(fname)}</td>
+            <td class="py-2.5 pr-4 text-right text-text-muted">${formatNumber(inputT)}</td>
+            <td class="py-2.5 pr-4 text-right text-text-muted">${formatNumber(outputT)}</td>
+            <td class="py-2.5 pr-4 text-right ${cacheReadT > 0 ? 'text-success' : 'text-text-dim'}">${formatNumber(cacheReadT)}</td>
+            <td class="py-2.5 pr-4 text-right font-semibold text-primary-light">$${cost.toFixed(2)}</td>
+            <td class="py-2.5 text-right text-text-dim text-xs">${topModel ? topModel[0] : '-'}</td>
+          </tr>
+        `;
+      }
+    }
+
+    // --- Compare Analyses ---
+    async function populateCompareDropdowns() {
+      const analyses = await getAllAnalyses();
+      const section = document.getElementById('compare-section');
+      if (analyses.length < 2) {
+        section.classList.add('hidden');
+        return;
+      }
+      section.classList.remove('hidden');
+      const selectA = document.getElementById('compare-a');
+      const selectB = document.getElementById('compare-b');
+      selectA.innerHTML = '<option value="">Select baseline...</option>';
+      selectB.innerHTML = '<option value="">Select comparison...</option>';
+
+      const reversed = [...analyses].reverse();
+      for (const a of reversed) {
+        const opt = `<option value="${a.id}">${a.date} — ${formatNumber(a.totalTokens)} tokens, $${a.totalCost.toFixed(2)}</option>`;
+        selectA.innerHTML += opt;
+        selectB.innerHTML += opt;
+      }
+    }
+
+    document.getElementById('btn-compare').addEventListener('click', async () => {
+      const idA = Number(document.getElementById('compare-a').value);
+      const idB = Number(document.getElementById('compare-b').value);
+      if (!idA || !idB || idA === idB) return;
+
+      const analyses = await getAllAnalyses();
+      const a = analyses.find(x => x.id === idA);
+      const b = analyses.find(x => x.id === idB);
+      if (!a || !b) return;
+
+      const container = document.getElementById('compare-results');
+      container.classList.remove('hidden');
+
+      function delta(oldVal, newVal) {
+        if (oldVal === 0) return newVal > 0 ? '+100%' : '0%';
+        const pct = (newVal - oldVal) / oldVal * 100;
+        const sign = pct > 0 ? '+' : '';
+        return sign + pct.toFixed(1) + '%';
+      }
+
+      function deltaColor(oldVal, newVal, lowerIsBetter = true) {
+        const change = newVal - oldVal;
+        if (change === 0) return 'text-text-dim';
+        if (lowerIsBetter) return change < 0 ? 'text-success' : 'text-red-400';
+        return change > 0 ? 'text-success' : 'text-red-400';
+      }
+
+      const metrics = [
+        { label: 'Total tokens', valA: a.totalTokens, valB: b.totalTokens, format: formatNumber, lower: true },
+        { label: 'API-equivalent cost', valA: a.totalCost, valB: b.totalCost, format: v => '$' + v.toFixed(2), lower: true },
+        { label: 'Input tokens', valA: a.totalInput, valB: b.totalInput, format: formatNumber, lower: true },
+        { label: 'Output tokens', valA: a.totalOutput, valB: b.totalOutput, format: formatNumber, lower: false },
+        { label: 'Cache writes', valA: a.totalCacheWrite, valB: b.totalCacheWrite, format: formatNumber, lower: true },
+        { label: 'Cache reads', valA: a.totalCacheRead, valB: b.totalCacheRead, format: formatNumber, lower: false },
+        { label: 'Cache miss rate', valA: a.cacheMissRate, valB: b.cacheMissRate, format: v => v + '%', lower: true },
+        { label: 'Files analyzed', valA: a.sessionCount, valB: b.sessionCount, format: v => v, lower: false },
+      ];
+
+      container.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-text-dim border-b border-surface-lighter">
+                <th class="pb-2 pr-4">Metric</th>
+                <th class="pb-2 pr-4 text-right">${a.date}</th>
+                <th class="pb-2 pr-4 text-right">${b.date}</th>
+                <th class="pb-2 text-right">Change</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-lighter/50">
+              ${metrics.map(m => `
+                <tr class="hover:bg-surface-light/30 transition-colors">
+                  <td class="py-2 pr-4 text-text-muted">${m.label}</td>
+                  <td class="py-2 pr-4 text-right text-text">${m.format(m.valA)}</td>
+                  <td class="py-2 pr-4 text-right text-text">${m.format(m.valB)}</td>
+                  <td class="py-2 text-right font-semibold ${deltaColor(m.valA, m.valB, m.lower)}">${delta(m.valA, m.valB)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'costpilot_compare', { 'event_category': 'engagement' });
+      }
+    });
+
+    // --- Patch renderHistory to also update compare dropdowns ---
+    const _origRenderHistory = renderHistory;
+    renderHistory = async function() {
+      await _origRenderHistory();
+      await populateCompareDropdowns();
+      updateBudgetDisplay();
+    };
+
+    // --- Session Timeline (hourly heatmap) ---
+    let timelineData = {};
+
+    function buildTimeline(entries) {
+      const hourlyGrid = {}; // 'day-hour' -> tokens
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      let hasTimestamps = false;
+
+      for (const entry of entries) {
+        const ts = entry.timestamp || entry.created_at || entry.date;
+        if (!ts) continue;
+        try {
+          const d = new Date(ts);
+          if (isNaN(d.getTime())) continue;
+          hasTimestamps = true;
+          const dayIdx = d.getDay();
+          const hour = d.getHours();
+          const key = `${dayIdx}-${hour}`;
+          const usage = entry.usage || entry.message?.usage || entry.result?.usage;
+          if (!usage) continue;
+          const tokens = (usage.input_tokens || 0) + (usage.output_tokens || 0);
+          hourlyGrid[key] = (hourlyGrid[key] || 0) + tokens;
+        } catch {}
+      }
+
+      if (!hasTimestamps) return;
+
+      const section = document.getElementById('timeline-section');
+      const grid = document.getElementById('timeline-grid');
+      section.classList.remove('hidden');
+      grid.innerHTML = '';
+
+      const maxTokens = Math.max(...Object.values(hourlyGrid), 1);
+
+      // Header row: empty cell + 24 hour labels
+      grid.innerHTML += '<div class="text-xs text-text-dim"></div>';
+      for (let h = 0; h < 24; h++) {
+        grid.innerHTML += `<div class="text-[10px] text-text-dim text-center">${h.toString().padStart(2, '0')}</div>`;
+      }
+
+      // Data rows: day label + 24 cells
+      for (let d = 1; d <= 7; d++) {
+        const dayIdx = d % 7; // Mon=1..Sun=0
+        grid.innerHTML += `<div class="text-xs text-text-dim pr-2 flex items-center">${dayNames[dayIdx]}</div>`;
+        for (let h = 0; h < 24; h++) {
+          const val = hourlyGrid[`${dayIdx}-${h}`] || 0;
+          const intensity = val > 0 ? Math.max(0.15, val / maxTokens) : 0;
+          const bg = val > 0
+            ? `rgba(99,102,241,${intensity.toFixed(2)})`
+            : 'rgba(255,255,255,0.03)';
+          const title = val > 0 ? `${dayNames[dayIdx]} ${h}:00 — ${formatNumber(val)} tokens` : `${dayNames[dayIdx]} ${h}:00`;
+          grid.innerHTML += `<div class="w-full aspect-square rounded-sm cursor-default transition-colors" style="background:${bg}" title="${title}"></div>`;
+        }
+      }
+
+      timelineData = hourlyGrid;
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'costpilot_timeline', { 'event_category': 'engagement' });
+      }
+    }
+
+    // --- Model Cost Optimizer ---
+    function renderOptimizer(entries) {
+      const modelTokens = {}; // model -> { input, output, cacheWrite, cacheRead, cost }
+      const sonnetPrice = PRICING['claude-sonnet-4-20250514'];
+      const haikuPrice = PRICING['claude-haiku-3-5-20241022'];
+
+      for (const entry of entries) {
+        const usage = entry.usage || entry.message?.usage || entry.result?.usage;
+        if (!usage) continue;
+        const model = entry.model || entry.message?.model || entry.result?.model || 'unknown';
+        const price = getPrice(model);
+        const modelKey = model.split('-').slice(0, 3).join('-') || model;
+
+        if (!modelTokens[modelKey]) {
+          modelTokens[modelKey] = { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, cost: 0, price };
+        }
+        const inp = usage.input_tokens || 0;
+        const out = usage.output_tokens || 0;
+        const cw = usage.cache_creation_input_tokens || 0;
+        const cr = usage.cache_read_input_tokens || 0;
+        modelTokens[modelKey].input += inp;
+        modelTokens[modelKey].output += out;
+        modelTokens[modelKey].cacheWrite += cw;
+        modelTokens[modelKey].cacheRead += cr;
+        modelTokens[modelKey].cost += (inp * price.input + out * price.output + cw * price.cacheWrite + cr * price.cacheRead) / 1e6;
+      }
+
+      const section = document.getElementById('optimizer-section');
+      const results = document.getElementById('optimizer-results');
+      const suggestions = [];
+
+      for (const [model, data] of Object.entries(modelTokens)) {
+        if (model.includes('opus')) {
+          // Calculate cost if run on Sonnet
+          const sonnetCost = (data.input * sonnetPrice.input + data.output * sonnetPrice.output +
+            data.cacheWrite * sonnetPrice.cacheWrite + data.cacheRead * sonnetPrice.cacheRead) / 1e6;
+          const savings = data.cost - sonnetCost;
+          if (savings > 0.01) {
+            suggestions.push({
+              title: `Switch Opus to Sonnet: save $${savings.toFixed(2)}`,
+              desc: `Your Opus usage costs $${data.cost.toFixed(2)} at API rates. Running the same workload on Sonnet 4 would cost $${sonnetCost.toFixed(2)}. Sonnet handles most coding tasks well — reserve Opus for complex architectural decisions and multi-file refactors.`,
+              savings,
+              pct: Math.round((savings / data.cost) * 100)
+            });
+          }
+          // Also show Haiku option for simple tasks
+          const haikuCost = (data.input * haikuPrice.input + data.output * haikuPrice.output +
+            data.cacheWrite * haikuPrice.cacheWrite + data.cacheRead * haikuPrice.cacheRead) / 1e6;
+          const haikuSavings = data.cost - haikuCost;
+          if (haikuSavings > 0.05) {
+            suggestions.push({
+              title: `Use Haiku for simple tasks: save up to $${haikuSavings.toFixed(2)}`,
+              desc: `If even 30% of your Opus usage is simple tasks (formatting, small edits, lookups), moving those to Haiku 3.5 could save ~$${(haikuSavings * 0.3).toFixed(2)}. Haiku is 19x cheaper than Opus per token.`,
+              savings: haikuSavings * 0.3,
+              pct: Math.round((haikuSavings * 0.3 / data.cost) * 100)
+            });
+          }
+        } else if (model.includes('sonnet')) {
+          const haikuCost = (data.input * haikuPrice.input + data.output * haikuPrice.output +
+            data.cacheWrite * haikuPrice.cacheWrite + data.cacheRead * haikuPrice.cacheRead) / 1e6;
+          const savings = data.cost - haikuCost;
+          if (savings > 0.05) {
+            suggestions.push({
+              title: `Route simple Sonnet tasks to Haiku: save up to $${(savings * 0.3).toFixed(2)}`,
+              desc: `Haiku 3.5 handles simple edits, formatting, and lookups at a fraction of Sonnet's cost. Routing 30% of your Sonnet workload to Haiku could save ~$${(savings * 0.3).toFixed(2)}.`,
+              savings: savings * 0.3,
+              pct: Math.round((savings * 0.3 / data.cost) * 100)
+            });
+          }
+        }
+      }
+
+      if (suggestions.length === 0) {
+        suggestions.push({
+          title: 'Your model mix looks efficient',
+          desc: 'No obvious savings from switching models. Your current usage pattern is cost-effective.',
+          savings: 0,
+          pct: 0
+        });
+      }
+
+      // Sort by savings descending
+      suggestions.sort((a, b) => b.savings - a.savings);
+
+      results.innerHTML = suggestions.map(s => `
+        <div class="p-4 rounded-xl border ${s.savings > 0 ? 'border-success/20 bg-success/5' : 'border-surface-lighter bg-surface-light/20'}">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-semibold text-text flex items-center gap-2">
+                ${s.savings > 0 ? `<span class="text-xs px-2 py-0.5 rounded-full bg-success/20 text-success font-bold">-${s.pct}%</span>` : ''}
+                ${s.title}
+              </p>
+              <p class="text-text-muted text-sm mt-1">${s.desc}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      section.classList.remove('hidden');
+    }
+
+    // --- Shareable Report Link ---
+    function generateShareLink() {
+      if (!lastAnalysisData) return;
+      const d = lastAnalysisData;
+      const payload = {
+        d: d.date,
+        tt: d.totalTokens,
+        ti: d.totalInput,
+        to: d.totalOutput,
+        tcw: d.totalCacheWrite,
+        tcr: d.totalCacheRead,
+        tc: Math.round(d.totalCost * 100) / 100,
+        cm: d.cacheMissRate,
+        sc: d.sessionCount,
+        mu: Object.fromEntries(
+          Object.entries(d.modelUsage).map(([k, v]) => [k, { t: v.tokens, c: Math.round(v.cost * 100) / 100 }])
+        )
+      };
+
+      const json = JSON.stringify(payload);
+      const encoded = btoa(unescape(encodeURIComponent(json)));
+      const url = window.location.origin + window.location.pathname + '?r=' + encoded;
+      return url;
+    }
+
+    function loadSharedReport() {
+      const params = new URLSearchParams(window.location.search);
+      const reportData = params.get('r');
+      if (!reportData) return false;
+
+      try {
+        const json = decodeURIComponent(escape(atob(reportData)));
+        const p = JSON.parse(json);
+
+        // Reconstruct lastAnalysisData
+        lastAnalysisData = {
+          date: p.d,
+          totalTokens: p.tt,
+          totalInput: p.ti,
+          totalOutput: p.to,
+          totalCacheWrite: p.tcw,
+          totalCacheRead: p.tcr,
+          totalCost: p.tc,
+          cacheMissRate: p.cm,
+          sessionCount: p.sc,
+          modelUsage: Object.fromEntries(
+            Object.entries(p.mu).map(([k, v]) => [k, { tokens: v.t, cost: v.c }])
+          ),
+          dailyUsage: {}
+        };
+
+        // Show shared banner, hide upload
+        document.getElementById('shared-banner').classList.remove('hidden');
+        document.getElementById('upload-section').innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-bold">Shared Report</h2>
+              <p class="text-text-muted text-sm">Snapshot from ${p.d} — ${p.sc} file(s), ${formatNumber(p.tt)} tokens</p>
+            </div>
+            <a href="/cost-dashboard/analyze" class="btn-secondary !py-2 !px-4 !text-sm">Analyze your own files</a>
+          </div>
+        `;
+
+        // Render summary cards
+        document.getElementById('total-tokens').textContent = formatNumber(p.tt);
+        document.getElementById('total-cost').textContent = '$' + p.tc.toFixed(2);
+        document.getElementById('cache-miss-rate').textContent = p.cm + '%';
+        document.getElementById('total-sessions').textContent = p.sc;
+
+        // Model breakdown
+        const modelContainer = document.getElementById('model-breakdown');
+        modelContainer.innerHTML = '';
+        const sortedModels = Object.entries(lastAnalysisData.modelUsage).sort((a, b) => b[1].tokens - a[1].tokens);
+        for (const [model, data] of sortedModels) {
+          const pct = p.tt > 0 ? (data.tokens / p.tt * 100) : 0;
+          modelContainer.innerHTML += `
+            <div class="flex items-center gap-4">
+              <span class="text-sm text-text-muted w-32 truncate">${model}</span>
+              <div class="flex-grow h-6 bg-surface-light rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style="width: ${pct}%"></div>
+              </div>
+              <span class="text-sm text-text-muted w-20 text-right">${formatNumber(data.tokens)}</span>
+              <span class="text-sm text-text-dim w-16 text-right">$${data.cost.toFixed(2)}</span>
+            </div>
+          `;
+        }
+
+        // Waste tips (basic for shared view)
+        const wasteTips = document.getElementById('waste-tips');
+        wasteTips.innerHTML = '';
+        if (p.cm > 70) {
+          wasteTips.innerHTML = `<div class="p-4 rounded-xl border border-red-500/20 bg-red-500/5"><p class="font-semibold">High cache miss rate (${p.cm}%)</p><p class="text-text-muted text-sm mt-1">Most input tokens are not cached. Consistent system prompts enable caching and can cut costs 50%+.</p></div>`;
+        } else if (p.cm > 40) {
+          wasteTips.innerHTML = `<div class="p-4 rounded-xl border border-warning/20 bg-warning/5"><p class="font-semibold">Moderate cache miss rate (${p.cm}%)</p><p class="text-text-muted text-sm mt-1">Cache hit rate is decent but could improve with more consistent prompts.</p></div>`;
+        } else {
+          wasteTips.innerHTML = `<div class="p-4 rounded-xl border border-success/20 bg-success/5"><p class="font-semibold">Good cache performance (${p.cm}% miss rate)</p><p class="text-text-muted text-sm mt-1">Usage patterns look efficient.</p></div>`;
+        }
+
+        // Show results
+        document.getElementById('results').classList.remove('hidden');
+        // Hide sections that need raw entries
+        document.getElementById('daily-chart').parentElement.classList.add('hidden');
+        document.getElementById('session-breakdown').classList.add('hidden');
+        document.getElementById('timeline-section').classList.add('hidden');
+
+        // Show share button for re-sharing
+        document.getElementById('share-section').classList.remove('hidden');
+
+        return true;
+      } catch (e) {
+        console.warn('Failed to load shared report:', e);
+        return false;
+      }
+    }
+
+    document.getElementById('btn-share')?.addEventListener('click', () => {
+      const url = generateShareLink();
+      if (!url) return;
+      navigator.clipboard.writeText(url).then(() => {
+        const toast = document.getElementById('share-toast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 2500);
+      }).catch(() => {
+        // Fallback: select a prompt
+        prompt('Copy this link:', url);
+      });
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'costpilot_share', { 'event_category': 'engagement' });
+      }
+    });
+
+    // --- Hook new features into analysis flow ---
+    const _origAnalyze = analyzeEntries;
+    analyzeEntries = function(entries, fileCount) {
+      _origAnalyze(entries, fileCount);
+      buildTimeline(entries);
+      renderOptimizer(entries);
+      document.getElementById('share-section').classList.remove('hidden');
+    };
+
+    // --- Init: check for shared report, then load history ---
+    if (!loadSharedReport()) {
+      renderHistory();
     }
   </script>
 </Layout>

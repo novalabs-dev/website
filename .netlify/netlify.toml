@@ -1,14 +1,13 @@
 functionsDirectory = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/netlify/functions"
 functionsDirectoryOrigin = "config"
 headersOrigin = "config"
+redirectsOrigin = "config"
 plugins = []
-redirects = []
 
 [build]
 publish = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/dist"
 publishOrigin = "config"
 commandOrigin = "config"
-base = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website"
 command = "npm run build"
 functions = "/Users/woutervanackooij/Documents/Programming/AIOS/ventures/project-1/website/netlify/functions"
 
@@ -44,3 +43,39 @@ for = "/_astro/*"
 
 [headers.values]
 Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+from = "/download/playbook"
+to = "https://lmgkaljzocppkiqmevis.supabase.co/storage/v1/object/public/products/playbook/AI-OS-Blueprint-Playbook.pdf"
+status = 302.0
+force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/download/bundle"
+to = "https://lmgkaljzocppkiqmevis.supabase.co/storage/v1/object/public/products/bundle/AI-OS-Blueprint-Bundle.pdf"
+status = 302.0
+force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/download/skill-pack"
+to = "https://lmgkaljzocppkiqmevis.supabase.co/storage/v1/object/public/products/skill-pack/business-skill-pack.zip"
+status = 302.0
+force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

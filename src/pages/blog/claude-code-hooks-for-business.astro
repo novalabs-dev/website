@@ -1,0 +1,207 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Claude Code Hooks Explained: How to Make Your AI Actually Do What You Tell It"
+  description="Claude Code hooks give you deterministic control over your AI. Here's how to use them for business automation without writing code."
+  date="April 5, 2026"
+  readTime="8 min read"
+  keywords={["Claude Code hooks", "Claude Code hooks examples", "Claude Code automation", "Claude Code business hooks"]}
+  relatedPosts={[
+    { title: "Context engineering for business: why it replaced prompt engineering and how to actually do it", slug: "context-engineering-for-business" },
+    { title: "Getting started with Claude Code", slug: "getting-started-with-claude-code" },
+    { title: "Build AI agents that run your business", slug: "build-ai-agents-that-run-your-business" },
+  ]}
+>
+  <p>
+    Claude does what you ask most of the time. It writes the email, runs the workflow, updates the file. Most of the time is good enough for a writing assistant. For a business system, it is not.
+  </p>
+
+  <p>
+    When you are running actual operations on AI, you need things to happen every single time. Not when the model remembers. Not when the prompt is worded correctly. Every time, without exception. That is what hooks are for.
+  </p>
+
+  <h2>What hooks actually are</h2>
+
+  <p>
+    Hooks are shell commands that fire at fixed moments in Claude's execution cycle. You define them once in a configuration file. After that, they run automatically, regardless of what you asked Claude to do or how you asked it.
+  </p>
+
+  <p>
+    There are four moments you can hook into:
+  </p>
+
+  <ul>
+    <li><strong>PreToolUse</strong> — fires before Claude uses any tool (reading a file, running a script, making an API call)</li>
+    <li><strong>PostToolUse</strong> — fires after a tool completes</li>
+    <li><strong>Stop</strong> — fires when Claude finishes a response</li>
+    <li><strong>SubagentStop</strong> — fires when a subagent finishes its work</li>
+  </ul>
+
+  <p>
+    The critical difference between hooks and prompts: a prompt is a suggestion. A hook is a guarantee. You cannot forget to include a hook in your message. It does not depend on Claude interpreting your intent correctly. It runs.
+  </p>
+
+  <p>
+    This is what makes hooks the foundation of reliable AI automation. Everything else in the system can be flexible and context-dependent. Hooks are the fixed points.
+  </p>
+
+  <h2>Three hooks that matter for business owners</h2>
+
+  <p>
+    You do not need to be a developer to use these. Each example below takes about five minutes to set up.
+  </p>
+
+  <h3>1. Log every AI action to a daily file</h3>
+
+  <p>
+    If AI is running tasks in your business, you need a record. Not because you distrust it, but because you need to know what happened yesterday when something goes wrong today.
+  </p>
+
+  <p>
+    A PostToolUse hook can write a one-line entry to a log file every time Claude uses a tool. Date, time, tool name, what it touched. That is it. You end up with a plain text audit trail that you can read in any text editor.
+  </p>
+
+  <p>
+    The setup in your <code>.claude/settings.json</code> looks like this:
+  </p>
+
+  <pre><code>{`{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \\"$(date): $TOOL_NAME used\\" >> ~/ai-logs/$(date +%Y-%m-%d).log"
+          }
+        ]
+      }
+    ]
+  }
+}`}</code></pre>
+
+  <p>
+    Every tool call gets logged. Every day gets its own file. You now have accountability built into the system, not bolted on as an afterthought.
+  </p>
+
+  <h3>2. Send a notification when a task completes</h3>
+
+  <p>
+    If you are running Claude in the background while you do other work, you need to know when it finishes. Checking manually defeats the point of automation.
+  </p>
+
+  <p>
+    A Stop hook solves this. Every time Claude finishes a response, it fires a script that sends you a Telegram message or Slack notification. You keep working. Your phone pings when the task is done.
+  </p>
+
+  <pre><code>{`{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/scripts/notify.py \\"Task complete\\""
+          }
+        ]
+      }
+    ]
+  }
+}`}</code></pre>
+
+  <p>
+    The notify script is simple: call the Telegram or Slack API with a message. Under 20 lines of Python. Claude finishes writing your weekly report at 11:47am. You are in a meeting. Your phone tells you it is done.
+  </p>
+
+  <p>
+    This sounds minor. In practice it changes how you work. You stop hovering over the terminal waiting for Claude to finish. You start treating it like an employee who will find you when the job is done.
+  </p>
+
+  <h3>3. Run a quality check before content goes anywhere</h3>
+
+  <p>
+    This one is for anyone using Claude to produce content, emails, or proposals. Before any file gets written or sent, a PreToolUse hook can run a validation script that checks for your specific requirements: minimum word count, no banned phrases, proper formatting, required sections present.
+  </p>
+
+  <p>
+    If the check fails, the hook returns a non-zero exit code. Claude sees the failure, reads the error message your script outputs, and fixes the problem before proceeding. The file never gets written in a broken state.
+  </p>
+
+  <p>
+    You can also use this for compliance. If your business has rules about what cannot appear in client-facing documents, write those rules into a validation script and attach it as a PreToolUse hook on file writes. It runs every time. You do not have to remember to check.
+  </p>
+
+  <h2>How hooks fit into an AI OS</h2>
+
+  <p>
+    If you have read <a href="/blog/context-engineering-for-business" class="text-primary-light hover:underline">how context engineering works</a>, you already know that a well-built AI system has layers. Each layer handles something different.
+  </p>
+
+  <p>
+    Hooks are the deterministic layer. They handle the things that must happen without exception: logging, notifications, validation, cleanup. You write the rule once. The system enforces it forever.
+  </p>
+
+  <p>
+    Skills are the knowledge layer. They define how recurring tasks should be done: what to check, what decisions to make, what the output should look like. Claude reads them before starting work.
+  </p>
+
+  <p>
+    Memory is the persistence layer. Facts the system has learned about your business, your clients, your preferences. It accumulates over time and makes every task better than the last.
+  </p>
+
+  <p>
+    Context is the identity layer. Your business description, your voice guide, your ICP. It tells Claude who it is working for and how to behave.
+  </p>
+
+  <p>
+    Most people building with AI only work at the context and skills layer. They write good prompts and process definitions. Then they wonder why things sometimes fall through the cracks. Hooks close those cracks. They are what turn a capable AI into a system you can actually rely on.
+  </p>
+
+  <p>
+    The difference between a chatbot and a business operator is the deterministic layer. <a href="/blog/build-ai-agents-that-run-your-business" class="text-primary-light hover:underline">Agents that run your business</a> need both.
+  </p>
+
+  <h2>Setting up your first hook</h2>
+
+  <p>
+    Claude Code hooks live in your project's <code>.claude/settings.json</code> file, inside a <code>hooks</code> object. The structure is straightforward: pick a trigger event, optionally filter by tool name, and provide the command to run.
+  </p>
+
+  <p>
+    Here is a complete minimal example that logs every session to a file:
+  </p>
+
+  <pre><code>{`{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \\"Session ended at $(date)\\" >> ~/ai-logs/sessions.log"
+          }
+        ]
+      }
+    ]
+  }
+}`}</code></pre>
+
+  <p>
+    Add that to your settings file, start Claude, do some work, end the session. Check <code>~/ai-logs/sessions.log</code>. You will see a timestamped entry. That is it. That is your first hook.
+  </p>
+
+  <p>
+    From there you can build up. Add a PostToolUse hook for tool logging. Add a Telegram notification on Stop. Add a PreToolUse validator for file writes. Each hook is independent. Add them one at a time until the system behaves the way you need it to.
+  </p>
+
+  <p>
+    If you are running Claude on a real workflow, the <a href="/blog/getting-started-with-claude-code" class="text-primary-light hover:underline">getting started guide</a> covers the full project structure before you get to hooks.
+  </p>
+
+  <p>
+    The <a href="/free-chapter" class="text-primary-light hover:underline">free preview of the AI OS Blueprint</a> includes the full context engineering architecture: how hooks, skills, memory, and context work together as a system. If you are serious about running operations on Claude rather than just chatting with it, that is where to start. The complete playbook is at <a href="/#pricing" class="text-primary-light hover:underline">the pricing page</a>.
+  </p>
+</BlogPost>

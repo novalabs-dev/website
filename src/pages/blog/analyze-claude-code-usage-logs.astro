@@ -1,0 +1,179 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to analyze your Claude Code usage logs and find where tokens are wasted"
+  description="Claude Code keeps detailed session logs but gives you no way to read them. Here is how to find your logs, what is in them, and how to turn raw data into actionable cost insights."
+  date="April 6, 2026"
+  readTime="8 min read"
+  keywords={["claude code usage logs", "claude code session logs", "claude code token usage", "claude code jsonl", "analyze claude code usage", "claude code usage data", "claude code token waste"]}
+  relatedPosts={[
+    { title: "Claude Code rate limits: why you keep hitting them and what to do about it", slug: "claude-code-rate-limits-explained" },
+    { title: "How much does Claude Code cost per month? Real production numbers", slug: "claude-code-pricing-real-cost-per-month" },
+    { title: "How to track and reduce your Claude Code costs (the complete guide)", slug: "how-to-track-reduce-claude-code-costs" },
+  ]}
+>
+  <p>
+    Claude Code generates detailed logs of every session. Token counts, model selections, tool calls, timestamps, response lengths. The data is there. The problem is that nobody tells you where to find it or how to read it.
+  </p>
+
+  <p>
+    If you are trying to understand why your costs are high or why you keep hitting rate limits, the logs have the answer. Here is how to get to it.
+  </p>
+
+  <h2>Where Claude Code stores session logs</h2>
+
+  <p>
+    Claude Code writes session data to your local filesystem. The exact location depends on your operating system:
+  </p>
+
+  <ul>
+    <li><strong>macOS:</strong> <code>~/.claude/projects/</code> contains per-project session data</li>
+    <li><strong>Linux:</strong> Same path, <code>~/.claude/projects/</code></li>
+    <li><strong>Windows (WSL):</strong> Inside your WSL home directory at the same path</li>
+  </ul>
+
+  <p>
+    Inside each project directory, you will find JSONL files (JSON Lines format) that contain the raw session data. Each line is a JSON object representing one message, tool call, or system event.
+  </p>
+
+  <p>
+    A single active day of Claude Code use can generate 10-50MB of JSONL data. If you have been using Claude Code for a month, you might be sitting on gigabytes of usage data that you have never looked at.
+  </p>
+
+  <h2>What the logs contain</h2>
+
+  <p>
+    Each JSONL entry typically includes:
+  </p>
+
+  <ul>
+    <li><strong>Message role:</strong> Whether this was a user message, assistant response, or system prompt</li>
+    <li><strong>Token counts:</strong> Input tokens and output tokens for each exchange</li>
+    <li><strong>Model used:</strong> Which Claude model handled the request (Opus, Sonnet, Haiku)</li>
+    <li><strong>Tool calls:</strong> Every file read, grep, bash command, and edit, with the content that was sent and returned</li>
+    <li><strong>Timestamps:</strong> When each message was sent and how long the response took</li>
+    <li><strong>Cache information:</strong> Whether cached content was used and cache hit/miss ratios</li>
+  </ul>
+
+  <p>
+    This is enough data to reconstruct exactly where every token went. The challenge is that raw JSONL is not human-readable at scale. A single session can be thousands of lines.
+  </p>
+
+  <h2>What to look for in your usage data</h2>
+
+  <p>
+    Not all token usage is equal. Some is necessary, some is waste. Here are the patterns that matter:
+  </p>
+
+  <h3>Context loading ratio</h3>
+
+  <p>
+    Compare how many tokens go to loading context files (CLAUDE.md, rules, project files) versus actual work (code generation, analysis, edits). If context loading exceeds 30% of your total input tokens, your configuration files are too heavy.
+  </p>
+
+  <p>
+    Fix: move reference material out of CLAUDE.md into separate files. Use an index file that points to detailed docs so Claude only loads what the current task needs.
+  </p>
+
+  <h3>Session length distribution</h3>
+
+  <p>
+    Plot how many tokens each session uses. You will likely find that a small number of long sessions account for a disproportionate share of total usage. In our data, the longest 10% of sessions consumed 45% of all tokens.
+  </p>
+
+  <p>
+    Fix: break long sessions into shorter ones. After 10-15 exchanges, start fresh. The context reload cost is almost always less than the compounding cost of a long conversation.
+  </p>
+
+  <h3>Cache hit rates</h3>
+
+  <p>
+    Claude Code uses prompt caching to avoid resending unchanged content. If your cache hit rate is below 50%, you are paying full price for content that has not changed between messages. Common causes: frequently modified context files, or sessions that restart too often without cache warmup.
+  </p>
+
+  <h3>Model selection patterns</h3>
+
+  <p>
+    Check which model handles which types of requests. If Opus is processing simple file reads or formatting tasks, that is expensive overkill. On API billing, Opus can cost 20x or more per token than Haiku for the same task.
+  </p>
+
+  <h3>Failed or retried requests</h3>
+
+  <p>
+    Look for sequences where the same request appears multiple times. Retries burn tokens without producing value. Common causes: rate limit errors that trigger automatic retries, or tool calls that fail and get re-attempted with slightly different parameters.
+  </p>
+
+  <h2>Analyzing logs manually (the hard way)</h2>
+
+  <p>
+    If you want to parse the data yourself, here is a minimal approach:
+  </p>
+
+  <pre><code set:html={`# Find your session files
+find ~/.claude/projects -name "*.jsonl" -mtime -7
+
+# Count tokens per session (rough)
+cat session.jsonl | python3 -c "
+import sys, json
+total_in, total_out = 0, 0
+for line in sys.stdin:
+    try:
+        obj = json.loads(line)
+        usage = obj.get('usage', {})
+        total_in += usage.get('input_tokens', 0)
+        total_out += usage.get('output_tokens', 0)
+    except: pass
+print(f'Input: {total_in:,} tokens')
+print(f'Output: {total_out:,} tokens')
+"`} /></pre>
+
+  <p>
+    This gives you a rough total but misses the nuance. You need per-message breakdowns, model attribution, cache analysis, and session-over-session trends to make real optimization decisions.
+  </p>
+
+  <h2>Analyzing logs automatically (the easy way)</h2>
+
+  <p>
+    We built <a href="/cost-dashboard/analyze">CostPilot</a> specifically for this problem. Drop your JSONL file into the browser and get:
+  </p>
+
+  <ul>
+    <li>Token breakdown per session and per conversation</li>
+    <li>Model usage split (how much goes to Opus vs Sonnet vs Haiku)</li>
+    <li>Cache hit/miss analysis</li>
+    <li>Waste detection (oversized contexts, retry loops, redundant reads)</li>
+    <li>Cost estimation at current API rates</li>
+  </ul>
+
+  <p>
+    It runs 100% in your browser. The JSONL file never leaves your machine. No account needed, no data collection. We built it because we needed it ourselves and figured others would too.
+  </p>
+
+  <p>
+    <a href="/cost-dashboard/analyze">Try the free analyzer here.</a>
+  </p>
+
+  <h2>What to do with the insights</h2>
+
+  <p>
+    Once you can see your usage patterns, the optimization path is usually obvious:
+  </p>
+
+  <ol>
+    <li><strong>Trim context files</strong> if context loading exceeds 30% of input tokens</li>
+    <li><strong>Shorten sessions</strong> if your longest sessions dominate total usage</li>
+    <li><strong>Route to cheaper models</strong> if Opus is handling simple tasks</li>
+    <li><strong>Fix cache misses</strong> if your hit rate is below 50%</li>
+    <li><strong>Investigate retries</strong> if you see repeated identical requests</li>
+  </ol>
+
+  <p>
+    Most users find one or two changes that cut their usage by 30-50%. The data tells you which changes matter for your specific workflow.
+  </p>
+
+  <p>
+    The logs are already on your machine. The only question is whether you look at them.
+  </p>
+</BlogPost>

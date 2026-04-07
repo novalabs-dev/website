@@ -1,0 +1,187 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to build your first Claude Code skill in 10 minutes (step by step)"
+  description="A Claude Code skill turns a repeated task into a one-command workflow. Here is how to build one from scratch in 10 minutes, with a real example you can copy and use today."
+  date="April 5, 2026"
+  readTime="8 min read"
+  keywords={["claude code skill", "build claude code skill", "claude code tutorial", "claude code skills tutorial", "claude code automation", "create claude code skill"]}
+  relatedPosts={[
+    { title: "The 10 most useful Claude Code skills you can build (or buy) for your business", slug: "best-claude-code-skills-for-business" },
+    { title: "Context engineering for business: why it replaced prompt engineering and how to actually do it", slug: "context-engineering-for-business" },
+    { title: "Claude Code hooks explained: how to make your AI actually do what you tell it", slug: "claude-code-hooks-for-business" },
+  ]}
+>
+  <p>
+    A Claude Code skill is a reusable workflow that Claude follows the same way every time. Instead of re-explaining what you want in every conversation, you define the process once. Then you say "run the meeting prep skill" and it does exactly what the skill document says.
+  </p>
+
+  <p>
+    Skills are what turn Claude Code from a smart assistant into a reliable operator. Without them, every session starts from scratch. With them, Claude Code handles recurring work the same way a well-trained team member would.
+  </p>
+
+  <p>
+    You do not need to be a developer to build one. A skill is a markdown file with a clear set of instructions. If you can write a checklist, you can write a skill.
+  </p>
+
+  <h2>What you need before starting</h2>
+
+  <ul>
+    <li><strong>Claude Code installed and running.</strong> If you have not set this up yet, start with the <a href="/blog/getting-started-with-claude-code">getting started tutorial</a>.</li>
+    <li><strong>A project folder.</strong> Any directory where you want Claude Code to work. This will be your workspace.</li>
+    <li><strong>A task you repeat at least weekly.</strong> Meeting prep, content drafts, email triage, weekly planning. Pick one you know well.</li>
+  </ul>
+
+  <p>
+    For this tutorial, we will build a meeting prep skill. You tell it who you are meeting with, and it produces a one-page brief with background research, talking points, and follow-up items.
+  </p>
+
+  <h2>Step 1: Create the skill directory (1 minute)</h2>
+
+  <p>
+    Inside your project folder, create the skill structure:
+  </p>
+
+  <pre><code>mkdir -p .claude/skills/meeting-prep
+touch .claude/skills/meeting-prep/SKILL.md</code></pre>
+
+  <p>
+    That is the entire structure. A folder and a markdown file. The folder name is the skill name. The SKILL.md file is the process definition.
+  </p>
+
+  <h2>Step 2: Write the skill definition (5 minutes)</h2>
+
+  <p>
+    Open SKILL.md and write the process. Here is a working meeting prep skill:
+  </p>
+
+  <pre><code>---
+name: meeting-prep
+description: Prepare a one-page brief for an upcoming meeting
+---
+
+# Meeting Prep
+
+## Input
+- Who: the person or company you are meeting with
+- When: the meeting date and time
+- Context: any notes about the meeting purpose
+
+## Process
+1. Research the person/company using web search
+2. Check if we have any prior notes or history in memory
+3. Identify 3-5 relevant talking points based on their business and our services
+4. Draft 2-3 questions to ask that show preparation
+5. Note any follow-up items from previous interactions
+
+## Output
+Write a brief with these sections:
+- **Background**: who they are, what they do, recent news
+- **Our angle**: why this meeting matters, what we can offer
+- **Talking points**: 3-5 specific conversation starters
+- **Questions to ask**: 2-3 smart questions
+- **Follow-ups**: anything outstanding from past interactions
+
+Save the brief to `notes/meeting-prep-[name]-[date].md`</code></pre>
+
+  <p>
+    That is a complete skill. Notice what it includes: clear inputs, a step-by-step process, and a defined output format. Claude Code reads this and knows exactly what to do without you explaining it each time.
+  </p>
+
+  <h2>Step 3: Test the skill (3 minutes)</h2>
+
+  <p>
+    Open Claude Code in your project folder and say:
+  </p>
+
+  <pre><code>Prep for my meeting with Sarah Chen from Acme Corp, Thursday at 2pm.
+She wants to discuss automating their client onboarding process.</code></pre>
+
+  <p>
+    Claude Code will find the meeting-prep skill based on the description match, follow the process steps, research Sarah Chen and Acme Corp, and produce a formatted brief saved to your notes folder.
+  </p>
+
+  <p>
+    The first time, check the output carefully. Is the format right? Did it research the right things? Are the talking points relevant? If something is off, edit the SKILL.md to be more specific.
+  </p>
+
+  <h2>Step 4: Refine based on real use (1 minute)</h2>
+
+  <p>
+    After using the skill a few times, you will notice patterns. Maybe you always want it to check LinkedIn. Maybe you want talking points specific to your industry. Add those details to the skill:
+  </p>
+
+  <pre><code>## Process
+1. Research the person/company using web search
+2. Check their LinkedIn profile for recent posts or job changes
+3. Check if we have any prior notes or history in memory
+4. Identify 3-5 talking points related to field service automation
+   (our core offering)
+5. Draft 2-3 questions that demonstrate industry knowledge
+6. Note any follow-up items from previous interactions</code></pre>
+
+  <p>
+    Each refinement makes the skill better. After a month, it produces meeting briefs that would take you 30 minutes to research and write manually.
+  </p>
+
+  <h2>Why this beats prompting</h2>
+
+  <p>
+    You could type detailed instructions every time you need meeting prep. Some people do. Here is why a skill is better:
+  </p>
+
+  <ul>
+    <li><strong>Consistency.</strong> The skill follows the same process every time. No forgetting to check for prior history. No skipping the research step because you are in a rush.</li>
+    <li><strong>Improvement over time.</strong> When you edit the SKILL.md, every future execution benefits. With prompts, you improve one conversation and the next one starts from scratch.</li>
+    <li><strong>Delegation.</strong> Anyone on your team can trigger the skill and get the same quality output. The process knowledge is in the file, not in your head.</li>
+    <li><strong>Composability.</strong> Skills can reference other skills. Your weekly planning skill can trigger meeting prep for every meeting on next week's calendar.</li>
+  </ul>
+
+  <h2>Five more skills you can build today</h2>
+
+  <p>
+    Now that you know the pattern, here are five more skills worth building:
+  </p>
+
+  <ul>
+    <li><strong>Content writer:</strong> Takes a topic and produces a draft in your brand voice, following your style guide and content calendar.</li>
+    <li><strong>Email triage:</strong> Reads your inbox, categorizes messages by urgency, drafts responses for routine items.</li>
+    <li><strong>Weekly review:</strong> Pulls data from your task list, calendar, and notes to generate a structured review of the past week and priorities for next week.</li>
+    <li><strong>Client onboarding:</strong> Takes new client details and produces a welcome email, project setup checklist, and kickoff agenda.</li>
+    <li><strong>Daily planner:</strong> Checks your calendar, tasks, and priorities to produce a focused plan for the day.</li>
+  </ul>
+
+  <p>
+    Each of these follows the same pattern: create a folder, write a SKILL.md with inputs, process, and output, then test and refine.
+  </p>
+
+  <h2>Going further: adding context and memory</h2>
+
+  <p>
+    A single skill is useful. A skill that reads your business context is powerful.
+  </p>
+
+  <p>
+    When you add a business context file (who you are, what you sell, who your clients are) and a memory file (facts Claude has learned over time), every skill benefits. Your meeting prep skill automatically knows your pricing, your services, and your relationship history with each client.
+  </p>
+
+  <p>
+    This is context engineering. The skill defines the process. The context files provide the knowledge. Together, they produce output that no generic AI tool can match because it is built on your specific business reality.
+  </p>
+
+  <p>
+    The <a href="/free-chapter">AI OS Quick Start Guide</a> walks through setting up context files alongside your first skill. It takes about 10 more minutes and makes a significant difference in output quality.
+  </p>
+
+  <h2>Ready-made skills you can use immediately</h2>
+
+  <p>
+    If building from scratch is not your style, the <a href="/#pricing">AI OS Blueprint</a> includes five production-ready business skills: content writing, email triage, meeting prep, daily planning, and weekly reviews. Each one has been refined through real daily use. You clone the repository, fill in your business details, and they work.
+  </p>
+
+  <p>
+    Whether you build your own or start with ready-made ones, the key insight is the same: skills turn Claude Code from a tool you talk to into a system that works for you. And the first one takes 10 minutes to build.
+  </p>
+</BlogPost>

@@ -1,0 +1,176 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="The 7 MCP servers every solopreneur should connect to Claude Code"
+  description="A practical guide to the MCP servers that actually matter for running a solo business with Claude Code. No coding required."
+  date="April 5, 2026"
+  readTime="9 min read"
+  keywords={["MCP servers", "MCP server for business", "best MCP servers solopreneurs", "Claude Code MCP"]}
+  relatedPosts={[
+    { title: "Context engineering for business: why it replaced prompt engineering and how to actually do it", slug: "context-engineering-for-business" },
+    { title: "Getting started with Claude Code: a practical guide for business owners", slug: "getting-started-with-claude-code" },
+    { title: "How to use Claude Code for business: the non-developer's guide", slug: "how-to-use-claude-code-for-business" },
+  ]}
+>
+  <p>
+    Claude Code can write code, draft emails, and analyze documents. But out of the box, it only knows what you tell it in the current session. It cannot check your calendar, see your open invoices, or know what is in your Notion workspace. That is where MCP comes in.
+  </p>
+
+  <p>
+    MCP stands for Model Context Protocol. It is a standard that lets Claude Code connect to external tools and data sources. Think of it like USB ports for your AI. You plug in a server, and Claude can now read from and interact with that tool directly. No copy-pasting data in. No manual exports. The AI just has access.
+  </p>
+
+  <h2>The 7 servers that matter for solo businesses</h2>
+
+  <p>
+    There are hundreds of MCP servers. Most are toys. These seven are the ones that change how a solo business actually operates.
+  </p>
+
+  <h3>1. GitHub</h3>
+
+  <p>
+    If you manage any kind of technical project, even just a simple website, GitHub MCP gives Claude access to your repositories. It can read your codebase, create issues, review pull requests, and track what changed when.
+  </p>
+
+  <p>
+    For solopreneurs, the practical use is project management. Your GitHub issues become your task list. Claude can read them, update them, and close them based on what it has done. No separate project management app needed.
+  </p>
+
+  <pre><code>claude mcp add github --api-key YOUR_GITHUB_TOKEN</code></pre>
+
+  <h3>2. Notion</h3>
+
+  <p>
+    If your business knowledge lives in Notion, this one is worth setting up first. Notion MCP lets Claude read and write to your workspace. Your SOPs, client notes, product docs, and content calendar all become accessible.
+  </p>
+
+  <p>
+    A practical example: you ask Claude to draft a proposal. Instead of re-explaining your pricing every time, it reads your pricing page in Notion. Every draft comes out consistent because the source of truth is always the same.
+  </p>
+
+  <pre><code>claude mcp add notion --api-key YOUR_NOTION_API_KEY</code></pre>
+
+  <h3>3. Google Workspace</h3>
+
+  <p>
+    Calendar, Drive, Gmail. This combination gives Claude the context it needs to handle the daily rhythm of running a business.
+  </p>
+
+  <p>
+    With Google Calendar connected, your AI can check your schedule before drafting a meeting prep email. It will not suggest a 9am Monday call if you have blocked that time. With Drive, it can pull in the relevant documents for a client without you having to find them first. With Gmail, it can check recent thread history before writing a follow-up.
+  </p>
+
+  <pre><code>claude mcp add google-workspace --credentials-file ./google-credentials.json</code></pre>
+
+  <h3>4. A CRM connector</h3>
+
+  <p>
+    HubSpot and Pipedrive both have MCP servers. If you use a simpler setup, like a spreadsheet as your CRM, there is a Google Sheets MCP that works just as well for most solo operations.
+  </p>
+
+  <p>
+    The point is that Claude should know who your clients are, where they are in the pipeline, and what the last interaction was. Without this, every client-facing task starts from scratch. With it, the AI writes follow-ups that actually reference the real conversation.
+  </p>
+
+  <pre><code>claude mcp add hubspot --api-key YOUR_HUBSPOT_KEY
+# or for Google Sheets
+claude mcp add google-sheets --credentials-file ./google-credentials.json</code></pre>
+
+  <h3>5. Stripe or your payment processor</h3>
+
+  <p>
+    Revenue visibility matters. Stripe MCP gives Claude read access to your payment data. It can pull monthly revenue, flag failed payments, list active subscriptions, and tell you which products are selling.
+  </p>
+
+  <p>
+    You set this up once. Then your daily operations briefing includes real revenue numbers, not estimates you pull manually. It also means Claude can flag anomalies without you having to watch the dashboard yourself.
+  </p>
+
+  <pre><code>claude mcp add stripe --api-key YOUR_STRIPE_SECRET_KEY</code></pre>
+
+  <h3>6. A web scraper (Apify or Browserbase)</h3>
+
+  <p>
+    This one gets overlooked, but it is one of the most useful for solopreneurs doing their own market research and competitive analysis.
+  </p>
+
+  <p>
+    Apify MCP lets Claude browse the web and extract structured data on demand. Competitor pricing, job listings in your market, news coverage of an industry, product reviews. Claude can pull this data, structure it, and turn it into a summary. No manual copy-paste, no subscribing to expensive research tools.
+  </p>
+
+  <pre><code>claude mcp add apify --api-key YOUR_APIFY_KEY</code></pre>
+
+  <h3>7. Your own internal tools via Claude Code</h3>
+
+  <p>
+    This is where it gets interesting. MCP is not just for third-party services. You can expose your own internal data as an MCP server. A local SQLite database. Your task tracking system. Your content pipeline. Any structured data source can be wrapped into an MCP server that Claude Code talks to directly.
+  </p>
+
+  <p>
+    This is the AI OS approach. Instead of plugging Claude into a generic stack, you build the exact integrations your business needs. Claude Code can generate the server code. You run it locally. The AI connects to it the same way it connects to GitHub or Stripe.
+  </p>
+
+  <p>
+    If you want to see what this looks like in practice, the <a href="/blog/context-engineering-for-business" class="text-primary-light hover:underline">context engineering guide</a> covers how to structure the information layer around these connections.
+  </p>
+
+  <h2>How to install MCP servers</h2>
+
+  <p>
+    The general pattern for adding any MCP server to Claude Code is:
+  </p>
+
+  <pre><code>claude mcp add [server-name] [--flag value]</code></pre>
+
+  <p>
+    To see what is currently connected:
+  </p>
+
+  <pre><code>claude mcp list</code></pre>
+
+  <p>
+    To remove a server:
+  </p>
+
+  <pre><code>claude mcp remove [server-name]</code></pre>
+
+  <p>
+    Most servers need an API key or credentials file. You get these from the relevant platform (GitHub settings, Notion integrations page, Google Cloud Console, etc.). The server documentation for each one lists exactly what credentials are required and what permissions to grant.
+  </p>
+
+  <p>
+    One practical note: start with one server, not seven. Get comfortable with how Claude uses it before adding more. The value compounds as you add servers, but the setup overhead compounds too. GitHub or Notion is usually the best first connection because the payoff is immediate and obvious.
+  </p>
+
+  <p>
+    For a broader foundation on getting Claude Code running for your business, the <a href="/blog/getting-started-with-claude-code" class="text-primary-light hover:underline">getting started guide</a> walks through the initial setup. If you are past that stage and want to see what daily operations actually look like, <a href="/blog/how-to-use-claude-code-for-business" class="text-primary-light hover:underline">this post on using Claude Code for business</a> covers the practical workflow.
+  </p>
+
+  <h2>MCP servers are tools. An AI OS turns them into a system.</h2>
+
+  <p>
+    Here is the distinction that matters. Connecting seven MCP servers to Claude Code gives you a capable AI with access to a lot of data. That is useful. But it is not the same as an AI that reliably runs your daily operations.
+  </p>
+
+  <p>
+    Tools do not have memory. They do not know your voice or your processes. They do not know that you never schedule calls on Fridays or that a specific client always needs a two-week lead time. Every session, you would still be starting from scratch contextually even if Claude can technically access your calendar.
+  </p>
+
+  <p>
+    An AI OS adds the layer that makes tools into a system. CLAUDE.md tells the AI who it is working for and what the rules are. Skills define the exact process for recurring tasks. Memory accumulates facts across sessions. Voice guidelines make every output sound like you, not like a generic AI response.
+  </p>
+
+  <p>
+    With that foundation in place, MCP servers stop being isolated connections and start being part of a coherent operation. Claude checks your CRM because there is a skill that says to check the CRM before drafting any client email. It looks at your Stripe data because the morning briefing skill pulls revenue as a standard step. The behavior is predictable because the process is defined, not because you reminded it this session.
+  </p>
+
+  <p>
+    That is the difference between AI that helps sometimes and AI that runs daily operations.
+  </p>
+
+  <p>
+    The <a href="/#pricing" class="text-primary-light hover:underline">AI OS Blueprint</a> covers exactly how to build this architecture: the context files, the skills library, the memory system, and how MCP connections fit into the whole. If you want to see the approach before committing, the <a href="/free-chapter" class="text-primary-light hover:underline">free Quick Start Guide</a> is a good place to start.
+  </p>
+</BlogPost>

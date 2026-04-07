@@ -1,0 +1,157 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Claude Code rate limits: why you keep hitting them and what to do about it"
+  description="Claude Code rate limits stop your work cold with no warning. Here is what triggers them, how the quota system actually works, and practical changes that keep you under the line."
+  date="April 6, 2026"
+  readTime="9 min read"
+  keywords={["claude code rate limits", "claude code quota", "claude code usage limits", "claude code max plan limits", "claude code token limits", "claude code slow", "claude code rate limit fix"]}
+  relatedPosts={[
+    { title: "How much does Claude Code cost per month? Real production numbers", slug: "claude-code-pricing-real-cost-per-month" },
+    { title: "How to track and reduce your Claude Code costs (the complete guide)", slug: "how-to-track-reduce-claude-code-costs" },
+    { title: "Claude Code hooks explained: how to make your AI actually do what you tell it", slug: "claude-code-hooks-for-business" },
+  ]}
+>
+  <p>
+    You are in the middle of a session. Claude Code is reading files, making edits, running tests. Then it stops. "Rate limit exceeded." No countdown timer. No indication of when it comes back. You wait, retry, wait some more.
+  </p>
+
+  <p>
+    If this happens to you regularly, you are not alone. Rate limits are the single most common complaint from Claude Code power users. The frustrating part is that Anthropic does not publish exact quota numbers, so you are flying blind.
+  </p>
+
+  <p>
+    Here is what we know from running Claude Code in production for over 30 days straight, hitting every limit there is to hit, and figuring out what actually helps.
+  </p>
+
+  <h2>How Claude Code rate limits work</h2>
+
+  <p>
+    Claude Code uses token-based rate limiting. Every message you send and every response Claude generates consumes tokens. Your available quota depends on your plan tier:
+  </p>
+
+  <ul>
+    <li><strong>Claude Pro ($20/month):</strong> The most restrictive. Heavy sessions can burn through the daily allocation in 2-3 hours of active coding.</li>
+    <li><strong>Claude Max ($100/month):</strong> Significantly more headroom. In our experience, production-level workloads are possible, but sustained heavy use across multiple projects still triggers limits.</li>
+    <li><strong>Claude Max ($200/month):</strong> The highest tier. In our experience, rate limits exist but individual users rarely hit them during normal work.</li>
+    <li><strong>API billing:</strong> No hard rate limits in the traditional sense. You pay per token, so the limit is your wallet. There are requests-per-minute caps that matter for automated workloads.</li>
+  </ul>
+
+  <p>
+    The key detail most people miss: rate limits are not just about total tokens per day. They also apply per minute and per hour. A single session that reads twenty large files in rapid succession can trigger a per-minute cap even if your daily usage is well within bounds.
+  </p>
+
+  <h2>What actually consumes your quota</h2>
+
+  <p>
+    Most people think output tokens (Claude writing code) are the expensive part. They are wrong. Input tokens dominate your usage by a factor of 5-10x in a typical session. Here is where they go:
+  </p>
+
+  <h3>1. Context loading at session start</h3>
+
+  <p>
+    Every time you start a new Claude Code session, it loads your CLAUDE.md, project rules, relevant files, and any memory files. If your project has a large CLAUDE.md (2,000+ words) or multiple rule files, that is thousands of tokens consumed before you even ask a question.
+  </p>
+
+  <p>
+    Multiply that across 20 sessions per day and context loading alone accounts for 20-40% of your daily quota on some plans.
+  </p>
+
+  <h3>2. File reads</h3>
+
+  <p>
+    When Claude Code reads a file to understand it or make edits, the entire file content becomes input tokens. A 500-line Python file is roughly 3,000-5,000 tokens. Read ten files in a session and that is 30,000-50,000 tokens just for reading, before any actual work happens.
+  </p>
+
+  <h3>3. Long conversations</h3>
+
+  <p>
+    Claude Code maintains your full conversation in context. By message 15 in a session, every new message includes the entire conversation history as input. This is where token usage compounds. The 20th message in a session can cost 10x more tokens than the first message.
+  </p>
+
+  <h3>4. Tool use overhead</h3>
+
+  <p>
+    Every tool call (file reads, grep searches, bash commands) adds tokens for the tool definition, the request, and the response. A session with heavy tool use can burn through tokens faster than a conversation-only session, even if the conversation is longer.
+  </p>
+
+  <h2>Practical changes that reduce rate limit hits</h2>
+
+  <h3>Start new sessions instead of continuing long ones</h3>
+
+  <p>
+    The single most effective change. After 10-15 messages, start a fresh session. You lose conversation context but gain a clean token slate. For production workloads, we found that sessions longer than 20 messages hit rate limits 3x more often than shorter ones.
+  </p>
+
+  <h3>Keep CLAUDE.md lean</h3>
+
+  <p>
+    Every token in your CLAUDE.md is loaded on every session. If it has grown to 3,000+ words, trim it. Move detailed reference material to separate files and only load them when needed. Use tiered loading: a compact index file that points to detailed docs, so Claude only reads what the current task requires.
+  </p>
+
+  <h3>Route simple tasks to cheaper models</h3>
+
+  <p>
+    Not every task needs Opus. If you use Claude Code with model routing (via the <code>model:</code> frontmatter in skills or the <code>/model</code> command), sending simple lookups and formatting tasks to Haiku or Sonnet keeps your Opus quota available for complex reasoning.
+  </p>
+
+  <h3>Batch file reads</h3>
+
+  <p>
+    Instead of asking Claude to read files one at a time, give it a clear task with all relevant file paths upfront. Claude Code can read multiple files in parallel when it knows what it needs. Sequential reads mean sequential token charges and more round trips against the rate limiter.
+  </p>
+
+  <h3>Use compact mode when available</h3>
+
+  <p>
+    Claude Code's <code>/compact</code> command summarizes the conversation so far into a shorter form. This reduces the context size for subsequent messages, effectively resetting your per-message token cost without losing all context.
+  </p>
+
+  <h2>How to see where your tokens actually go</h2>
+
+  <p>
+    The core problem with rate limits is visibility. You cannot fix what you cannot see. Claude Code does not show you a live token counter or a breakdown of usage by category.
+  </p>
+
+  <p>
+    Your options:
+  </p>
+
+  <ul>
+    <li><strong>API usage dashboard:</strong> If you are on API billing, Anthropic's console shows token usage per request. Useful but not organized by project or session.</li>
+    <li><strong>JSONL session logs:</strong> Claude Code writes detailed logs of every session. These files contain the raw data, but parsing 50MB of JSONL by hand is not realistic.</li>
+    <li><strong>CostPilot free analyzer:</strong> We built a <a href="/cost-dashboard/analyze">free tool that parses your Claude Code JSONL logs</a> and shows you exactly where tokens go. Per-session breakdown, model split, cache analysis, waste detection. Runs entirely in your browser, nothing leaves your machine.</li>
+  </ul>
+
+  <p>
+    Knowing where your tokens go is the first step to staying under rate limits. Once you can see that 40% of your daily usage is context loading, you know to trim your CLAUDE.md. Once you see that one project generates 3x the tokens of another, you know where to focus optimization.
+  </p>
+
+  <h2>When rate limits mean you need a different plan</h2>
+
+  <p>
+    Sometimes the answer is not optimization but capacity. Here is a rough guide:
+  </p>
+
+  <ul>
+    <li><strong>Hitting limits once or twice a week:</strong> Optimize first. The tips above will probably solve it.</li>
+    <li><strong>Hitting limits daily:</strong> You are likely on the wrong plan tier. If you are on Pro, Max $100 is worth the upgrade. If you are on Max $100 and hitting limits daily, the $200 tier or API billing might make more sense.</li>
+    <li><strong>Running automated workloads:</strong> API billing is almost certainly the right choice. Scheduled tasks, heartbeat systems, and multi-agent setups blow through subscription limits fast.</li>
+  </ul>
+
+  <p>
+    The math depends on your usage pattern. Our <a href="/cost-dashboard/analyze">free analyzer</a> can help you estimate whether API or subscription is cheaper for your workload.
+  </p>
+
+  <h2>The bottom line</h2>
+
+  <p>
+    Rate limits are a token budget problem, not a speed problem. The solution is knowing where your tokens go and making deliberate choices about what gets loaded into context and when. Short sessions, lean context files, model routing, and usage visibility are the four levers that matter.
+  </p>
+
+  <p>
+    Start by analyzing your actual usage. Everything else follows from that data.
+  </p>
+</BlogPost>

@@ -63,30 +63,30 @@ export default async (req) => {
     <h1 style="color: #a78bfa; margin: 0;">Nova<span style="color: #888;">Labs</span></h1>
   </div>
 
-  <h2 style="color: #f0f0f0;">Your free AI OS preview is ready</h2>
+  <h2 style="color: #f0f0f0;">Your AI OS Quick Start Guide is ready</h2>
 
-  <p>Thanks for your interest in the AI OS Blueprint. Here are your free chapters:</p>
+  <p>You're 10 minutes away from a working AI skill that writes content in your voice. Not a chatbot. A system.</p>
 
   <div style="text-align: center; margin: 30px 0;">
-    <a href="${downloadUrl}" style="display: inline-block; padding: 14px 28px; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Download Chapters 1 & 2 (PDF)</a>
+    <a href="${downloadUrl}" style="display: inline-block; padding: 14px 28px; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Download Quick Start Guide (PDF)</a>
   </div>
 
-  <p><strong>What you'll learn:</strong></p>
+  <p><strong>What you'll build:</strong></p>
   <ul style="color: #ccc; line-height: 1.8;">
-    <li>Why 95% of founders waste their AI potential</li>
-    <li>The difference between "using AI" and "having an AI system"</li>
-    <li>The 6 building blocks of every AI Operating System</li>
-    <li>A visual architecture diagram you can reference while building</li>
+    <li>Your AI OS project structure (2 minutes)</li>
+    <li>A context file that teaches AI your business and voice</li>
+    <li>A content writing skill that produces posts as YOU</li>
+    <li>A repeatable system you can extend to email, meetings, reviews</li>
   </ul>
 
   <div style="margin: 30px 0; padding: 20px; border: 1px solid #333; border-radius: 8px; background-color: #111;">
-    <p style="margin: 0 0 10px 0; font-weight: bold; color: #f0f0f0;">Ready for the full system?</p>
-    <p style="margin: 0 0 15px 0; color: #aaa;">The complete playbook has 12 chapters, 5 premium skills, and a ready-to-clone AI OS repo.</p>
-    <a href="${playbookUrl}" style="color: #a78bfa; text-decoration: underline;">See pricing and get the full playbook</a>
+    <p style="margin: 0 0 10px 0; font-weight: bold; color: #f0f0f0;">Want more skills without building them yourself?</p>
+    <p style="margin: 0 0 15px 0; color: #aaa;">The Skill Pack gives you 5 production-ready skills (content writer, email triage, meeting prep, daily planner, weekly review) for $9. Or get the full 12-chapter playbook with architecture deep-dives and a clone-ready repo.</p>
+    <a href="${playbookUrl}" style="color: #a78bfa; text-decoration: underline;">See pricing and options</a>
   </div>
 
   <p style="color: #666; font-size: 12px; margin-top: 40px; border-top: 1px solid #222; padding-top: 20px;">
-    You're receiving this because you requested the free AI OS Blueprint preview from nova-labs.dev.<br>
+    You're receiving this because you requested the AI OS Quick Start Guide from nova-labs.dev.<br>
     Nova Labs - An AI-first business experiment by AckNova Automations.
   </p>
 </body>
@@ -96,9 +96,9 @@ export default async (req) => {
     await transporter.sendMail({
       from: '"Nova Labs" <support@nova-labs.dev>',
       to: email,
-      subject: "Your free AI OS Blueprint preview",
+      subject: "Your AI OS Quick Start Guide",
       html: htmlBody,
-      text: `Your free AI OS preview is ready!\n\nDownload chapters 1 & 2 here: ${downloadUrl}\n\nReady for the full system? See pricing: ${playbookUrl}\n\nNova Labs - An AI-first business experiment by AckNova Automations.`,
+      text: `Your AI OS Quick Start Guide is ready!\n\nYou're 10 minutes away from a working AI skill. Download the guide: ${downloadUrl}\n\nWant more skills? See pricing: ${playbookUrl}\n\nNova Labs - An AI-first business experiment by AckNova Automations.`,
     });
 
     return new Response(

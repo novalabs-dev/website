@@ -1,0 +1,153 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to cut your Claude Code context window costs in half"
+  description="Context window usage is the biggest hidden cost in Claude Code. Most of your tokens go to loading context, not generating code. Here are seven changes that cut context costs by 40-60 percent."
+  date="April 6, 2026"
+  readTime="8 min read"
+  keywords={["claude code context window", "claude code token usage", "reduce claude code cost", "claude code context size", "claude code expensive", "claude code token optimization", "claude code save tokens", "claude code input tokens"]}
+  relatedPosts={[
+    { title: "Claude Code rate limits: why you keep hitting them and what to do about it", slug: "claude-code-rate-limits-explained" },
+    { title: "How to analyze your Claude Code usage logs and find where tokens are wasted", slug: "analyze-claude-code-usage-logs" },
+    { title: "Is Claude Code Max worth it? A real cost breakdown with numbers", slug: "is-claude-code-max-worth-it" },
+  ]}
+>
+  <p>
+    Here is something most Claude Code users do not realize: even though output tokens cost more per token, input tokens dominate your total bill by sheer volume. In a typical session, input tokens outnumber output tokens 5-10x. And the biggest source of input tokens is not the code you ask Claude to read. It is the context window filling up with things you did not explicitly ask for.
+  </p>
+
+  <p>
+    In a typical 20-message Claude Code session, over 70% of your total token volume is input. That includes your CLAUDE.md loaded on every message, the growing conversation history, file contents from previous reads still in context, and tool definitions you never use.
+  </p>
+
+  <p>
+    The good news: most of this waste is fixable. Here are seven specific changes that reduce context window costs, based on real data from 30 days of continuous Claude Code use.
+  </p>
+
+  <h2>1. Trim your CLAUDE.md to under 500 words</h2>
+
+  <p>
+    Your CLAUDE.md loads on every single message in every session. If it is 2,000 words (roughly 3,000 tokens), and you send 15 messages in a session across 10 sessions per day, that is 450,000 tokens per day just for your project instructions.
+  </p>
+
+  <p>
+    Most CLAUDE.md files grow over time. They accumulate conventions, debugging notes, architectural decisions, and workflow instructions that seemed important once. Audit yours. Move reference material to separate files. Keep the CLAUDE.md to critical instructions only.
+  </p>
+
+  <p>
+    A lean CLAUDE.md of 300-500 words (450-750 tokens) saves you 60-75% of context loading costs compared to a 2,000-word version.
+  </p>
+
+  <h2>2. Use tiered context loading</h2>
+
+  <p>
+    Instead of dumping everything into CLAUDE.md, create an index file that points to detailed reference files. Tell Claude to load them only when relevant:
+  </p>
+
+  <pre><code># CLAUDE.md (lean version)
+## Architecture
+See `docs/ARCHITECTURE.md` for full details.
+
+## Conventions
+See `docs/CONVENTIONS.md` for coding standards.
+
+## API Reference
+See `docs/API.md` when working on API endpoints.
+</code></pre>
+
+  <p>
+    Claude reads the 50-word CLAUDE.md on every message. It only reads ARCHITECTURE.md when it needs to understand the architecture. The savings compound across every message.
+  </p>
+
+  <h2>3. Keep sessions under 15 messages</h2>
+
+  <p>
+    This is the single highest-impact change you can make. Here is why:
+  </p>
+
+  <p>
+    Every message in a Claude Code session includes the full conversation history. Message 1 carries only the initial context. Message 10 carries messages 1-9 plus their responses. Message 20 carries everything from the entire session.
+  </p>
+
+  <p>
+    The token cost per message grows linearly, which means total session cost grows quadratically. A 20-message session does not cost twice as much as a 10-message session. It costs roughly four times as much.
+  </p>
+
+  <p>
+    When you finish a logical unit of work (one bug fixed, one feature added, one test passing), start a new session. The context reset is free. The productivity hit is minimal because you start the new session with a clear, specific task.
+  </p>
+
+  <h2>4. Use /compact before long sessions</h2>
+
+  <p>
+    If you need a longer session, use Claude Code's <code>/compact</code> command at message 10-12. This summarizes the conversation so far into a shorter representation, reducing the context that gets carried into subsequent messages.
+  </p>
+
+  <p>
+    In practice, <code>/compact</code> reduces the carried context by 50-70%. A session that would have cost 200K tokens for messages 12-20 drops to 80-120K tokens. The trade-off is that some nuance from earlier messages gets lost in the summary, but for most coding tasks the summary retains what matters.
+  </p>
+
+  <h2>5. Be specific about which files to read</h2>
+
+  <p>
+    When you say "fix the bug in the auth module," Claude might read every file in the auth directory looking for the problem. If that directory has 15 files averaging 300 lines each, you just loaded 45,000 tokens of context.
+  </p>
+
+  <p>
+    Instead: "fix the bug in src/auth/middleware.ts, line 47 throws when the session cookie is missing." Claude reads one file, jumps to the relevant section, and fixes it. Total context loaded: 3,000 tokens.
+  </p>
+
+  <p>
+    Being specific about file paths and line numbers is not just faster. It is 10-15x cheaper in tokens.
+  </p>
+
+  <h2>6. Route simple tasks to cheaper models</h2>
+
+  <p>
+    Claude Code defaults to Opus for reasoning-heavy tasks. Opus is more expensive per token than Sonnet or Haiku. For tasks that do not require complex reasoning (formatting, simple edits, file lookups, running commands), routing to a cheaper model saves both tokens and rate limit quota.
+  </p>
+
+  <p>
+    If you use automated scripts or structured workflows with Claude Code, you can specify a cheaper model for mechanical tasks. Some setups support a <code>model</code> flag or configuration that routes simple jobs to Sonnet or Haiku automatically. This is especially effective for automated workflows that run without you watching.
+  </p>
+
+  <h2>7. Clean up your rules directory</h2>
+
+  <p>
+    Claude Code loads <code>.claude/rules/</code> files into context alongside CLAUDE.md. Every rule file adds to the per-message token cost. If you have six rule files averaging 200 words each, that is 1,200 words (1,800 tokens) loaded on every message.
+  </p>
+
+  <p>
+    Audit your rules. Merge related ones. Delete rules for behavior Claude already follows by default. Move conditional rules (only relevant for specific tasks) into skill-specific files that load on demand, not globally.
+  </p>
+
+  <h2>Measuring the impact</h2>
+
+  <p>
+    The challenge with all of these optimizations is knowing whether they worked. Claude Code does not show you a live token counter or a before-and-after comparison.
+  </p>
+
+  <p>
+    What it does give you is JSONL session logs. Every session writes a detailed log file that includes token counts per message, model used, and tool calls. The data is there. You just need a way to read it.
+  </p>
+
+  <p>
+    Our <a href="/cost-dashboard/analyze">free cost analyzer</a> parses those logs and shows you exactly where tokens go. Per-session breakdowns, input vs output splits, cache hit rates, and waste detection. Run it before you optimize and after. The numbers tell you what worked.
+  </p>
+
+  <h2>The compound effect</h2>
+
+  <p>
+    None of these changes is dramatic on its own. Trimming CLAUDE.md saves 15%. Shorter sessions save 20%. Specific file reads save 10% per instance. But they compound. Apply all seven and you can realistically cut your token usage by 40-60%.
+  </p>
+
+  <p>
+    That might mean your current plan has plenty of headroom when you thought you needed an upgrade. Or it might mean your Max 5x plan feels like Max 10x. Either way, you are getting more work done per dollar.
+  </p>
+
+  <p>
+    Start by <a href="/cost-dashboard/analyze">analyzing your current usage</a>. You cannot optimize what you cannot see.
+  </p>
+</BlogPost>
