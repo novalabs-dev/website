@@ -1,0 +1,287 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is a CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "A CLAUDE.md file is a project configuration file that sits in your repository root. Claude Code reads it at the start of every session to understand your project's conventions, architecture, and coding style. It dramatically improves the quality of Claude's output." }},
+    { "@type": "Question", "name": "Where do I put my CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "Place it in your project root directory, right next to your package.json or pyproject.toml. Claude Code automatically looks for it when you start a session in that directory." }},
+    { "@type": "Question", "name": "How long should a CLAUDE.md be?", "acceptedAnswer": { "@type": "Answer", "text": "Most effective CLAUDE.md files are 50-150 lines. Too short and Claude misses context. Too long and you waste tokens loading it every session. Focus on what actually changes Claude's behavior." }},
+    { "@type": "Question", "name": "Can I use CLAUDE.md with Cursor or other tools?", "acceptedAnswer": { "@type": "Answer", "text": "The concept works across tools but the filenames differ. Cursor uses .cursorrules, GitHub Copilot uses AGENTS.md, and Gemini CLI uses GEMINI.md. Tools like ContextKit can generate the correct format for each tool." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to write the perfect CLAUDE.md (with examples for every stack)"
+  description="Your CLAUDE.md file is the single biggest lever for Claude Code output quality. Here's how to write one that actually works, with real examples for React, Python, Go, and more."
+  date="April 8, 2026"
+  readTime="12 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write a CLAUDE.md that actually makes Claude Code useful", slug: "how-to-write-claudemd" },
+    { title: "How to set up Claude Code for a new project", slug: "how-to-setup-claude-code-for-new-project" },
+    { title: "Claude Code subagents: run parallel tasks and finish faster", slug: "claude-code-subagents-parallel-tasks" },
+  ]}
+>
+  <p>
+    You install Claude Code. You open a project. You ask it to build something. And the output is... fine. Generic. It uses the wrong naming convention, picks a testing library you don't use, and structures the code in a way that doesn't match your codebase.
+  </p>
+
+  <p>
+    The fix is a CLAUDE.md file. It's the single biggest lever you have for improving Claude Code's output quality. But most people either skip it or write one that doesn't actually help.
+  </p>
+
+  <p>
+    This guide covers exactly what to include, what to skip, and how to structure it for maximum impact. If you want to skip the reading and generate one instantly, <a href="/contextkit/generate">use our free CLAUDE.md generator</a> - it takes 30 seconds.
+  </p>
+
+  <h2>What is a CLAUDE.md file?</h2>
+
+  <p>
+    CLAUDE.md is a markdown file in your project root that Claude Code reads at the start of every session. Think of it as a project brief for your AI coding assistant. It tells Claude:
+  </p>
+
+  <ul>
+    <li>What tech stack you're using</li>
+    <li>How your code is organized</li>
+    <li>Your coding conventions and style preferences</li>
+    <li>How to test and lint your code</li>
+    <li>What to avoid doing</li>
+  </ul>
+
+  <p>
+    Without it, Claude makes reasonable guesses. With a good one, Claude writes code that actually fits your project.
+  </p>
+
+  <h2>The 5 sections every CLAUDE.md needs</h2>
+
+  <p>
+    After working with CLAUDE.md files across dozens of projects, these are the sections that consistently improve output quality. In order of impact:
+  </p>
+
+  <h3>1. Project overview (3-5 lines)</h3>
+
+  <p>
+    Keep it short. Claude doesn't need your product roadmap. It needs to know what it's working with.
+  </p>
+
+  <pre><code>## Project Overview
+
+This is a Next.js 14 web application using the App Router, Tailwind CSS,
+and Supabase for auth and database. It's a B2B SaaS dashboard for
+managing inventory across multiple warehouses.</code></pre>
+
+  <p>
+    Why this works: Claude immediately knows the framework version (App Router, not Pages), the styling approach (Tailwind, don't generate CSS modules), and the domain (inventory management, use relevant terminology).
+  </p>
+
+  <h3>2. Code conventions (the highest-impact section)</h3>
+
+  <p>
+    This is where most CLAUDE.md files fail. They either include nothing, or they paste in their entire ESLint config. Neither helps.
+  </p>
+
+  <p>
+    Focus on the conventions that Claude gets wrong without guidance:
+  </p>
+
+  <pre><code>## Code Style & Conventions
+
+- Only add comments where the logic is not self-evident
+- No premature abstractions - three similar lines is better than a helper function
+- Handle errors at system boundaries, not inside internal functions
+- Use strict TypeScript everywhere, no `any` type
+- Prefer named exports over default exports
+- File naming: kebab-case for files, PascalCase for components
+- Import order: external deps, then internal, then relative</code></pre>
+
+  <p>
+    Each rule here directly changes Claude's behavior. Without "no premature abstractions," Claude creates utility functions for everything. Without "strict TypeScript," you get <code>any</code> sprinkled everywhere.
+  </p>
+
+  <h3>3. Testing setup</h3>
+
+  <pre><code>## Testing
+
+- Framework: Vitest
+- Run tests: `npx vitest`
+- Test files go next to source files (e.g., `user-service.test.ts`)
+- Prefer integration tests for API routes
+- Use descriptive test names: "should return 404 when user not found"</code></pre>
+
+  <p>
+    Without this, Claude might use Jest syntax in a Vitest project, put tests in a separate <code>__tests__</code> directory when you co-locate them, or write unit tests when you want integration tests.
+  </p>
+
+  <h3>4. File structure</h3>
+
+  <pre><code>## File Structure
+
+```
+src/
+  app/          # Next.js App Router pages
+  components/   # Reusable UI components
+  lib/          # Business logic and utilities
+  hooks/        # Custom React hooks
+  types/        # Shared TypeScript types
+```</code></pre>
+
+  <p>
+    This prevents Claude from creating new directories that don't match your structure. It also helps Claude find existing code instead of reimplementing something that already exists in <code>lib/</code>.
+  </p>
+
+  <h3>5. Important notes (things to avoid)</h3>
+
+  <pre><code>## Important Notes
+
+- Read existing code before suggesting modifications
+- Prefer editing existing files over creating new ones
+- Do not add features or refactoring beyond what was asked
+- Use App Router patterns (server components by default)
+- Database migrations go in supabase/migrations/</code></pre>
+
+  <p>
+    These "negative instructions" are surprisingly effective. "Do not add features beyond what was asked" stops Claude from adding error handling, logging, and type annotations to code you didn't ask it to touch.
+  </p>
+
+  <h2>Common mistakes that waste tokens</h2>
+
+  <h3>Including your entire README</h3>
+
+  <p>
+    Claude reads your CLAUDE.md every single session. Every line costs tokens. A 500-line CLAUDE.md that includes installation instructions, contribution guidelines, and deployment docs wastes tokens on information Claude rarely needs.
+  </p>
+
+  <p>
+    Rule of thumb: if a section doesn't change Claude's coding behavior, remove it.
+  </p>
+
+  <h3>Being too vague</h3>
+
+  <p>
+    "Write clean code" tells Claude nothing. "Use named exports, kebab-case file names, and co-locate test files" tells Claude exactly what to do. Every rule should be specific enough that you could check whether Claude followed it.
+  </p>
+
+  <h3>Duplicating what Claude already knows</h3>
+
+  <p>
+    You don't need to explain how React hooks work or what TypeScript generics are. Claude knows. Focus on your project-specific conventions that Claude can't infer from the code alone.
+  </p>
+
+  <h2>Real examples by stack</h2>
+
+  <h3>React + TypeScript (Next.js)</h3>
+
+  <pre><code># Project Configuration
+
+## Overview
+Next.js 14 App Router, TypeScript strict, Tailwind CSS, Supabase.
+
+## Conventions
+- Server Components by default, "use client" only when needed
+- Use Tailwind classes, never inline styles or CSS modules
+- Strict TypeScript, no `any`
+- Named exports only
+- Use `cn()` from lib/utils for conditional classes
+
+## Testing
+- Vitest + Testing Library
+- Run: `npx vitest`
+- Co-locate tests next to source files
+
+## File Structure
+```
+src/app/       # Pages and layouts
+src/components # UI components
+src/lib/       # Business logic
+src/hooks/     # Custom hooks
+```</code></pre>
+
+  <h3>Python (FastAPI)</h3>
+
+  <pre><code># Project Configuration
+
+## Overview
+FastAPI backend with SQLAlchemy ORM and Alembic migrations. PostgreSQL database.
+
+## Conventions
+- Type hints on all function signatures
+- Pydantic models for request/response validation
+- Use dependency injection for database sessions
+- Handle errors with HTTPException, not generic try/catch
+- No print() for debugging, use structured logging
+
+## Testing
+- pytest with httpx for async tests
+- Run: `pytest -v`
+- Test files in tests/ mirroring src/ structure
+
+## File Structure
+```
+app/
+  routers/    # Route handlers
+  models/     # SQLAlchemy models
+  schemas/    # Pydantic schemas
+  services/   # Business logic
+  deps.py     # Dependency injection
+```</code></pre>
+
+  <h3>Go (API server)</h3>
+
+  <pre><code># Project Configuration
+
+## Overview
+Go REST API using standard library net/http and sqlx for database access.
+
+## Conventions
+- Follow Go conventions: short variable names, error returns
+- Handle every error explicitly, no blank identifier
+- Use context.Context for request-scoped values
+- Interfaces in the consuming package, not the implementing package
+- No global state, pass dependencies through constructors
+
+## Testing
+- go test with table-driven tests
+- Run: `go test ./...`
+- Test files next to source (*_test.go)
+
+## File Structure
+```
+cmd/server/    # Entry point
+internal/
+  handler/     # HTTP handlers
+  service/     # Business logic
+  store/       # Database access
+  model/       # Data types
+```</code></pre>
+
+  <h2>Advanced: multi-tool configuration</h2>
+
+  <p>
+    If your team uses different AI coding tools, you need different config files. CLAUDE.md is for Claude Code. Cursor reads <code>.cursorrules</code>. GitHub Copilot reads <code>AGENTS.md</code>. Gemini CLI reads <code>GEMINI.md</code>.
+  </p>
+
+  <p>
+    The core rules are the same across tools - your conventions don't change because you switched editors. But the format and some tool-specific features differ.
+  </p>
+
+  <p>
+    <a href="/contextkit/generate">ContextKit's free generator</a> exports to all four formats from a single configuration. Answer the questions once, export for each tool your team uses.
+  </p>
+
+  <h2>Generate yours in 30 seconds</h2>
+
+  <p>
+    Writing a CLAUDE.md from scratch works, but you'll miss best practices that come from seeing hundreds of configurations. Our free generator includes 40+ proven rules, stack-specific templates, and multi-tool export.
+  </p>
+
+  <p>
+    <a href="/contextkit/generate" style="font-weight: 600;">Try the free ContextKit generator</a> - no signup, runs in your browser, copy to clipboard in one click.
+  </p>
+
+  <p>
+    If you want to go deeper into building a complete AI-powered development workflow around Claude Code, check out the <a href="/#pricing">AI OS Blueprint</a> - it covers the full system architecture including CLAUDE.md, skills, memory, and task automation.
+  </p>
+</BlogPost>

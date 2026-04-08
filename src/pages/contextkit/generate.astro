@@ -1,0 +1,714 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Free CLAUDE.md Generator - Create Your Config in 30 Seconds | ContextKit"
+  description="Answer 5 questions about your project and get an optimized CLAUDE.md file. Works with Claude Code, Cursor, Codex, and Gemini CLI. No signup needed."
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/contextkit" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Context</span><span class="text-text-dim">Kit</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/contextkit" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Overview</a>
+        <a href="/contextkit#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">Get Pro access</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative min-h-screen pt-24 pb-16">
+    <div class="section-container max-w-4xl">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-6 text-sm text-success">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          Free - runs in your browser, no account needed
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4 tracking-tight">
+          Generate your <span class="gradient-text">CLAUDE.md</span>
+        </h1>
+        <p class="text-lg text-text-muted max-w-2xl mx-auto">
+          Answer a few questions about your project. Get a production-ready config file in seconds.
+        </p>
+      </div>
+
+      <!-- WIZARD -->
+      <div id="wizard" class="glass-card p-8 mb-8">
+        <!-- Step indicator -->
+        <div class="flex items-center justify-center gap-2 mb-8" id="step-indicator">
+          <div class="step-dot active" data-step="1">1</div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="2">2</div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="3">3</div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="4">4</div>
+          <div class="step-line"></div>
+          <div class="step-dot" data-step="5">5</div>
+        </div>
+
+        <!-- Step 1: Language & Framework -->
+        <div class="wizard-step" data-step="1">
+          <h2 class="text-xl font-bold mb-2">What's your tech stack?</h2>
+          <p class="text-text-muted text-sm mb-6">Pick your primary language and framework.</p>
+
+          <div class="mb-6">
+            <label class="text-sm font-semibold text-text-muted mb-2 block">Language</label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="lang-select">
+              <button class="option-btn" data-value="typescript">TypeScript</button>
+              <button class="option-btn" data-value="javascript">JavaScript</button>
+              <button class="option-btn" data-value="python">Python</button>
+              <button class="option-btn" data-value="go">Go</button>
+              <button class="option-btn" data-value="rust">Rust</button>
+              <button class="option-btn" data-value="java">Java</button>
+              <button class="option-btn" data-value="csharp">C#</button>
+              <button class="option-btn" data-value="ruby">Ruby</button>
+              <button class="option-btn" data-value="php">PHP</button>
+              <button class="option-btn" data-value="swift">Swift</button>
+              <button class="option-btn" data-value="kotlin">Kotlin</button>
+              <button class="option-btn" data-value="other">Other</button>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="text-sm font-semibold text-text-muted mb-2 block">Framework <span class="text-text-dim">(optional)</span></label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="framework-select">
+              <button class="option-btn" data-value="react">React</button>
+              <button class="option-btn" data-value="nextjs">Next.js</button>
+              <button class="option-btn" data-value="vue">Vue</button>
+              <button class="option-btn" data-value="nuxt">Nuxt</button>
+              <button class="option-btn" data-value="svelte">Svelte</button>
+              <button class="option-btn" data-value="astro">Astro</button>
+              <button class="option-btn" data-value="express">Express</button>
+              <button class="option-btn" data-value="fastapi">FastAPI</button>
+              <button class="option-btn" data-value="django">Django</button>
+              <button class="option-btn" data-value="flask">Flask</button>
+              <button class="option-btn" data-value="rails">Rails</button>
+              <button class="option-btn" data-value="laravel">Laravel</button>
+              <button class="option-btn" data-value="spring">Spring</button>
+              <button class="option-btn" data-value="gin">Gin</button>
+              <button class="option-btn" data-value="none">None / CLI tool</button>
+              <button class="option-btn" data-value="other">Other</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Project Type -->
+        <div class="wizard-step hidden" data-step="2">
+          <h2 class="text-xl font-bold mb-2">What are you building?</h2>
+          <p class="text-text-muted text-sm mb-6">This shapes the architecture section of your CLAUDE.md.</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="project-type-select">
+            <button class="option-btn-lg" data-value="web-app">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+              Web app
+            </button>
+            <button class="option-btn-lg" data-value="api">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              API / Backend
+            </button>
+            <button class="option-btn-lg" data-value="cli">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              CLI tool
+            </button>
+            <button class="option-btn-lg" data-value="library">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
+              Library / Package
+            </button>
+            <button class="option-btn-lg" data-value="mobile">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+              Mobile app
+            </button>
+            <button class="option-btn-lg" data-value="monorepo">
+              <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+              Monorepo
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Testing & Quality -->
+        <div class="wizard-step hidden" data-step="3">
+          <h2 class="text-xl font-bold mb-2">Testing & quality setup</h2>
+          <p class="text-text-muted text-sm mb-6">Tell Claude how you test and lint your code.</p>
+
+          <div class="mb-6">
+            <label class="text-sm font-semibold text-text-muted mb-2 block">Test framework</label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="test-select">
+              <button class="option-btn" data-value="jest">Jest</button>
+              <button class="option-btn" data-value="vitest">Vitest</button>
+              <button class="option-btn" data-value="pytest">pytest</button>
+              <button class="option-btn" data-value="go-test">go test</button>
+              <button class="option-btn" data-value="rspec">RSpec</button>
+              <button class="option-btn" data-value="junit">JUnit</button>
+              <button class="option-btn" data-value="phpunit">PHPUnit</button>
+              <button class="option-btn" data-value="playwright">Playwright</button>
+              <button class="option-btn" data-value="cypress">Cypress</button>
+              <button class="option-btn" data-value="none">No tests yet</button>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="text-sm font-semibold text-text-muted mb-2 block">Linter / Formatter</label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="lint-select">
+              <button class="option-btn" data-value="eslint">ESLint</button>
+              <button class="option-btn" data-value="prettier">Prettier</button>
+              <button class="option-btn" data-value="biome">Biome</button>
+              <button class="option-btn" data-value="ruff">Ruff</button>
+              <button class="option-btn" data-value="black">Black</button>
+              <button class="option-btn" data-value="golangci-lint">golangci-lint</button>
+              <button class="option-btn" data-value="rubocop">RuboCop</button>
+              <button class="option-btn" data-value="clippy">Clippy</button>
+              <button class="option-btn" data-value="none">None</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Conventions -->
+        <div class="wizard-step hidden" data-step="4">
+          <h2 class="text-xl font-bold mb-2">Your coding conventions</h2>
+          <p class="text-text-muted text-sm mb-6">Select rules you want Claude to follow. These are the most impactful ones.</p>
+
+          <div class="space-y-3" id="conventions-select">
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="no-comments" checked />
+              <div><span class="text-sm font-semibold">Minimal comments</span><br><span class="text-text-dim text-xs">Only comment when the logic isn't self-evident. No docstrings on obvious functions.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="no-unnecessary-abstractions" checked />
+              <div><span class="text-sm font-semibold">No premature abstractions</span><br><span class="text-text-dim text-xs">Three similar lines of code is better than a premature abstraction. Build for what's needed now.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="error-handling" checked />
+              <div><span class="text-sm font-semibold">Explicit error handling</span><br><span class="text-text-dim text-xs">Handle errors at system boundaries. Don't wrap internal code in try/catch unless there's a real failure mode.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="security-first" />
+              <div><span class="text-sm font-semibold">Security-first</span><br><span class="text-text-dim text-xs">Never introduce XSS, SQL injection, or command injection. Validate all user input. Sanitize outputs.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="tdd" />
+              <div><span class="text-sm font-semibold">Test-driven development</span><br><span class="text-text-dim text-xs">Write failing tests first, then implement. Every feature needs test coverage before merging.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="strict-types" />
+              <div><span class="text-sm font-semibold">Strict typing</span><br><span class="text-text-dim text-xs">Use strict types everywhere. No 'any' in TypeScript, type hints required in Python, explicit types in Go.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="functional" />
+              <div><span class="text-sm font-semibold">Functional style</span><br><span class="text-text-dim text-xs">Prefer pure functions, immutable data, and composition over inheritance. Avoid side effects where possible.</span></div>
+            </label>
+            <label class="flex items-start gap-3 glass-card p-4 cursor-pointer hover:border-primary/30 transition-colors">
+              <input type="checkbox" class="mt-1 accent-primary" value="small-functions" />
+              <div><span class="text-sm font-semibold">Small functions</span><br><span class="text-text-dim text-xs">Functions should do one thing. If a function needs a comment to explain what it does, split it.</span></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 5: Export -->
+        <div class="wizard-step hidden" data-step="5">
+          <h2 class="text-xl font-bold mb-2">Choose your format</h2>
+          <p class="text-text-muted text-sm mb-6">Export for one or more AI coding tools.</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8" id="format-select">
+            <button class="option-btn-lg active" data-value="claude">
+              <span class="text-lg font-black gradient-text">CLAUDE.md</span>
+              <span class="text-text-dim text-xs">Claude Code</span>
+            </button>
+            <button class="option-btn-lg" data-value="cursor">
+              <span class="text-lg font-black text-primary-light">.cursorrules</span>
+              <span class="text-text-dim text-xs">Cursor</span>
+            </button>
+            <button class="option-btn-lg" data-value="codex">
+              <span class="text-lg font-black text-accent-light">AGENTS.md</span>
+              <span class="text-text-dim text-xs">Codex / Copilot</span>
+            </button>
+            <button class="option-btn-lg" data-value="gemini">
+              <span class="text-lg font-black text-warning">GEMINI.md</span>
+              <span class="text-text-dim text-xs">Gemini CLI</span>
+            </button>
+          </div>
+
+          <div id="output-container" class="hidden">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-lg" id="output-filename">CLAUDE.md</h3>
+              <div class="flex gap-2">
+                <button id="copy-btn" class="btn-primary !py-2 !px-4 !text-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                  Copy to clipboard
+                </button>
+                <button id="download-btn" class="btn-secondary !py-2 !px-4 !text-sm">
+                  Download file
+                </button>
+              </div>
+            </div>
+            <div class="relative">
+              <pre id="output-code" class="bg-[#0d1117] border border-surface-lighter rounded-xl p-6 text-sm text-text-muted overflow-x-auto max-h-[600px] overflow-y-auto font-mono leading-relaxed whitespace-pre-wrap"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex items-center justify-between mt-8 pt-6 border-t border-surface-lighter/30">
+          <button id="prev-btn" class="btn-secondary !py-2.5 !px-5 !text-sm hidden">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
+            Back
+          </button>
+          <div></div>
+          <button id="next-btn" class="btn-primary !py-2.5 !px-5 !text-sm">
+            Next
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+          </button>
+          <button id="generate-btn" class="btn-primary !py-2.5 !px-5 !text-sm hidden">
+            Generate CLAUDE.md
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pro upsell -->
+      <div class="glass-card p-6 text-center border-primary/20">
+        <p class="text-text-muted text-sm mb-3">
+          Need to manage CLAUDE.md files across multiple projects?
+        </p>
+        <a href="/contextkit#waitlist" class="text-primary-light hover:underline text-sm font-semibold">
+          Join the Pro waitlist - save projects, version history, team sharing
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .option-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .option-btn:hover { border-color: rgba(99, 102, 241, 0.4); color: var(--color-text); }
+    .option-btn.active { border-color: var(--color-primary); background: rgba(99, 102, 241, 0.15); color: var(--color-text); }
+
+    .option-btn-lg {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .option-btn-lg:hover { border-color: rgba(99, 102, 241, 0.4); color: var(--color-text); }
+    .option-btn-lg.active { border-color: var(--color-primary); background: rgba(99, 102, 241, 0.15); color: var(--color-text); }
+
+    .step-dot {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 2px solid rgba(51, 65, 85, 0.5);
+      color: var(--color-text-dim);
+      transition: all 0.3s;
+    }
+    .step-dot.active { border-color: var(--color-primary); color: var(--color-primary-light); background: rgba(99, 102, 241, 0.1); }
+    .step-dot.done { border-color: var(--color-success); color: var(--color-success); background: rgba(16, 185, 129, 0.1); }
+    .step-line { width: 2rem; height: 2px; background: rgba(51, 65, 85, 0.5); }
+  </style>
+
+  <script is:inline>
+    (function() {
+      // State
+      let currentStep = 1;
+      const totalSteps = 5;
+      const config = {
+        language: null,
+        framework: null,
+        projectType: null,
+        testFramework: null,
+        linter: null,
+        conventions: [],
+        formats: ['claude']
+      };
+
+      // DOM refs
+      const steps = document.querySelectorAll('.wizard-step');
+      const dots = document.querySelectorAll('.step-dot');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const genBtn = document.getElementById('generate-btn');
+
+      // Option button handlers
+      function setupOptionGroup(containerId, configKey, multiSelect) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.querySelectorAll('.option-btn, .option-btn-lg').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (multiSelect) {
+              btn.classList.toggle('active');
+              const vals = [];
+              container.querySelectorAll('.active').forEach(b => vals.push(b.dataset.value));
+              config[configKey] = vals;
+            } else {
+              container.querySelectorAll('.option-btn, .option-btn-lg').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              config[configKey] = btn.dataset.value;
+            }
+          });
+        });
+      }
+
+      setupOptionGroup('lang-select', 'language', false);
+      setupOptionGroup('framework-select', 'framework', false);
+      setupOptionGroup('project-type-select', 'projectType', false);
+      setupOptionGroup('test-select', 'testFramework', false);
+      setupOptionGroup('lint-select', 'linter', false);
+      setupOptionGroup('format-select', 'formats', true);
+
+      // Format defaults
+      document.querySelector('#format-select .option-btn-lg[data-value="claude"]').classList.add('active');
+
+      function showStep(n) {
+        steps.forEach(s => s.classList.add('hidden'));
+        document.querySelector(`.wizard-step[data-step="${n}"]`).classList.remove('hidden');
+        dots.forEach((d, i) => {
+          d.classList.remove('active', 'done');
+          if (i + 1 < n) d.classList.add('done');
+          if (i + 1 === n) d.classList.add('active');
+        });
+        prevBtn.classList.toggle('hidden', n === 1);
+        if (n === totalSteps) {
+          nextBtn.classList.add('hidden');
+          genBtn.classList.remove('hidden');
+        } else {
+          nextBtn.classList.remove('hidden');
+          genBtn.classList.add('hidden');
+        }
+      }
+
+      prevBtn.addEventListener('click', () => { if (currentStep > 1) { currentStep--; showStep(currentStep); } });
+      nextBtn.addEventListener('click', () => {
+        // Validate required fields before advancing
+        if (currentStep === 1 && !config.language) {
+          document.getElementById('lang-select').scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('lang-select').classList.add('ring-2', 'ring-warning', 'rounded-xl', 'p-2');
+          setTimeout(() => document.getElementById('lang-select').classList.remove('ring-2', 'ring-warning', 'rounded-xl', 'p-2'), 2000);
+          return;
+        }
+        if (currentStep < totalSteps) { currentStep++; showStep(currentStep); }
+      });
+
+      genBtn.addEventListener('click', () => {
+        // Gather conventions
+        const convChecks = document.querySelectorAll('#conventions-select input[type="checkbox"]:checked');
+        config.conventions = Array.from(convChecks).map(c => c.value);
+        if (!config.formats || config.formats.length === 0) config.formats = ['claude'];
+
+        const output = generateOutput(config);
+        const container = document.getElementById('output-container');
+        const codeEl = document.getElementById('output-code');
+        const fnameEl = document.getElementById('output-filename');
+
+        codeEl.textContent = output.content;
+        fnameEl.textContent = output.filename;
+        container.classList.remove('hidden');
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Track
+        if (typeof gtag === 'function') gtag('event', 'contextkit_generate', { language: config.language, framework: config.framework, project_type: config.projectType });
+      });
+
+      // Copy
+      document.getElementById('copy-btn').addEventListener('click', () => {
+        const text = document.getElementById('output-code').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('copy-btn');
+          btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!';
+          setTimeout(() => { btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy to clipboard'; }, 2000);
+          if (typeof gtag === 'function') gtag('event', 'contextkit_copy', { format: config.formats[0] });
+        }).catch(() => {
+          const btn = document.getElementById('copy-btn');
+          btn.innerHTML = 'Select text manually';
+          document.getElementById('output-code').focus();
+          const range = document.createRange();
+          range.selectNodeContents(document.getElementById('output-code'));
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        });
+      });
+
+      // Download
+      document.getElementById('download-btn').addEventListener('click', () => {
+        const text = document.getElementById('output-code').textContent;
+        const fname = document.getElementById('output-filename').textContent;
+        const blob = new Blob([text], { type: 'text/markdown' });
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fname;
+        a.click();
+        URL.revokeObjectURL(url);
+        if (typeof gtag === 'function') gtag('event', 'contextkit_download', { format: config.formats[0] });
+      });
+
+      // Generator
+      function generateOutput(cfg) {
+        const lang = cfg.language || 'typescript';
+        const fw = cfg.framework || 'none';
+        const pt = cfg.projectType || 'web-app';
+        const test = cfg.testFramework || 'none';
+        const lint = cfg.linter || 'none';
+        const convs = cfg.conventions || [];
+        const fmt = (cfg.formats && cfg.formats[0]) || 'claude';
+
+        const langNames = { typescript:'TypeScript', javascript:'JavaScript', python:'Python', go:'Go', rust:'Rust', java:'Java', csharp:'C#', ruby:'Ruby', php:'PHP', swift:'Swift', kotlin:'Kotlin', other:'[Your Language]' };
+        const fwNames = { react:'React', nextjs:'Next.js', vue:'Vue', nuxt:'Nuxt', svelte:'Svelte', astro:'Astro', express:'Express', fastapi:'FastAPI', django:'Django', flask:'Flask', rails:'Rails', laravel:'Laravel', spring:'Spring Boot', gin:'Gin', none:'', other:'[Your Framework]' };
+        const ptNames = { 'web-app':'web application', api:'REST API / backend service', cli:'CLI tool', library:'library / npm package', mobile:'mobile application', monorepo:'monorepo' };
+        const testNames = { jest:'Jest', vitest:'Vitest', pytest:'pytest', 'go-test':'go test', rspec:'RSpec', junit:'JUnit', phpunit:'PHPUnit', playwright:'Playwright', cypress:'Cypress', none:'' };
+        const lintNames = { eslint:'ESLint', prettier:'Prettier', biome:'Biome', ruff:'Ruff', black:'Black', 'golangci-lint':'golangci-lint', rubocop:'RuboCop', clippy:'Clippy', none:'' };
+
+        const langName = langNames[lang] || lang;
+        const fwName = fwNames[fw] || fw;
+        const ptName = ptNames[pt] || pt;
+        const testName = testNames[test] || '';
+        const lintName = lintNames[lint] || '';
+
+        const stackStr = fwName ? `${langName} + ${fwName}` : langName;
+        const archDesc = getArchDescription(pt, lang, fw);
+        const testSection = getTestSection(test, testName, lang);
+        const lintSection = getLintSection(lint, lintName);
+        const convSection = getConventionsSection(convs, lang);
+        const toolSection = getToolSpecificSection(lang, fw);
+
+        let content = '';
+
+        if (fmt === 'claude' || fmt === 'codex' || fmt === 'gemini') {
+          const filename = fmt === 'claude' ? 'CLAUDE.md' : fmt === 'codex' ? 'AGENTS.md' : 'GEMINI.md';
+          content = `# ${filename === 'CLAUDE.md' ? 'Project Configuration' : filename === 'AGENTS.md' ? 'Agent Configuration' : 'Gemini Configuration'}
+
+## Project Overview
+
+This is a ${ptName} built with ${stackStr}.
+
+${archDesc}
+
+## Code Style & Conventions
+
+${convSection}
+
+${testSection}
+
+${lintSection}
+
+${toolSection}
+
+## File Structure
+
+\`\`\`
+${getFileStructure(pt, lang, fw)}
+\`\`\`
+
+## Important Notes
+
+- Read existing code before suggesting modifications
+- Prefer editing existing files over creating new ones
+- Do not add features or refactoring beyond what was asked
+- Keep changes minimal and focused
+`;
+
+          return { content: content.trim(), filename };
+        }
+
+        if (fmt === 'cursor') {
+          content = `# .cursorrules
+
+You are working on a ${ptName} built with ${stackStr}.
+
+${archDesc}
+
+## Rules
+
+${convSection}
+
+${testSection}
+
+${lintSection}
+
+${toolSection}
+
+## File Structure
+
+\`\`\`
+${getFileStructure(pt, lang, fw)}
+\`\`\`
+`;
+          return { content: content.trim(), filename: '.cursorrules' };
+        }
+
+        return { content: '', filename: 'CLAUDE.md' };
+      }
+
+      function getArchDescription(pt, lang, fw) {
+        const descs = {
+          'web-app': 'The frontend serves a web UI with server-side or client-side rendering. Follow the framework\'s conventions for routing, data fetching, and component organization.',
+          'api': 'This is a backend service exposing a REST or GraphQL API. Follow the framework\'s conventions for routing, middleware, error handling, and database access.',
+          'cli': 'This is a command-line tool. Focus on clear argument parsing, helpful error messages, and proper exit codes. Support --help and --version flags.',
+          'library': 'This is a published library. Public API stability matters. Every export needs documentation. Minimize dependencies. Ship TypeScript types if applicable.',
+          'mobile': 'This is a mobile application. Focus on responsive layouts, offline support, performance, and platform-specific conventions.',
+          'monorepo': 'This is a monorepo with multiple packages/apps. Respect package boundaries. Shared code goes in shared packages. Each package has its own tests and build.'
+        };
+        return descs[pt] || descs['web-app'];
+      }
+
+      function getTestSection(test, testName, lang) {
+        if (test === 'none') return '## Testing\n\nNo test framework configured yet. When adding tests, prefer integration tests over unit tests for critical paths.';
+        const cmds = { jest:'npx jest', vitest:'npx vitest', pytest:'pytest', 'go-test':'go test ./...', rspec:'bundle exec rspec', junit:'mvn test', phpunit:'./vendor/bin/phpunit', playwright:'npx playwright test', cypress:'npx cypress run' };
+        const cmd = cmds[test] || `run ${testName}`;
+        return `## Testing
+
+- Framework: ${testName}
+- Run tests: \`${cmd}\`
+- Write tests for new features before submitting
+- Test files go next to the source file (e.g., \`foo.test.ts\` next to \`foo.ts\`)
+- Prefer integration tests for API endpoints and critical paths
+- Use descriptive test names that explain the expected behavior`;
+      }
+
+      function getLintSection(lint, lintName) {
+        if (lint === 'none') return '';
+        const cmds = { eslint:'npx eslint .', prettier:'npx prettier --check .', biome:'npx biome check .', ruff:'ruff check .', black:'black --check .', 'golangci-lint':'golangci-lint run', rubocop:'bundle exec rubocop', clippy:'cargo clippy' };
+        const cmd = cmds[lint] || `run ${lintName}`;
+        return `## Linting & Formatting
+
+- Tool: ${lintName}
+- Check: \`${cmd}\`
+- All code must pass linting before committing
+- Do not disable lint rules without a clear reason in a comment`;
+      }
+
+      function getConventionsSection(convs, lang) {
+        const rules = [];
+        if (convs.includes('no-comments')) rules.push('- Only add comments where the logic is not self-evident. No docstrings on obvious functions. No \"// end of function\" comments.');
+        if (convs.includes('no-unnecessary-abstractions')) rules.push('- Do not create helpers, utilities, or abstractions for one-time operations. Three similar lines of code is better than a premature abstraction.');
+        if (convs.includes('error-handling')) rules.push('- Handle errors at system boundaries (user input, external APIs). Trust internal code and framework guarantees. Do not add try/catch for scenarios that cannot fail.');
+        if (convs.includes('security-first')) rules.push('- Never introduce XSS, SQL injection, or command injection. Validate all user input. Sanitize HTML output. Use parameterized queries.');
+        if (convs.includes('tdd')) rules.push('- Write failing tests first, then implement. Every feature needs test coverage.');
+        if (convs.includes('strict-types')) {
+          if (lang === 'typescript') rules.push('- Use strict TypeScript. No `any` type. Enable strict mode in tsconfig.');
+          else if (lang === 'python') rules.push('- Use type hints on all function signatures. Run mypy for type checking.');
+          else rules.push('- Use explicit types. Avoid dynamic typing where the language supports static types.');
+        }
+        if (convs.includes('functional')) rules.push('- Prefer pure functions and immutable data. Avoid side effects. Use composition over inheritance.');
+        if (convs.includes('small-functions')) rules.push('- Functions should do one thing. If a function needs a comment to explain what it does, split it into smaller functions.');
+        if (rules.length === 0) rules.push('- Follow the existing code style and conventions in the codebase.');
+        return rules.join('\n');
+      }
+
+      function getToolSpecificSection(lang, fw) {
+        let section = '## Tool-Specific Settings\n\n';
+        if (lang === 'typescript' || lang === 'javascript') {
+          section += '- Package manager: npm (or change to pnpm/yarn if used)\n';
+          section += '- Use ES modules (import/export), not CommonJS (require)\n';
+        }
+        if (lang === 'python') {
+          section += '- Use virtual environments (venv or poetry)\n';
+          section += '- Requirements in requirements.txt or pyproject.toml\n';
+        }
+        if (lang === 'go') {
+          section += '- Use Go modules\n';
+          section += '- Follow standard Go project layout\n';
+        }
+        if (lang === 'rust') {
+          section += '- Use Cargo for builds and dependency management\n';
+          section += '- Follow Rust API guidelines for public APIs\n';
+        }
+        if (fw === 'nextjs') section += '- Use App Router (app/) unless the project uses Pages Router (pages/)\n- Server Components by default, use "use client" only when needed\n';
+        if (fw === 'astro') section += '- Use .astro components for static content, framework components only for interactive islands\n';
+        if (fw === 'fastapi') section += '- Use Pydantic models for request/response validation\n- Use dependency injection for shared resources\n';
+        if (fw === 'django') section += '- Follow Django conventions: models in models.py, views in views.py\n- Use Django ORM, not raw SQL\n';
+        return section;
+      }
+
+      function getFileStructure(pt, lang, fw) {
+        if (pt === 'web-app' && (fw === 'nextjs' || fw === 'react')) {
+          return `src/
+  app/          # App Router pages and layouts
+  components/   # Reusable UI components
+  lib/          # Utility functions and shared logic
+  hooks/        # Custom React hooks
+  types/        # TypeScript type definitions
+public/         # Static assets
+tests/          # Test files`;
+        }
+        if (pt === 'web-app' && fw === 'astro') {
+          return `src/
+  pages/        # File-based routing (.astro files)
+  components/   # Reusable components
+  layouts/      # Page layouts
+  styles/       # Global styles
+  content/      # Content collections (if used)
+public/         # Static assets`;
+        }
+        if (pt === 'api' && (fw === 'fastapi' || lang === 'python')) {
+          return `app/
+  main.py       # FastAPI app entry point
+  routers/      # Route handlers
+  models/       # Pydantic models / DB models
+  services/     # Business logic
+  config.py     # Configuration
+tests/          # Test files`;
+        }
+        if (pt === 'api' && (fw === 'express' || lang === 'typescript')) {
+          return `src/
+  routes/       # Route handlers
+  middleware/   # Express middleware
+  services/     # Business logic
+  models/       # Data models / types
+  utils/        # Utility functions
+  index.ts      # Entry point
+tests/          # Test files`;
+        }
+        if (pt === 'cli') {
+          return `src/
+  commands/     # CLI command handlers
+  utils/        # Utility functions
+  config.ts     # Configuration loading
+  index.ts      # Entry point and argument parsing
+tests/          # Test files`;
+        }
+        if (pt === 'library') {
+          return `src/
+  index.ts      # Public API exports
+  core/         # Core library logic
+  utils/        # Internal utilities
+  types/        # Type definitions
+tests/          # Test files
+docs/           # Documentation`;
+        }
+        return `src/            # Source code
+tests/          # Test files
+docs/           # Documentation
+scripts/        # Build and utility scripts`;
+      }
+
+      // Init
+      showStep(1);
+    })();
+  </script>
+</Layout>

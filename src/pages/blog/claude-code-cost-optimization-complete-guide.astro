@@ -1,0 +1,312 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="The complete guide to Claude Code cost optimization (2026)"
+  description="Everything you need to cut Claude Code costs by 30-60% without sacrificing output quality. Twelve tested strategies covering context management, model routing, caching, session hygiene, and real-world benchmarks."
+  date="April 7, 2026"
+  readTime="18 min read"
+  keywords={["claude code cost optimization", "reduce claude code cost", "claude code save money", "claude code token optimization", "claude code cheaper", "claude code cost management", "optimize claude code usage", "claude code budget", "claude code efficiency"]}
+  relatedPosts={[
+    { title: "Why your Claude Code bill is higher than expected", slug: "why-claude-code-bill-higher-than-expected" },
+    { title: "How to count tokens in Claude Code", slug: "claude-code-token-counter-how-to-count" },
+    { title: "Is Claude Code Max worth it?", slug: "is-claude-code-max-worth-it" },
+  ]}
+>
+  <p>
+    Claude Code is the most capable coding AI available right now. It is also, if you are not careful, one of the most expensive. Whether you are on a $200/month Max subscription hitting rate limits daily, or paying per token on the API and watching the bill climb, there are concrete steps you can take to cut costs without losing output quality.
+  </p>
+
+  <p>
+    This guide covers twelve strategies I have tested across hundreds of sessions running a production business entirely on Claude Code. Most of them take less than five minutes to implement. Combined, they can reduce your effective cost by 30-60%.
+  </p>
+
+  <p>
+    Use the <a href="/cost-dashboard/analyze">free CostPilot analyzer</a> to measure your current baseline before applying these changes. Upload your session JSONL files and see exactly where tokens go. Then come back after a week and measure again.
+  </p>
+
+  <h2>Part 1: Context management (the biggest lever)</h2>
+
+  <p>
+    Context loading is where most people waste the most tokens without realizing it. Every session starts by loading your project files, and every message carries the full conversation history. Small changes here compound across hundreds of sessions.
+  </p>
+
+  <h3>Strategy 1: Keep your CLAUDE.md under 500 words</h3>
+
+  <p>
+    Your CLAUDE.md file loads on every single session. If it is 2,000 words, that is roughly 3,000 tokens consumed before you type anything. Multiply by 20 sessions per day and you are burning 60,000 tokens daily just on instructions.
+  </p>
+
+  <p>
+    The fix: treat CLAUDE.md like a routing table, not a manual. State the rules in short, direct sentences. Move detailed reference material to separate files that Claude loads on demand. A 500-word CLAUDE.md that points to a <code>context/</code> directory with detailed docs loads 4x fewer tokens per session than a monolithic file.
+  </p>
+
+  <p>
+    <strong>Before:</strong> A 2,500-word CLAUDE.md with coding standards, project history, API docs, and deployment instructions all inline. ~3,750 tokens per session load.
+  </p>
+
+  <p>
+    <strong>After:</strong> A 400-word CLAUDE.md with rules and pointers. <code>context/coding-standards.md</code>, <code>context/api-docs.md</code>, <code>context/deploy.md</code> loaded only when relevant. ~600 tokens per session load, plus the specific file when needed.
+  </p>
+
+  <p>
+    Savings: ~63,000 tokens/day at 20 sessions. That is real money on API billing and real quota on subscription plans.
+  </p>
+
+  <h3>Strategy 2: Use tiered context loading</h3>
+
+  <p>
+    Not all context is relevant to every task. If Claude is fixing a CSS bug, it does not need your database migration docs. Tiered loading means organizing your context into levels:
+  </p>
+
+  <ul>
+    <li><strong>Tier 1 (always loaded):</strong> CLAUDE.md with core rules and a compact index of available docs</li>
+    <li><strong>Tier 2 (loaded by task type):</strong> Frontend docs for UI work, backend docs for API work, deployment docs for infra work</li>
+    <li><strong>Tier 3 (loaded on demand):</strong> Detailed API references, historical decisions, meeting notes</li>
+  </ul>
+
+  <p>
+    Add a <code>context/INDEX.md</code> file that lists what is available and when to load each file. Claude is smart enough to follow this routing. The result: each session loads only the 20-30% of context that is actually relevant.
+  </p>
+
+  <h3>Strategy 3: Start new sessions for new tasks</h3>
+
+  <p>
+    Every message in a conversation includes the full history. By message 15, each exchange carries 15 previous messages as input tokens. By message 30, you are spending more on history than on the actual work.
+  </p>
+
+  <p>
+    The rule: one task, one session. Finished debugging that API endpoint? Start a fresh session for the next task. The context loading cost of a new session is almost always less than carrying 20 messages of irrelevant history.
+  </p>
+
+  <p>
+    Exception: multi-step tasks where each step builds on the last (like a complex refactor) benefit from staying in the same session because the context is genuinely relevant.
+  </p>
+
+  <h2>Part 2: Model routing (pay only for what you need)</h2>
+
+  <h3>Strategy 4: Use Sonnet for mechanical tasks</h3>
+
+  <p>
+    Opus is 5x more expensive than Sonnet per token. For many tasks, Sonnet produces identical results. The key is knowing which tasks need Opus-level reasoning and which ones are mechanical.
+  </p>
+
+  <p>
+    <strong>Good for Sonnet:</strong> File renames, simple refactors, boilerplate generation, test writing from existing patterns, documentation updates, code formatting, straightforward bug fixes with clear error messages.
+  </p>
+
+  <p>
+    <strong>Keep on Opus:</strong> Complex architectural decisions, debugging subtle race conditions, implementing novel algorithms, security reviews, planning multi-file changes, tasks requiring deep codebase understanding.
+  </p>
+
+  <p>
+    If you are using Claude Code skills or subagents, add <code>model: sonnet</code> to the frontmatter of mechanical skills. This routes them to the cheaper model automatically.
+  </p>
+
+  <h3>Strategy 5: Use Haiku for validation and formatting</h3>
+
+  <p>
+    Haiku costs 25x less than Opus. For validation tasks (checking JSON syntax, verifying file paths exist, formatting output), it is more than capable.
+  </p>
+
+  <p>
+    Real example: a content review workflow that uses Opus for the initial draft, Sonnet for editing, and Haiku for final spell-check and format validation. Total cost per piece drops by roughly 40% compared to running everything on Opus.
+  </p>
+
+  <h3>Strategy 6: Route subagents to cheaper models</h3>
+
+  <p>
+    If you use Claude Code subagents (via the Agent tool), each subagent can run on a different model. The parent agent on Opus orchestrates the work, while child agents on Sonnet or Haiku handle the execution.
+  </p>
+
+  <p>
+    Pattern: Opus plans the work and breaks it into tasks. Sonnet subagents execute each task independently. Opus reviews the combined results. This "orchestrator-worker" pattern can cut the total token cost of complex workflows by 50-70%.
+  </p>
+
+  <h2>Part 3: Caching (free performance)</h2>
+
+  <h3>Strategy 7: Maximize cache hit rates</h3>
+
+  <p>
+    Anthropic caches prompt prefixes. If the beginning of your prompt is identical across messages (which it is, because CLAUDE.md and rules files load first), those tokens are served from cache at a 90% discount. This happens automatically, but you can help it.
+  </p>
+
+  <p>
+    Keys to high cache rates:
+  </p>
+
+  <ul>
+    <li>Keep static content (rules, context) at the beginning of the prompt</li>
+    <li>Put dynamic content (user messages, file reads) at the end</li>
+    <li>Avoid randomizing the order of loaded files between sessions</li>
+    <li>Do not modify CLAUDE.md frequently. Every change invalidates the cache for that prefix</li>
+  </ul>
+
+  <p>
+    A well-structured project with stable CLAUDE.md and consistent context loading can hit 70-85% cache rates. A messy project with frequently changing instructions might see 20-30%. The difference is substantial: at Opus rates, 80% cache vs 30% cache on a 50,000-token context saves roughly $0.50 per session.
+  </p>
+
+  <p>
+    Check your cache hit rate with the <a href="/cost-dashboard/analyze">free CostPilot analyzer</a>. Upload a few session files and look at the cache breakdown. If you are below 60%, your context structure needs work.
+  </p>
+
+  <h3>Strategy 8: Batch similar tasks in sequence</h3>
+
+  <p>
+    Cache prefixes persist for a short time between sessions. If you run three frontend tasks back to back, the context from the first session is likely still cached when the second starts. If you alternate between frontend and backend tasks, each switch potentially invalidates the cache.
+  </p>
+
+  <p>
+    Practical approach: group your tasks by domain. Do all the frontend work in one block, then switch to backend. Do all your documentation updates together. This natural batching improves cache hit rates without any configuration changes.
+  </p>
+
+  <h2>Part 4: Session hygiene (small habits, big savings)</h2>
+
+  <h3>Strategy 9: Be specific in your prompts</h3>
+
+  <p>
+    Vague prompts cost more. "Fix the bug" makes Claude explore multiple files, read code it does not need, and generate exploratory output. "Fix the null pointer in src/auth/login.ts line 42" sends Claude directly to the problem.
+  </p>
+
+  <p>
+    Specific prompts reduce:
+  </p>
+
+  <ul>
+    <li>Tool call tokens (fewer file reads and searches)</li>
+    <li>Output tokens (focused response instead of exploratory analysis)</li>
+    <li>Retry tokens (less likely to go in the wrong direction)</li>
+  </ul>
+
+  <p>
+    This is not about prompt engineering. It is about giving Claude the information it needs to avoid wasting work. File paths, line numbers, function names, expected behavior, actual behavior. The more context in your prompt, the fewer tokens Claude spends discovering that context.
+  </p>
+
+  <h3>Strategy 10: Use glob and grep before asking Claude to search</h3>
+
+  <p>
+    When Claude searches your codebase, every file it reads counts as input tokens. A broad search across a large project can consume tens of thousands of tokens just in file reads. If you already know roughly where the relevant code lives, tell Claude directly.
+  </p>
+
+  <p>
+    Instead of: "Find all the places where we handle authentication"
+  </p>
+
+  <p>
+    Try: "Look at src/auth/ and src/middleware/auth.ts for the authentication handling code"
+  </p>
+
+  <p>
+    The targeted version might consume 2,000 tokens in file reads. The broad version might consume 20,000+ while Claude opens and scans multiple directories.
+  </p>
+
+  <h3>Strategy 11: Avoid re-reading files Claude already has in context</h3>
+
+  <p>
+    If Claude just read a file two messages ago, it is still in the conversation history. Asking it to "read that file again" or triggering another read of the same file adds duplicate tokens. This happens more than you think, especially when using tools that automatically re-read files before editing.
+  </p>
+
+  <p>
+    If you notice Claude reading the same files repeatedly, restructure your request so it works with what is already in context. Reference specific line numbers or function names from the earlier read instead of asking for a fresh read.
+  </p>
+
+  <h3>Strategy 12: Clean up stale conversations</h3>
+
+  <p>
+    Old conversations that you revisit carry their full history. A conversation from last week with 50 messages costs you 50 messages worth of tokens every time you continue it. If you need to return to an old topic, it is usually cheaper to start fresh and paste in the specific context you need.
+  </p>
+
+  <h2>Putting it all together: a cost-optimized workflow</h2>
+
+  <p>
+    Here is what a cost-optimized Claude Code setup looks like in practice:
+  </p>
+
+  <ol>
+    <li>CLAUDE.md is under 500 words. Detailed docs live in <code>context/</code> with an index file.</li>
+    <li>Each task gets its own session. Sessions are closed after completing the task.</li>
+    <li>Tasks are grouped by domain (frontend block, backend block, docs block).</li>
+    <li>Mechanical skills and subagents route to Sonnet or Haiku.</li>
+    <li>Prompts include file paths, line numbers, and specific instructions.</li>
+    <li>Cache hit rates stay above 60% (checked monthly with CostPilot).</li>
+  </ol>
+
+  <p>
+    Teams and individuals who follow these practices consistently report 30-60% lower effective costs compared to using Claude Code with default settings and habits.
+  </p>
+
+  <h2>Measure what you manage</h2>
+
+  <p>
+    None of these strategies matter if you cannot see their impact. The biggest reason people overspend on Claude Code is not that optimization is hard. It is that they have no visibility into where tokens go.
+  </p>
+
+  <p>
+    The <a href="/cost-dashboard/analyze">CostPilot free analyzer</a> gives you that visibility in under two minutes. Upload your session JSONL files from <code>~/.claude/projects/</code> and get an instant breakdown of token usage, cache rates, model costs, and waste patterns. No account needed, everything runs in your browser.
+  </p>
+
+  <p>
+    If you want ongoing monitoring with historical trends, budget alerts, and automated optimization suggestions, <a href="/cost-dashboard#waitlist">join the CostPilot Pro waitlist</a>. We are building the cost intelligence layer that Claude Code is missing.
+  </p>
+
+  <h2>Quick reference: optimization cheat sheet</h2>
+
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>Effort</th>
+          <th>Savings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Trim CLAUDE.md to 500 words</td>
+          <td>15 min</td>
+          <td>10-20%</td>
+        </tr>
+        <tr>
+          <td>Tiered context loading</td>
+          <td>30 min</td>
+          <td>15-25%</td>
+        </tr>
+        <tr>
+          <td>One task per session</td>
+          <td>Habit</td>
+          <td>10-30%</td>
+        </tr>
+        <tr>
+          <td>Route to Sonnet/Haiku</td>
+          <td>5 min/skill</td>
+          <td>30-60%</td>
+        </tr>
+        <tr>
+          <td>Maximize cache hits</td>
+          <td>20 min</td>
+          <td>10-15%</td>
+        </tr>
+        <tr>
+          <td>Batch similar tasks</td>
+          <td>Habit</td>
+          <td>5-10%</td>
+        </tr>
+        <tr>
+          <td>Specific prompts</td>
+          <td>Habit</td>
+          <td>10-20%</td>
+        </tr>
+        <tr>
+          <td>Direct file references</td>
+          <td>Habit</td>
+          <td>5-15%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Savings are not additive (you cannot save 200% total), but combining the top four strategies typically yields 30-50% reduction in effective cost. Start with trimming CLAUDE.md and routing models. Those give the biggest return for the least effort.
+  </p>
+</BlogPost>

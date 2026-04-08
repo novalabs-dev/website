@@ -1,0 +1,302 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the difference between CLAUDE.md and .cursorrules?", "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is read by Claude Code and supports full markdown, project-wide context, and skill/memory directives specific to Claude's agent architecture. .cursorrules is Cursor's config format, simpler in structure, and focused on per-workspace coding rules. The core conventions you define are the same - the format and some tool-specific features differ." }},
+    { "@type": "Question", "name": "What is AGENTS.md?", "acceptedAnswer": { "@type": "Answer", "text": "AGENTS.md is the configuration format used by OpenAI Codex and GitHub Copilot's agent mode. It follows a similar markdown structure to CLAUDE.md but is oriented around describing agent behavior, tool permissions, and multi-step task execution." }},
+    { "@type": "Question", "name": "Do I need a separate config file for each AI coding tool?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, each tool reads its own format. Claude Code reads CLAUDE.md, Cursor reads .cursorrules, Codex/Copilot reads AGENTS.md, and Gemini CLI reads GEMINI.md. If your team uses multiple tools, you need multiple files - but tools like ContextKit let you generate all four from a single configuration." }},
+    { "@type": "Question", "name": "Which AI coding tool config format is most powerful?", "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is currently the most flexible - it supports nested context, skill definitions, memory references, and agent behavior directives beyond just coding style. .cursorrules is the most widely adopted. AGENTS.md and GEMINI.md are newer and still evolving." }}
+  ]
+};
+---
+
+<BlogPost
+  title="CLAUDE.md vs .cursorrules vs AGENTS.md: how to configure any AI coding tool"
+  description="Every AI coding tool has its own config format. Here's what each one does, how they differ, and how to manage all four without duplicating your conventions across every repo."
+  date="April 8, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "How to set up Claude Code for a new project", slug: "how-to-setup-claude-code-for-new-project" },
+    { title: "5 workflows you can automate with Claude Code", slug: "5-business-workflows-automate-claude-code" },
+  ]}
+>
+  <p>
+    Every AI coding tool now ships with its own configuration format. Claude Code reads <code>CLAUDE.md</code>. Cursor reads <code>.cursorrules</code>. GitHub Copilot and Codex read <code>AGENTS.md</code>. Gemini CLI reads <code>GEMINI.md</code>. Same idea, four different files, all living in your repo root.
+  </p>
+
+  <p>
+    If you're only using one tool, this isn't a problem. But if your team uses Cursor and you use Claude Code, or you're switching between tools, you end up maintaining duplicate configs that slowly drift apart. By month three, each file says something different about your naming conventions.
+  </p>
+
+  <p>
+    This guide breaks down what each format does, where they differ, and how to handle the multi-tool problem without losing your mind.
+  </p>
+
+  <h2>CLAUDE.md (Claude Code)</h2>
+
+  <p>
+    Claude Code is Anthropic's terminal-based coding agent. It reads <code>CLAUDE.md</code> from your project root at the start of every session. The file is loaded into the context window before any conversation starts, so everything in it shapes Claude's behavior for the entire session.
+  </p>
+
+  <p>
+    What makes CLAUDE.md different from other config formats is its scope. It's not just about coding style. You can define:
+  </p>
+
+  <ul>
+    <li>Project architecture and tech stack</li>
+    <li>Coding conventions and what to avoid</li>
+    <li>Testing setup and how to run tests</li>
+    <li>File structure and where things live</li>
+    <li>Agent behavior directives (skills, memory, subagent rules)</li>
+    <li>Guardrails (what Claude should never do autonomously)</li>
+  </ul>
+
+  <p>
+    That last category is specific to Claude Code's agent architecture. You can tell Claude to always ask before running destructive commands, how to handle failures, and what external tools it's allowed to call.
+  </p>
+
+  <pre><code>## Project Overview
+Next.js 14 App Router, TypeScript strict, Tailwind, Supabase.
+
+## Code Conventions
+- Named exports only, no default exports
+- No `any` type - use unknown and narrow it
+- Tailwind classes only, no CSS modules
+- Co-locate tests next to source files
+
+## Guardrails
+- Never run `rm` - move files to .trash/ instead
+- Ask before modifying database migrations
+- Do not add unrequested features or refactoring</code></pre>
+
+  <p>
+    Optimal length is 50-150 lines. The file is loaded every session, so every line costs tokens. Keep it to what actually changes Claude's behavior.
+  </p>
+
+  <h2>.cursorrules (Cursor)</h2>
+
+  <p>
+    Cursor's <code>.cursorrules</code> file serves the same core purpose: tell your AI assistant how your project works. The format is simpler. It's a plain text or markdown file with no required structure - just rules and context written in natural language.
+  </p>
+
+  <p>
+    The main differences from CLAUDE.md:
+  </p>
+
+  <ul>
+    <li>No agent behavior directives - Cursor isn't an autonomous agent in the same way Claude Code is</li>
+    <li>Scoped to a workspace, not a project root (Cursor is editor-based)</li>
+    <li>Applied to both chat and autocomplete, not just explicit sessions</li>
+    <li>No memory or skill references - it's a flat config file</li>
+  </ul>
+
+  <pre><code>You are working on a Next.js 14 application using TypeScript strict mode and Tailwind CSS.
+
+Rules:
+- Use named exports only
+- No `any` type
+- App Router patterns (server components by default)
+- Co-locate test files next to source
+- Use Tailwind, never inline styles
+- Do not add features beyond what was asked</code></pre>
+
+  <p>
+    Notice the imperative tone. Cursor documentation recommends writing rules as direct instructions to the model. CLAUDE.md uses markdown headers and bullet points as structured sections. Same information, slightly different framing.
+  </p>
+
+  <p>
+    Cursor also supports <code>.cursorignore</code> to exclude files from indexing, and project-level vs global rules. The global rules file applies across all projects - useful for personal preferences that should follow you everywhere.
+  </p>
+
+  <h2>AGENTS.md (GitHub Copilot / Codex)</h2>
+
+  <p>
+    AGENTS.md is the newer format, introduced with OpenAI's Codex CLI and subsequently adopted by GitHub Copilot's agent mode. The name signals the intent: this isn't just a style guide, it's a behavioral specification for an agent that will execute multi-step tasks autonomously.
+  </p>
+
+  <p>
+    The structure is more explicit about what the agent is allowed to do:
+  </p>
+
+  <pre><code># Agent Configuration
+
+## Project
+TypeScript monorepo with Next.js frontend and Express API.
+
+## Tools Available
+- run_command: for running tests and builds
+- read_file, write_file: for code modifications
+- web_search: disabled
+
+## Conventions
+- TypeScript strict mode throughout
+- Use pnpm, not npm or yarn
+- Run `pnpm test` before committing
+- No direct database mutations in route handlers
+
+## Task Execution
+- Always run tests after changes
+- Create a summary of changes made
+- Do not modify files outside the scope of the task</code></pre>
+
+  <p>
+    The "tools available" and "task execution" sections have no equivalent in <code>.cursorrules</code>. They matter more when the agent is running commands and making file changes on its own. CLAUDE.md covers this through guardrails; AGENTS.md makes it a first-class section.
+  </p>
+
+  <p>
+    AGENTS.md is still evolving. The spec isn't locked down the same way <code>.cursorrules</code> is after years of Cursor adoption. Expect the format to change as Codex and Copilot's agent modes mature.
+  </p>
+
+  <h2>GEMINI.md (Gemini CLI)</h2>
+
+  <p>
+    Google's Gemini CLI reads <code>GEMINI.md</code> from the project root. It's the newest of the four formats and the most minimal. The approach mirrors CLAUDE.md structurally - markdown file, project root, session-scoped - but with less documentation around what's supported.
+  </p>
+
+  <pre><code>## Project
+FastAPI backend, Python 3.12, SQLAlchemy with Alembic migrations.
+
+## Conventions
+- Type hints on every function
+- Pydantic models for request/response validation
+- Use pytest, run with `pytest -v`
+- No print() statements - use structlog
+
+## Notes
+- Read existing code before suggesting changes
+- Migrations live in alembic/versions/</code></pre>
+
+  <p>
+    If you're using the Gemini CLI alongside other tools, the GEMINI.md content should largely mirror your CLAUDE.md. The behavioral directives are less developed at this point - it's primarily a coding context file rather than an agent behavior spec.
+  </p>
+
+  <h2>Comparison</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>CLAUDE.md</th>
+        <th>.cursorrules</th>
+        <th>AGENTS.md</th>
+        <th>GEMINI.md</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Format</td>
+        <td>Markdown (structured)</td>
+        <td>Plain text / markdown</td>
+        <td>Markdown (structured)</td>
+        <td>Markdown</td>
+      </tr>
+      <tr>
+        <td>Scope</td>
+        <td>Project root</td>
+        <td>Workspace</td>
+        <td>Project root</td>
+        <td>Project root</td>
+      </tr>
+      <tr>
+        <td>Coding conventions</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Agent behavior</td>
+        <td>Yes (guardrails, skills)</td>
+        <td>Limited</td>
+        <td>Yes (tools, task execution)</td>
+        <td>Minimal</td>
+      </tr>
+      <tr>
+        <td>Tool permissions</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Global rules</td>
+        <td>Via ~/.claude/</td>
+        <td>Yes (global config)</td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Applies to autocomplete</td>
+        <td>No (session-scoped)</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Best for</td>
+        <td>Agentic workflows, complex projects</td>
+        <td>Daily coding in Cursor</td>
+        <td>Autonomous task agents</td>
+        <td>Gemini CLI users</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>The multi-tool problem</h2>
+
+  <p>
+    Here's what actually happens on teams using multiple tools: someone writes a solid <code>.cursorrules</code> file. Then Claude Code gets added to the workflow. Someone copies the cursorrules content into a new CLAUDE.md. A month later, the TypeScript rules get updated in one file but not the other. The Go conventions get added to CLAUDE.md but never make it to AGENTS.md. You now have four files that each describe a slightly different version of your project.
+  </p>
+
+  <p>
+    This is friction that compounds. The more repos you have, the worse it gets. Every new developer has to figure out which file is current. Every convention change has to be made in four places.
+  </p>
+
+  <p>
+    The core conventions - how you write code, how tests are structured, what to avoid - don't change based on which AI tool is reading them. Only the format and the tool-specific sections differ.
+  </p>
+
+  <p>
+    The cleanest solution is to define your conventions once and generate the format-specific files from that source. That's what <a href="/contextkit/generate">ContextKit's generator</a> does: answer five questions about your project, and it outputs CLAUDE.md, .cursorrules, AGENTS.md, and GEMINI.md in the correct format for each tool.
+  </p>
+
+  <h2>Which format should you prioritize?</h2>
+
+  <p>
+    If you're using one tool, that tool's format is the only one that matters. Don't over-engineer it.
+  </p>
+
+  <p>
+    If you're deciding which tool to invest in first:
+  </p>
+
+  <ul>
+    <li>Use <strong>CLAUDE.md</strong> if you're doing agentic work - multi-step tasks, autonomous workflows, anything where the AI is making decisions and running commands on its own</li>
+    <li>Use <strong>.cursorrules</strong> if you're primarily in the Cursor editor and want conventions applied to both chat and autocomplete</li>
+    <li>Use <strong>AGENTS.md</strong> if your team is already in the GitHub Copilot ecosystem and agent mode is the primary way you work</li>
+    <li>Use <strong>GEMINI.md</strong> if you're experimenting with Gemini CLI - it's the thinnest format to set up</li>
+  </ul>
+
+  <p>
+    For most individual developers, CLAUDE.md is worth the investment even if you occasionally use Cursor too. The agent capabilities justify the slightly more structured format, and the guardrails section alone prevents enough mistakes to pay for itself.
+  </p>
+
+  <h2>Set up all four in one go</h2>
+
+  <p>
+    If you want to cover all four formats without writing each file by hand, <a href="/contextkit/generate">ContextKit generates them from a single input</a>. You describe your project once - stack, conventions, testing setup, what to avoid - and it produces the correct file for each tool. Free, runs in the browser, copy to clipboard.
+  </p>
+
+  <p>
+    It also handles the format differences automatically. The agent behavior sections that matter for CLAUDE.md and AGENTS.md get included where relevant. The simpler <code>.cursorrules</code> format strips out the directives that Cursor doesn't use. You get four files that are consistent with each other, not four slightly different interpretations of the same conventions.
+  </p>
+
+  <p>
+    If you want to go deeper on CLAUDE.md specifically - structure, sections, examples for different stacks - the <a href="/blog/how-to-write-the-perfect-claude-md">complete CLAUDE.md guide</a> covers it in detail.
+  </p>
+</BlogPost>

@@ -1,0 +1,199 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to audit your AI tool spending before it spirals out of control"
+  description="AI tools charge per token, per request, or per seat. Most teams have no idea what they actually spend. Here is a practical framework for auditing your AI costs, finding waste, and cutting spending without cutting capability."
+  date="April 8, 2026"
+  readTime="9 min read"
+  keywords={["ai tool spending audit", "ai costs too high", "reduce ai tool costs", "how much do ai tools cost", "ai tool budget", "ai spending optimization", "claude code costs", "ai subscription audit"]}
+  relatedPosts={[
+    { title: "The complete guide to Claude Code cost optimization (2026)", slug: "claude-code-cost-optimization-complete-guide" },
+    { title: "Why your Claude Code bill is higher than expected", slug: "why-claude-code-bill-higher-than-expected" },
+    { title: "How much does Claude Code cost per month? Real production numbers", slug: "claude-code-pricing-real-cost-per-month" },
+  ]}
+  faq={[
+    {
+      question: "How much should a small team spend on AI tools per month?",
+      answer: "There is no universal benchmark, but a solo developer or solopreneur typically spends $50 to $300 per month on AI tools. A small team of 3 to 5 people might spend $200 to $1000. The key metric is not total spend but cost per hour saved. If a $200 per month tool saves 40 hours, that is $5 per hour, which is almost certainly worth it."
+    },
+    {
+      question: "What is the biggest source of hidden AI tool costs?",
+      answer: "Token-based tools like Claude Code and API-billed services are the biggest source of unexpected costs. A single long session can burn through your daily budget. The second biggest source is unused subscriptions to AI tools you tried once and forgot to cancel."
+    },
+    {
+      question: "How often should I audit my AI tool spending?",
+      answer: "Monthly at minimum. If you use token-based tools, check weekly. Set a calendar reminder at the start of each month to review your AI subscriptions and usage. Most tools have dashboards that show your consumption trends."
+    }
+  ]}
+>
+  <p>
+    You signed up for one AI tool. Then another. Then an API key for a side project. Then a team subscription someone on your team requested. Now your credit card statement has six AI-related charges and you are not sure which ones you actually use.
+  </p>
+
+  <p>
+    AI tool spending has a unique problem: it feels productive. Every subscription promises time savings. Every API call does something useful in the moment. But in aggregate, most teams spend 30 to 50 percent more than they need to because nobody audits the total.
+  </p>
+
+  <p>
+    Here is how to audit your AI spending in 30 minutes and cut waste without cutting capability.
+  </p>
+
+  <h2>Step 1: List everything you pay for</h2>
+
+  <p>
+    Start with a complete inventory. Check your credit card statements, company expense reports, and subscription management tools. List every AI-related charge from the past 3 months.
+  </p>
+
+  <p>
+    Common places AI charges hide:
+  </p>
+
+  <ul>
+    <li><strong>Direct subscriptions:</strong> ChatGPT Plus, Claude Pro/Max, Cursor, Copilot, Midjourney, etc.</li>
+    <li><strong>API usage:</strong> OpenAI API, Anthropic API, Replicate, Hugging Face inference.</li>
+    <li><strong>Embedded AI:</strong> Notion AI, Grammarly, Adobe Firefly, Canva AI features.</li>
+    <li><strong>Team seats:</strong> Tools billed per user where not everyone actively uses them.</li>
+    <li><strong>Infrastructure:</strong> GPU instances, vector databases, embedding services.</li>
+  </ul>
+
+  <p>
+    Write down each tool, its monthly cost, and who uses it. Do not rely on memory. Pull actual numbers from billing dashboards.
+  </p>
+
+  <h2>Step 2: Categorize by billing model</h2>
+
+  <p>
+    AI tools use four billing models, and each one leaks money differently.
+  </p>
+
+  <h3>Fixed subscription (e.g., $20/month)</h3>
+  <p>
+    The risk here is paying for tools you do not use. Check your last login date. If you have not used a tool in 30 days, cancel it. You can always resubscribe.
+  </p>
+
+  <h3>Token-based (e.g., Claude Code API, OpenAI API)</h3>
+  <p>
+    The risk is unpredictable usage. One long conversation or a misconfigured script can burn through your budget overnight. Check your usage dashboards for spikes and set billing alerts.
+  </p>
+
+  <h3>Request-based (e.g., 500 requests/month)</h3>
+  <p>
+    The risk is hitting limits and paying overage fees, or conversely, paying for a higher tier than you need. Check your actual request count against your plan limit.
+  </p>
+
+  <h3>Per-seat (e.g., $19/user/month)</h3>
+  <p>
+    The risk is ghost seats. Check which team members actively use the tool versus who was added six months ago and forgot about it.
+  </p>
+
+  <h2>Step 3: Calculate cost per hour saved</h2>
+
+  <p>
+    This is the metric that matters. For each tool, estimate:
+  </p>
+
+  <ol>
+    <li><strong>Hours saved per month.</strong> Be honest. If ChatGPT saves you 30 minutes per day, that is roughly 10 hours per month.</li>
+    <li><strong>Monthly cost.</strong> Including overages and API charges.</li>
+    <li><strong>Cost per hour saved.</strong> Divide cost by hours saved.</li>
+  </ol>
+
+  <p>
+    Anything under $10 per hour saved is almost certainly worth keeping. Anything over $25 per hour saved deserves scrutiny. Anything where you cannot estimate the hours saved at all is probably not delivering value.
+  </p>
+
+  <h2>Step 4: Find the overlaps</h2>
+
+  <p>
+    The most common waste pattern is paying for multiple tools that do the same thing. Common overlaps:
+  </p>
+
+  <ul>
+    <li><strong>ChatGPT Plus + Claude Pro.</strong> Unless you need both models for specific tasks, pick one as your primary.</li>
+    <li><strong>Copilot + Cursor.</strong> Both are inline code assistants. Unless your workflow specifically benefits from switching between them, consolidate.</li>
+    <li><strong>Grammarly + ChatGPT/Claude for writing.</strong> If you are already using an AI assistant for writing, you may not need a separate grammar tool.</li>
+    <li><strong>Multiple image generators.</strong> Midjourney, DALL-E, and Stable Diffusion all serve similar purposes for most business use cases.</li>
+  </ul>
+
+  <p>
+    For each overlap, test whether one tool can handle both use cases. If it can, cancel the other.
+  </p>
+
+  <h2>Step 5: Optimize your token-based tools</h2>
+
+  <p>
+    Token-based billing is where the biggest savings hide. Small changes in how you use the tool can cut costs by 30 to 60 percent without changing your output quality.
+  </p>
+
+  <h3>For Claude Code users:</h3>
+  <ul>
+    <li><strong>Write a CLAUDE.md file.</strong> This gives Claude context upfront instead of it reading every file to figure out your project. Less file reading means fewer tokens.</li>
+    <li><strong>Start fresh sessions.</strong> Long sessions accumulate context that makes every subsequent message more expensive. New session per task.</li>
+    <li><strong>Use model routing.</strong> Not every task needs Opus. Route simple tasks to Sonnet or Haiku.</li>
+    <li><strong>Monitor your usage.</strong> Use a <a href="/cost-dashboard/analyze">cost analyzer tool</a> to see exactly where tokens go per session.</li>
+  </ul>
+
+  <h3>For API users:</h3>
+  <ul>
+    <li><strong>Set hard spending limits</strong> in your provider dashboard. This prevents runaway scripts from burning your budget.</li>
+    <li><strong>Cache responses.</strong> If you make the same API call repeatedly, cache the result instead of paying for it every time.</li>
+    <li><strong>Choose the right model.</strong> GPT-4o-mini and Claude Haiku cost 10 to 20 times less than their flagship models. Most tasks do not need the best model.</li>
+    <li><strong>Shorten your prompts.</strong> Every word in your prompt costs tokens. Concise prompts are cheaper and often get better results.</li>
+  </ul>
+
+  <h2>Step 6: Set up ongoing monitoring</h2>
+
+  <p>
+    An audit is worthless if you only do it once. Set up lightweight monitoring so costs do not creep back up.
+  </p>
+
+  <ul>
+    <li><strong>Monthly calendar reminder.</strong> First Monday of each month: check all AI billing dashboards.</li>
+    <li><strong>Billing alerts.</strong> Set alerts at 80% of your budget on every token-based tool.</li>
+    <li><strong>Quarterly subscription review.</strong> Every three months, go through your complete tool list and ask: "If I were signing up today, would I pay for this?"</li>
+    <li><strong>Team check-in.</strong> If you have a team, ask monthly: "Is everyone still using X? Does anyone need Y?"</li>
+  </ul>
+
+  <h2>Real example: how we cut our AI costs by 40%</h2>
+
+  <p>
+    At Nova Labs, we run an AI-operated business that uses Claude Code as its primary tool. After our first month, we audited our spending and found:
+  </p>
+
+  <ul>
+    <li>Google Ads was spending on keywords that drove clicks but zero conversions. We cut ad spend from $23/day to $5/day and tightened targeting.</li>
+    <li>Long Claude Code sessions were burning tokens on accumulated context. Switching to focused, single-task sessions cut token usage by roughly 35%.</li>
+    <li>We had API keys active for services we used during initial setup but no longer needed.</li>
+  </ul>
+
+  <p>
+    Total savings: about 40% of our monthly tool costs with no reduction in output. The audit took 30 minutes.
+  </p>
+
+  <h2>The 30-minute audit checklist</h2>
+
+  <ol>
+    <li>Pull 3 months of AI-related charges from your billing sources (5 min).</li>
+    <li>List each tool with its cost, billing model, and primary user (5 min).</li>
+    <li>Calculate cost per hour saved for each tool (5 min).</li>
+    <li>Identify overlapping tools and pick winners (5 min).</li>
+    <li>Check token-based tools for optimization opportunities (5 min).</li>
+    <li>Set billing alerts and a monthly review reminder (5 min).</li>
+  </ol>
+
+  <p>
+    Thirty minutes now saves you hundreds per month going forward. Do the audit.
+  </p>
+
+  <h2>Track your Claude Code costs for free</h2>
+
+  <p>
+    If Claude Code is your primary AI tool, our <a href="/cost-dashboard/analyze">free cost analyzer</a> gives you instant visibility into where your tokens go. Upload a session log and get a breakdown by model, by file, and by task type. No account required.
+  </p>
+
+  <p>
+    For ongoing cost monitoring with budget alerts, historical trends, and spending forecasts, check out <a href="/cost-dashboard/analyze">CostPilot</a>.
+  </p>
+</BlogPost>

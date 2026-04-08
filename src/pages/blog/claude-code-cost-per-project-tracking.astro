@@ -1,0 +1,136 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to track Claude Code costs per project (before they get out of control)"
+  description="Working on multiple projects with Claude Code? Each project burns tokens differently. Here is how to measure per-project costs and stop one project from eating the budget of all the others."
+  date="April 7, 2026"
+  readTime="8 min read"
+  keywords={["claude code cost per project", "claude code project tracking", "claude code multiple projects cost", "claude code budget per project", "claude code team costs", "claude code cost allocation", "track ai coding costs"]}
+  relatedPosts={[
+    { title: "Why your Claude Code bill is higher than expected (and how to fix it)", slug: "why-claude-code-bill-higher-than-expected" },
+    { title: "How to count tokens in Claude Code (and why you should)", slug: "claude-code-token-counter-how-to-count" },
+    { title: "How to track and reduce your Claude Code costs (the complete guide)", slug: "how-to-track-reduce-claude-code-costs" },
+  ]}
+>
+  <p>
+    If you work on one project, Claude Code costs are simple. But most developers and solopreneurs juggle multiple codebases. A client project, a side project, maybe an internal tool. Each one has different file sizes, different session patterns, and different costs.
+  </p>
+
+  <p>
+    The problem is that Claude Code gives you one total bill or one shared rate limit. You have no way to see that Project A consumed 60% of your monthly budget while Project B used 10%. Without that visibility, one runaway project silently drains the budget for everything else.
+  </p>
+
+  <h2>Why per-project costs vary so much</h2>
+
+  <p>
+    Not all projects cost the same per session. The differences can be dramatic:
+  </p>
+
+  <h3>Codebase size drives context costs</h3>
+
+  <p>
+    A small CLI tool with 20 files costs far less per session than a monorepo with 500 files. Claude Code loads CLAUDE.md, rules, and contextual files at session start. A project with extensive documentation and configuration loads more context, consuming more tokens before any work begins.
+  </p>
+
+  <p>
+    In our experience, a well-configured small project costs 5,000-10,000 tokens per session start. A large project with detailed CLAUDE.md and multiple rule files costs 20,000-40,000. Over 20 sessions a day, that is the difference between 100K and 800K tokens just for startup.
+  </p>
+
+  <h3>File size determines read costs</h3>
+
+  <p>
+    Projects with large source files (500+ lines per file) cost more per file read. A React project with component files averaging 150 lines costs far less to navigate than a legacy Python project with 1,000-line modules. Claude reads entire files, not just the parts it needs, so file size directly maps to token cost.
+  </p>
+
+  <h3>Task complexity affects session length</h3>
+
+  <p>
+    Bug fixes in familiar code take 3-5 messages. Implementing a new feature in unfamiliar code takes 15-25 messages. The longer the session, the more conversation history compounds. A project that regularly requires long exploratory sessions will cost 3-5x more per task than one where tasks are quick and well-defined.
+  </p>
+
+  <h2>How to measure per-project costs</h2>
+
+  <p>
+    Claude Code organizes session logs by project path. Each project gets its own directory under <code>~/.claude/projects/</code>, making it possible to calculate costs per project. The raw data is there. The challenge is processing it.
+  </p>
+
+  <h3>Option 1: Manual log analysis</h3>
+
+  <p>
+    Navigate to <code>~/.claude/projects/</code> and look at directory sizes. A project with 500MB of session logs has consumed far more tokens than one with 50MB. This gives you a rough ratio but not dollar amounts.
+  </p>
+
+  <p>
+    For actual numbers, you would need to parse each JSONL file, sum tokens by type (input, output, cache), multiply by the per-token rate for each model used, and aggregate by project. We wrote a <a href="/blog/claude-code-token-counter-how-to-count">complete guide to counting tokens</a> if you want to go this route. It is doable but tedious.
+  </p>
+
+  <h3>Option 2: Use the free analyzer with per-project uploads</h3>
+
+  <p>
+    Our <a href="/cost-dashboard/analyze">free Claude Code cost analyzer</a> lets you upload JSONL files and get an instant breakdown. To compare projects, run it separately for each project's log directory. You get per-session costs, model breakdowns, and cache efficiency for each project individually.
+  </p>
+
+  <p>
+    The budget tracking feature lets you set a monthly target and see how each project contributes to it. If you are on a $200/month Max plan and one project is burning through tokens 3x faster than the others, you will see it immediately.
+  </p>
+
+  <h2>Common patterns (and what to do about them)</h2>
+
+  <h3>The 80/20 project split</h3>
+
+  <p>
+    In most multi-project setups, one project consumes 60-80% of the total budget. It is usually the largest codebase or the one in active development with complex tasks. Knowing which project is the heavy hitter lets you focus optimization where it matters most.
+  </p>
+
+  <p>
+    <strong>Fix:</strong> Optimize the expensive project first. Trim its CLAUDE.md, split large files, use shorter sessions. See <a href="/blog/why-claude-code-bill-higher-than-expected">the five hidden cost drivers</a> for specific optimization tactics. A 30% reduction in your most expensive project's cost is worth more than a 90% reduction in a minor project.
+  </p>
+
+  <h3>The maintenance tax</h3>
+
+  <p>
+    Projects in maintenance mode (occasional bug fixes, minor updates) still cost tokens every time you open a session. If you have five maintenance projects and each session costs 10K tokens in context loading alone, that is 50K tokens per day for projects that might only need attention once a week.
+  </p>
+
+  <p>
+    <strong>Fix:</strong> Keep minimal CLAUDE.md files for maintenance projects. Strip them down to essential information only. Detailed context should live in separate files loaded on demand, not in the startup context.
+  </p>
+
+  <h3>The exploration trap</h3>
+
+  <p>
+    New projects or unfamiliar codebases trigger exploration mode. Claude reads more files, tries more approaches, and sessions run longer. The first week on a new project can cost 5-10x more per task than the same type of task after you have established patterns and CLAUDE.md is tuned.
+  </p>
+
+  <p>
+    <strong>Fix:</strong> Front-load CLAUDE.md setup when starting a new project. Spend 30 minutes writing clear architecture notes, key file locations, and coding conventions. This investment pays back quickly in reduced exploration costs across all future sessions.
+  </p>
+
+  <h2>Setting project budgets</h2>
+
+  <p>
+    Once you have per-project cost data, you can make informed decisions:
+  </p>
+
+  <ul>
+    <li><strong>Client projects:</strong> Factor Claude Code costs into your billing rate. If a project costs $50/month in tokens, that is real overhead.</li>
+    <li><strong>Side projects:</strong> Set a token budget and track against it. If a side project is consuming more than its fair share, either optimize or accept the cost consciously.</li>
+    <li><strong>Team allocation:</strong> For teams sharing an API key or organization account, per-project tracking prevents one team member's workflow from draining everyone's quota.</li>
+  </ul>
+
+  <p>
+    The key principle is measurement before management. You cannot set meaningful budgets without knowing current spend. And you cannot know current spend without analyzing your session logs.
+  </p>
+
+  <h2>Get started in two minutes</h2>
+
+  <p>
+    Open your <a href="/cost-dashboard/analyze">free cost analyzer</a>, drag in the JSONL files from one project, and look at the total. Then do the same for another project. Compare the numbers. That is all it takes to start making informed decisions about where your Claude Code budget goes.
+  </p>
+
+  <p>
+    If you are managing costs across multiple projects or a team, <a href="/cost-dashboard">CostPilot</a> is built to handle this at scale with historical tracking, budget alerts, and multi-project dashboards. Join the waitlist to get early access.
+  </p>
+</BlogPost>

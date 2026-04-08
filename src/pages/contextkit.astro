@@ -1,0 +1,410 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ContextKit - CLAUDE.md Generator & Manager",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web (cross-platform)",
+  "description": "Generate optimized CLAUDE.md files for any project in seconds. Free online generator with templates for React, Python, Go, and more.",
+  "offers": [
+    { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free - generate CLAUDE.md for 1 project" },
+    { "@type": "Offer", "price": "19", "priceCurrency": "USD", "description": "Pro - unlimited projects, versioning, team sharing" }
+  ],
+  "brand": { "@type": "Brand", "name": "Nova Labs" }
+};
+---
+
+<Layout
+  title="ContextKit - Generate the Perfect CLAUDE.md in 30 Seconds | Nova Labs"
+  description="Free CLAUDE.md generator for Claude Code. Answer 5 questions, get an optimized config file. Templates for React, Python, Go, and more."
+  jsonLd={jsonLd}
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 transition-all duration-300" id="navbar">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">AI OS Blueprint</a>
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="/contextkit/generate" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Generate free CLAUDE.md
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+    <div class="hero-mesh" aria-hidden="true"></div>
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <div class="section-container relative z-10 text-center max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8 text-sm text-accent-light">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        Free tool - no account needed
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+        Stop writing <span class="gradient-text">CLAUDE.md</span> from scratch
+      </h1>
+
+      <p class="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-4 leading-relaxed">
+        Answer 5 questions about your project. Get an optimized CLAUDE.md that makes Claude Code actually understand your codebase.
+      </p>
+
+      <p class="text-lg text-text-dim max-w-xl mx-auto mb-10">
+        30 seconds to generate. Works with Claude Code, Cursor, Codex, and Gemini CLI.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="/contextkit/generate" class="btn-primary text-lg">
+          Generate your CLAUDE.md
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+        <a href="#waitlist" class="btn-secondary">
+          Get Pro access
+        </a>
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-text-dim">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          No signup required
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copy to clipboard
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Multi-tool compatible
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="py-20 relative">
+    <div class="section-container max-w-4xl">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">The CLAUDE.md problem</h2>
+        <p class="text-text-muted text-lg max-w-2xl mx-auto">
+          Every Claude Code user runs into this: you spend 20 minutes writing a CLAUDE.md, and Claude still doesn't understand your project the way you want it to.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass-card p-6">
+          <div class="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Wasted time</h3>
+          <p class="text-text-muted text-sm">You write a CLAUDE.md from an empty file every time you start a project. No templates, no best practices, no structure.</p>
+        </div>
+        <div class="glass-card p-6">
+          <div class="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Missing context</h3>
+          <p class="text-text-muted text-sm">Claude ignores your conventions, picks wrong frameworks, generates code that doesn't match your stack. Your CLAUDE.md isn't specific enough.</p>
+        </div>
+        <div class="glass-card p-6">
+          <div class="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Context switching</h3>
+          <p class="text-text-muted text-sm">You work on 3+ projects. Each needs different rules, different conventions, different tool configs. Managing them is a mess.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="py-20 relative bg-surface-light/20">
+    <div class="section-container max-w-4xl">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">How ContextKit works</h2>
+        <p class="text-text-muted text-lg">From zero to production-ready CLAUDE.md in 30 seconds.</p>
+      </div>
+
+      <div class="space-y-8">
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary-light font-black text-lg">1</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Tell us about your project</h3>
+            <p class="text-text-muted">Pick your language, framework, and project type. We'll ask about your testing setup, conventions, and deployment target.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary-light font-black text-lg">2</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Pick your rules</h3>
+            <p class="text-text-muted">Choose from 40+ proven rules: code style, error handling, security, testing patterns, and tool-specific settings. Or use our recommended defaults.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-6">
+          <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary-light font-black text-lg">3</div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Copy and go</h3>
+            <p class="text-text-muted">One click copies a complete, structured CLAUDE.md to your clipboard. Paste it in your project root and Claude Code instantly understands your codebase.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="/contextkit/generate" class="btn-primary">
+          Try it free
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES COMPARISON -->
+  <section class="py-20 relative">
+    <div class="section-container max-w-4xl">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">Free vs Pro</h2>
+        <p class="text-text-muted text-lg">Start free. Upgrade when you manage multiple projects.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Free -->
+        <div class="glass-card p-8">
+          <div class="text-center mb-6">
+            <h3 class="text-2xl font-black mb-1">Free</h3>
+            <p class="text-4xl font-black gradient-text">$0</p>
+            <p class="text-text-dim text-sm">forever</p>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Generate CLAUDE.md for any project
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              40+ rule templates
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Multi-tool export (Claude, Cursor, Codex, Gemini)
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Copy to clipboard
+            </li>
+            <li class="flex items-center gap-2 text-text-dim text-sm">
+              <svg class="w-4 h-4 text-text-dim flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              No project saving
+            </li>
+            <li class="flex items-center gap-2 text-text-dim text-sm">
+              <svg class="w-4 h-4 text-text-dim flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              No version history
+            </li>
+          </ul>
+          <a href="/contextkit/generate" class="btn-secondary w-full text-center !text-base">
+            Generate for free
+          </a>
+        </div>
+
+        <!-- Pro -->
+        <div class="glass-card p-8 border-primary/30 relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-xs font-bold text-white">RECOMMENDED</div>
+          <div class="text-center mb-6">
+            <h3 class="text-2xl font-black mb-1">Pro</h3>
+            <p class="text-4xl font-black gradient-text">$19<span class="text-lg text-text-dim font-normal">/mo</span></p>
+            <p class="text-text-dim text-sm">cancel anytime</p>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Everything in Free
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Unlimited saved projects
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Full version history
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Team sharing (invite link)
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              GitHub repo scanning
+            </li>
+            <li class="flex items-center gap-2 text-text-muted text-sm">
+              <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              Custom templates
+            </li>
+          </ul>
+          <a href="#waitlist" class="btn-primary w-full text-center !text-base">
+            Join the Pro waitlist
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORTED TOOLS -->
+  <section class="py-20 relative bg-surface-light/20">
+    <div class="section-container max-w-4xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">Works with every AI coding tool</h2>
+        <p class="text-text-muted text-lg">Generate config files for all major AI code assistants from one place.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass-card p-6 text-center">
+          <div class="text-2xl font-black gradient-text mb-2">CLAUDE.md</div>
+          <p class="text-text-dim text-sm">Claude Code</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="text-2xl font-black text-primary-light mb-2">.cursorrules</div>
+          <p class="text-text-dim text-sm">Cursor</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="text-2xl font-black text-accent-light mb-2">AGENTS.md</div>
+          <p class="text-text-dim text-sm">Codex / Copilot</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="text-2xl font-black text-warning mb-2">GEMINI.md</div>
+          <p class="text-text-dim text-sm">Gemini CLI</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-20 relative">
+    <div class="section-container max-w-3xl">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">FAQ</h2>
+      </div>
+
+      <div class="space-y-4">
+        <details class="glass-card p-6 group cursor-pointer">
+          <summary class="flex items-center justify-between font-bold text-lg list-none">
+            What is a CLAUDE.md file?
+            <svg class="w-5 h-5 text-text-dim transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-text-muted mt-4 text-sm leading-relaxed">
+            CLAUDE.md is a configuration file that sits in your project root. Claude Code reads it at the start of every session to understand your project's conventions, stack, testing setup, and coding style. A well-written CLAUDE.md dramatically improves the quality of Claude's output. Think of it as a project brief that trains your AI coding assistant.
+          </p>
+        </details>
+
+        <details class="glass-card p-6 group cursor-pointer">
+          <summary class="flex items-center justify-between font-bold text-lg list-none">
+            Is the free generator really free?
+            <svg class="w-5 h-5 text-text-dim transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-text-muted mt-4 text-sm leading-relaxed">
+            Yes. The generator runs entirely in your browser. No account, no email, no limits. Generate as many CLAUDE.md files as you want. The Pro tier adds project saving, version history, and team features for people managing multiple projects.
+          </p>
+        </details>
+
+        <details class="glass-card p-6 group cursor-pointer">
+          <summary class="flex items-center justify-between font-bold text-lg list-none">
+            Does it work with Cursor and other tools?
+            <svg class="w-5 h-5 text-text-dim transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-text-muted mt-4 text-sm leading-relaxed">
+            Yes. ContextKit generates config files for Claude Code (CLAUDE.md), Cursor (.cursorrules), GitHub Copilot/Codex (AGENTS.md), and Gemini CLI (GEMINI.md). The core rules are the same; we adapt the format for each tool.
+          </p>
+        </details>
+
+        <details class="glass-card p-6 group cursor-pointer">
+          <summary class="flex items-center justify-between font-bold text-lg list-none">
+            What makes a good CLAUDE.md?
+            <svg class="w-5 h-5 text-text-dim transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <p class="text-text-muted mt-4 text-sm leading-relaxed">
+            The best CLAUDE.md files have: (1) project architecture overview, (2) specific coding conventions (naming, error handling, imports), (3) testing requirements, (4) file structure guidance, (5) tool-specific settings like model routing and context management. ContextKit generates all of these based on your project type.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section class="py-20 relative" id="waitlist">
+    <div class="section-container max-w-2xl text-center">
+      <h2 class="text-3xl md:text-4xl font-black mb-4">Get early access to Pro</h2>
+      <p class="text-text-muted text-lg mb-8">
+        Join the waitlist for multi-project management, version history, team sharing, and GitHub scanning.
+      </p>
+
+      <form
+        name="contextkit-waitlist"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thank-you"
+        class="max-w-md mx-auto"
+      >
+        <input type="hidden" name="form-name" value="contextkit-waitlist" />
+        <p class="hidden"><label>Don't fill this: <input name="bot-field" /></label></p>
+
+        <div class="flex gap-3">
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="your@email.com"
+            class="flex-1 px-4 py-3 bg-surface-light border border-surface-lighter rounded-xl text-text placeholder:text-text-dim focus:outline-none focus:border-primary transition-colors"
+          />
+          <button type="submit" class="btn-primary !py-3 !px-6 !text-base">
+            Join waitlist
+          </button>
+        </div>
+
+        <div class="mt-3 flex items-start gap-2">
+          <input type="checkbox" id="gdpr-consent" name="gdpr-consent" required class="mt-1 accent-primary" />
+          <label for="gdpr-consent" class="text-text-dim text-xs text-left">
+            I agree to receive product updates from Nova Labs. Unsubscribe anytime. No spam.
+          </label>
+        </div>
+      </form>
+
+      <p class="text-text-dim text-sm mt-6">
+        Or <a href="/contextkit/generate" class="text-primary-light hover:underline">try the free generator</a> right now - no signup needed.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-surface-lighter/30">
+    <div class="section-container text-center">
+      <p class="text-text-dim text-sm">
+        Built by <a href="/" class="text-primary-light hover:underline">Nova Labs</a> - an AI-run digital product studio.
+        <a href="/blog" class="text-text-muted hover:text-text ml-4">Blog</a>
+        <a href="/terms" class="text-text-muted hover:text-text ml-4">Terms</a>
+        <a href="/refund-policy" class="text-text-muted hover:text-text ml-4">Refunds</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Navbar scroll effect -->
+  <script is:inline>
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      } else {
+        navbar.classList.remove('bg-surface/80', 'backdrop-blur-lg', 'border-b', 'border-surface-lighter/30');
+      }
+    });
+  </script>
+</Layout>

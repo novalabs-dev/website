@@ -1,0 +1,254 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to set up Claude Code for a new project (step by step)"
+  description="Starting a new project with Claude Code? The first 10 minutes of setup determine whether it helps or wastes your time. Here is the exact sequence that gets Claude Code productive on any codebase from day one."
+  date="April 8, 2026"
+  readTime="10 min read"
+  keywords={["how to set up claude code", "claude code new project", "claude code setup guide", "claude code getting started", "claude code project setup", "configure claude code", "claude code first time", "claude code CLAUDE.md setup"]}
+  relatedPosts={[
+    { title: "How to write a CLAUDE.md file that actually makes Claude Code useful", slug: "claude-md-file-guide-best-practices" },
+    { title: "How to build your first Claude Code skill in 10 minutes", slug: "build-first-claude-code-skill" },
+    { title: "Claude Code hooks explained: how to make your AI actually do what you tell it", slug: "claude-code-hooks-for-business" },
+  ]}
+  faq={[
+    {
+      question: "How long does it take to set up Claude Code for a new project?",
+      answer: "Initial setup takes about 10 minutes: installing Claude Code, creating a CLAUDE.md file, and running your first session. A more thorough setup with custom skills and hooks takes 30 to 60 minutes but pays back quickly in session quality."
+    },
+    {
+      question: "Do I need to set up Claude Code differently for each project?",
+      answer: "Yes. Claude Code starts fresh every session and knows nothing about your project by default. A CLAUDE.md file in each project root is the minimum setup that gives Claude Code the context it needs. More complex projects benefit from custom skills and arg files."
+    },
+    {
+      question: "What is the most important file for Claude Code project setup?",
+      answer: "CLAUDE.md is the single most important file. It lives in your project root and tells Claude Code about your tech stack, conventions, file structure, and rules. Without it, Claude Code makes generic suggestions. With it, Claude Code works like a team member who read the onboarding docs."
+    }
+  ]}
+>
+  <p>
+    You installed Claude Code. You opened your terminal. You typed a prompt. Claude gave you a generic response that ignored your project structure, your conventions, and your tech stack. Now you are wondering if you wasted your money.
+  </p>
+
+  <p>
+    You did not. You skipped setup. Claude Code is powerful, but it starts every session with zero context about your project. The difference between "this tool is useless" and "this tool is incredible" comes down to the first 10 minutes of configuration.
+  </p>
+
+  <p>
+    Here is the exact setup sequence, from installation to a productive first session.
+  </p>
+
+  <h2>Step 1: Install Claude Code</h2>
+
+  <p>
+    Claude Code requires Node.js 18 or later and a terminal. It works on macOS, Linux, and Windows (via WSL).
+  </p>
+
+  <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+
+  <p>
+    Run <code>claude</code> in your terminal to verify the installation. On first launch it will ask you to authenticate with your Anthropic account. You need at least a Pro subscription ($20/month) to use Claude Code.
+  </p>
+
+  <h2>Step 2: Navigate to your project</h2>
+
+  <p>
+    Claude Code is project-aware. It reads files relative to where you run it. Always start Claude Code from your project root.
+  </p>
+
+  <pre><code>cd ~/projects/my-app
+claude</code></pre>
+
+  <p>
+    If you start Claude Code from your home directory, it will see everything. That means slower context loading, irrelevant file suggestions, and higher token costs. Always be in the right directory.
+  </p>
+
+  <h2>Step 3: Create your CLAUDE.md file</h2>
+
+  <p>
+    This is the step that separates good Claude Code experiences from frustrating ones. CLAUDE.md is a file in your project root that Claude reads at the start of every session. It tells Claude who you are, what the project is, and what rules to follow.
+  </p>
+
+  <p>
+    Here is a minimal template that works for most projects:
+  </p>
+
+  <pre><code># Project: [Your Project Name]
+
+## Tech Stack
+- Language: [e.g., TypeScript]
+- Framework: [e.g., Next.js 14]
+- Database: [e.g., PostgreSQL via Prisma]
+- Hosting: [e.g., Vercel]
+
+## Project Structure
+- `src/app/` — Page routes and layouts
+- `src/components/` — Reusable UI components
+- `src/lib/` — Utility functions and database client
+- `src/api/` — API route handlers
+
+## Conventions
+- Use functional components with TypeScript
+- All database queries go through Prisma client in `src/lib/db.ts`
+- Environment variables are in `.env.local` (never commit)
+- Tests use Vitest, run with `npm test`
+
+## Rules
+- Never modify files in `src/generated/` — these are auto-generated
+- Always run `npm run lint` before suggesting changes are done
+- Prefer editing existing files over creating new ones</code></pre>
+
+  <p>
+    You do not need to cover everything. Even a 10-line CLAUDE.md makes a measurable difference in response quality. You can expand it over time as you notice gaps.
+  </p>
+
+  <p>
+    For a deeper guide on writing effective CLAUDE.md files, see our <a href="/blog/claude-md-file-guide-best-practices">complete CLAUDE.md guide</a>.
+  </p>
+
+  <h2>Step 4: Run your first task</h2>
+
+  <p>
+    Start with something small that lets you see how Claude Code interacts with your project. Good first tasks:
+  </p>
+
+  <ul>
+    <li><strong>"Read the README and summarize this project"</strong> — Tests whether Claude understands your codebase.</li>
+    <li><strong>"Find all API endpoints and list them"</strong> — Tests file reading and pattern recognition.</li>
+    <li><strong>"Add a health check endpoint at /api/health"</strong> — Tests editing, creating files, and following your conventions.</li>
+  </ul>
+
+  <p>
+    Watch what Claude Code does. If it creates files in the wrong directory, uses the wrong coding style, or ignores your stack, update your CLAUDE.md with clearer instructions. This feedback loop is how you train it.
+  </p>
+
+  <h2>Step 5: Set up a .claude directory for advanced features</h2>
+
+  <p>
+    For projects where you use Claude Code regularly, create a <code>.claude/</code> directory in your project root. This is where advanced configuration lives.
+  </p>
+
+  <pre><code>mkdir -p .claude/skills</code></pre>
+
+  <p>
+    The .claude directory can contain:
+  </p>
+
+  <ul>
+    <li><strong>skills/</strong> — Custom workflows that Claude Code can execute. Think of them as reusable macros.</li>
+    <li><strong>rules/</strong> — Additional rule files that supplement CLAUDE.md. Good for separating concerns (testing rules, deployment rules, etc.).</li>
+    <li><strong>settings.json</strong> — Project-specific settings like hooks, model preferences, and allowed tools.</li>
+  </ul>
+
+  <h2>Step 6: Configure hooks for automated checks</h2>
+
+  <p>
+    Hooks are shell commands that Claude Code runs automatically at specific moments. They enforce consistency without you having to remember.
+  </p>
+
+  <p>
+    Example hooks you might add to <code>.claude/settings.json</code>:
+  </p>
+
+  <pre><code>{'{'}
+  "hooks": {'{'}
+    "postToolUse": [
+      {'{'}
+        "tool": "Edit",
+        "command": "npm run lint --quiet 2>&1 | tail -5"
+      {'}'}
+    ]
+  {'}'}
+{'}'}</code></pre>
+
+  <p>
+    This runs your linter after every file edit. Claude sees the output and fixes lint errors immediately instead of leaving them for you. Other useful hooks:
+  </p>
+
+  <ul>
+    <li><strong>Post-edit type checking:</strong> Run <code>tsc --noEmit</code> after edits to catch type errors immediately.</li>
+    <li><strong>Post-session summary:</strong> Auto-generate a session summary when you exit Claude Code.</li>
+    <li><strong>Pre-commit validation:</strong> Run tests before Claude creates any git commits.</li>
+  </ul>
+
+  <p>
+    For the full hooks guide, see our <a href="/blog/claude-code-hooks-for-business">hooks explanation post</a>.
+  </p>
+
+  <h2>Step 7: Build your first skill</h2>
+
+  <p>
+    A skill is a reusable workflow that you trigger with a slash command. If you find yourself giving Claude the same instructions repeatedly, that is a skill waiting to be created.
+  </p>
+
+  <p>
+    Common first skills:
+  </p>
+
+  <ul>
+    <li><strong>/deploy</strong> — Build, test, and deploy to staging or production.</li>
+    <li><strong>/review</strong> — Review recent changes against your code standards.</li>
+    <li><strong>/test</strong> — Run the full test suite and report results with explanations.</li>
+    <li><strong>/db-migrate</strong> — Generate and run a database migration with safety checks.</li>
+  </ul>
+
+  <p>
+    Skills live in <code>.claude/skills/</code>. Each skill is a markdown file with a frontmatter header and instructions. See our <a href="/blog/build-first-claude-code-skill">skill building tutorial</a> for a step-by-step guide.
+  </p>
+
+  <h2>Common setup mistakes to avoid</h2>
+
+  <h3>Starting Claude Code from the wrong directory</h3>
+  <p>
+    Claude Code reads files relative to where it launches. Starting from your home directory means it will try to read everything, burn tokens on irrelevant files, and give generic responses. Always <code>cd</code> into your project first.
+  </p>
+
+  <h3>Writing a CLAUDE.md that is too long</h3>
+  <p>
+    Your CLAUDE.md is loaded into every session. A 500-line file eats tokens on every interaction. Keep it under 100 lines. Move detailed reference material to separate files in <code>.claude/rules/</code> that Claude loads only when needed.
+  </p>
+
+  <h3>Trying to do everything in one session</h3>
+  <p>
+    Long sessions accumulate context that slows Claude down and costs more. Break work into focused sessions. One feature per session. One refactor per session. Start fresh when the task changes.
+  </p>
+
+  <h3>Not checking what Claude actually did</h3>
+  <p>
+    Claude Code makes real changes to your files. Always review diffs before accepting. Use git to track changes so you can revert if something goes wrong. Trust but verify.
+  </p>
+
+  <h2>Your first-day checklist</h2>
+
+  <ol>
+    <li>Install Claude Code and authenticate.</li>
+    <li>Navigate to your project root.</li>
+    <li>Create a CLAUDE.md with at minimum: tech stack, project structure, and three rules.</li>
+    <li>Run a small task to test the setup.</li>
+    <li>Update CLAUDE.md based on what Claude got wrong.</li>
+    <li>Create a .claude directory if you plan to use hooks or skills.</li>
+    <li>Build one skill for your most repetitive task.</li>
+  </ol>
+
+  <p>
+    This entire sequence takes about 30 minutes. The time investment pays for itself within the first week of use. Every session after setup is faster, more accurate, and less frustrating.
+  </p>
+
+  <h2>What to set up next</h2>
+
+  <p>
+    Once your basic setup is working, explore these topics to get more from Claude Code:
+  </p>
+
+  <ul>
+    <li><a href="/blog/claude-code-subagents-parallel-tasks">Subagents</a> — Run multiple tasks in parallel to finish work faster.</li>
+    <li><a href="/blog/claude-code-cost-optimization-complete-guide">Cost optimization</a> — Keep your token spending predictable as usage grows.</li>
+    <li><a href="/blog/mcp-servers-for-solopreneurs">MCP servers</a> — Connect Claude Code to external tools like your calendar, email, and databases.</li>
+  </ul>
+
+  <p>
+    If you want a ready-made setup with skills, rules, and workflows already configured, our <a href="/#pricing">AI OS Blueprint</a> includes a cloneable starter repo that gives you a production-ready Claude Code configuration in minutes.
+  </p>
+</BlogPost>

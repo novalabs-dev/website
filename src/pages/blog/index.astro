@@ -3,6 +3,97 @@ import Layout from '../../layouts/Layout.astro';
 
 const posts = [
   {
+    title: "Why Claude Code ignores half your instructions (and how to fix it)",
+    description: "You tell Claude Code to use Tailwind. It reaches for styled-components. You say no semicolons. It adds them anyway. Here is why this happens and how to fix it with a better CLAUDE.md.",
+    date: "April 8, 2026",
+    readTime: "8 min read",
+    slug: "why-claude-code-ignores-instructions"
+  },
+  {
+    title: "CLAUDE.md vs .cursorrules vs AGENTS.md: how to configure any AI coding tool",
+    description: "Every AI coding tool has its own config format. Here is what each one does, how they differ, and how to manage all four without duplicating your conventions across every repo.",
+    date: "April 8, 2026",
+    readTime: "10 min read",
+    slug: "claudemd-vs-cursorrules-vs-agentsmd"
+  },
+  {
+    title: "How to write the perfect CLAUDE.md (with examples for every stack)",
+    description: "Your CLAUDE.md file is the single biggest lever for Claude Code output quality. Here is how to write one that actually works, with real examples for React, Python, Go, and more.",
+    date: "April 8, 2026",
+    readTime: "12 min read",
+    slug: "how-to-write-the-perfect-claude-md"
+  },
+  {
+    title: "Claude Code alternatives in 2026: Cursor, Windsurf, Copilot, and Aider compared",
+    description: "You are picking an AI coding tool and the options keep multiplying. Here is a practical comparison of Claude Code versus its main alternatives, based on how each one works, what it costs, and who it is actually built for.",
+    date: "April 8, 2026",
+    readTime: "12 min read",
+    slug: "claude-code-alternatives-compared"
+  },
+  {
+    title: "How to set up Claude Code for a new project (step by step)",
+    description: "Starting a new project with Claude Code? The first 10 minutes of setup determine whether it helps or wastes your time. Here is the exact sequence that gets Claude Code productive on any codebase from day one.",
+    date: "April 8, 2026",
+    readTime: "10 min read",
+    slug: "set-up-claude-code-new-project"
+  },
+  {
+    title: "How to audit your AI tool spending before it spirals out of control",
+    description: "AI tools charge per token, per request, or per seat. Most teams have no idea what they actually spend. Here is a practical framework for auditing your AI costs, finding waste, and cutting spending without cutting capability.",
+    date: "April 8, 2026",
+    readTime: "9 min read",
+    slug: "audit-ai-tool-spending"
+  },
+  {
+    title: "The complete guide to Claude Code cost optimization (2026)",
+    description: "Everything you need to cut Claude Code costs by 30-60% without sacrificing output quality. Twelve tested strategies covering context management, model routing, caching, session hygiene, and real-world benchmarks.",
+    date: "April 7, 2026",
+    readTime: "18 min read",
+    slug: "claude-code-cost-optimization-complete-guide"
+  },
+  {
+    title: "How to write a CLAUDE.md file that actually makes Claude Code useful",
+    description: "CLAUDE.md is the most important file in your Claude Code setup. It tells Claude who you are, how your project works, and what rules to follow. Most people either skip it or write one that does nothing. Here is how to write one that transforms your workflow.",
+    date: "April 7, 2026",
+    readTime: "11 min read",
+    slug: "claude-md-file-guide-best-practices"
+  },
+  {
+    title: "Claude Code subagents: how to run parallel tasks and finish work faster",
+    description: "Claude Code can spawn subagents that work on independent tasks simultaneously. This is the difference between waiting for sequential work and getting three things done at once. Here is how subagents work and when to use them.",
+    date: "April 7, 2026",
+    readTime: "9 min read",
+    slug: "claude-code-subagents-parallel-tasks"
+  },
+  {
+    title: "5 business workflows you can automate with Claude Code today",
+    description: "Claude Code is not just for writing code. It can handle email triage, content production, data analysis, client onboarding, and financial tracking. Here are five workflows that replace hours of manual work with a single terminal session.",
+    date: "April 7, 2026",
+    readTime: "10 min read",
+    slug: "automate-business-claude-code-5-workflows"
+  },
+  {
+    title: "How to track Claude Code costs per project (before they get out of control)",
+    description: "Working on multiple projects with Claude Code? Each project burns tokens differently. Here is how to measure per-project costs and stop one project from eating the budget of all the others.",
+    date: "April 7, 2026",
+    readTime: "8 min read",
+    slug: "claude-code-cost-per-project-tracking"
+  },
+  {
+    title: "Why your Claude Code bill is higher than expected (and how to fix it)",
+    description: "Claude Code costs more than most people expect. The pricing page says one thing, your actual usage says another. Here are the five hidden cost drivers and what to do about each one.",
+    date: "April 7, 2026",
+    readTime: "9 min read",
+    slug: "why-claude-code-bill-higher-than-expected"
+  },
+  {
+    title: "How to count tokens in Claude Code (and why you should)",
+    description: "Claude Code does not show you token counts during a session. But your JSONL logs contain every token consumed. Here is how to actually count them and what the numbers reveal about your spending.",
+    date: "April 7, 2026",
+    readTime: "8 min read",
+    slug: "claude-code-token-counter-how-to-count"
+  },
+  {
     title: "How to cut your Claude Code context window costs in half",
     description: "Context window usage is the biggest hidden cost in Claude Code. Most of your tokens go to loading context, not generating code. Here are seven changes that cut context costs by 40-60 percent.",
     date: "April 6, 2026",
@@ -610,7 +701,7 @@ const jsonLd = {
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="text-center md:text-left">
           <p class="text-text-dim text-sm">
-            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+            <span class="text-primary-light font-semibold">Nova Labs</span> - AI-powered business tools by AckNova Automations
           </p>
           <p class="text-text-dim/60 text-xs mt-1">
             &copy; 2026 Nova Labs. All rights reserved.

@@ -1,0 +1,156 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to count tokens in Claude Code (and why you should)"
+  description="Claude Code does not show you token counts during a session. But your JSONL logs contain every token consumed. Here is how to actually count them and what the numbers reveal about your spending."
+  date="April 7, 2026"
+  readTime="8 min read"
+  keywords={["claude code token counter", "count tokens claude code", "claude code token usage", "claude code how many tokens", "claude code session tokens", "claude code token tracking", "anthropic token counter"]}
+  relatedPosts={[
+    { title: "The complete guide to Claude Code cost optimization (2026)", slug: "claude-code-cost-optimization-complete-guide" },
+    { title: "How to analyze your Claude Code usage logs and find where tokens are wasted", slug: "analyze-claude-code-usage-logs" },
+    { title: "Claude Code rate limits: why you keep hitting them and what to do about it", slug: "claude-code-rate-limits-explained" },
+  ]}
+>
+  <p>
+    Claude Code does not have a token counter. There is no sidebar widget, no usage bar, no "tokens remaining" indicator. You work blind until you hit a rate limit or get a bill that looks wrong.
+  </p>
+
+  <p>
+    This is the number one frustration for developers and solopreneurs who use Claude Code daily. You are spending $100-200 per month on a tool and you cannot see what you are paying for in real time.
+  </p>
+
+  <p>
+    The good news: the data exists. Claude Code logs every session in detail. The challenge is getting that data into a form you can actually read.
+  </p>
+
+  <h2>Where Claude Code stores token data</h2>
+
+  <p>
+    Every Claude Code session generates a JSONL log file. These files live in your home directory under <code>~/.claude/projects/</code>, organized by project path. Each line in the file is a JSON object containing the message, role, model used, and token counts.
+  </p>
+
+  <p>
+    The relevant fields are:
+  </p>
+
+  <ul>
+    <li><strong>input_tokens:</strong> How many tokens were sent to the model (your message + full conversation context + file contents + tool definitions)</li>
+    <li><strong>output_tokens:</strong> How many tokens Claude generated in response</li>
+    <li><strong>cache_creation_input_tokens:</strong> Tokens written to the prompt cache (charged at 1.25x the normal input rate on Opus)</li>
+    <li><strong>cache_read_input_tokens:</strong> Tokens served from cache (charged at 0.1x the normal input rate)</li>
+  </ul>
+
+  <p>
+    These four numbers tell you everything about what a session costs. The problem is that a single day of active use can generate hundreds of megabytes of JSONL across dozens of session files.
+  </p>
+
+  <h2>The manual approach (and why it breaks down)</h2>
+
+  <p>
+    You can write a quick script to parse JSONL and sum up tokens:
+  </p>
+
+  <pre><code>{`import json
+import glob
+
+total_input = 0
+total_output = 0
+
+for f in glob.glob("~/.claude/projects/**/session*.jsonl"):
+    for line in open(f):
+        msg = json.loads(line)
+        if "usage" in msg:
+            total_input += msg["usage"].get("input_tokens", 0)
+            total_output += msg["usage"].get("output_tokens", 0)
+
+print(f"Input: {total_input:,} tokens")
+print(f"Output: {total_output:,} tokens")`}</code></pre>
+
+  <p>
+    This gets you a raw total, but it misses the important details. Which sessions were expensive? Which projects consume the most? Where are tokens being wasted on cache misses vs. used efficiently? Is one model driving most of the cost?
+  </p>
+
+  <p>
+    Once you start asking these questions, a simple script turns into a project. You need to track sessions over time, split by model (Opus vs. Sonnet vs. Haiku), calculate actual dollar costs per tier, and identify patterns.
+  </p>
+
+  <h2>What token counts actually reveal</h2>
+
+  <p>
+    After analyzing over 30 days of production Claude Code usage, here are the patterns that matter:
+  </p>
+
+  <h3>Input tokens dominate your bill</h3>
+
+  <p>
+    In a typical session, 80-90% of tokens are input. Claude reads your files, loads context, processes your conversation history. All of that is input. The code it writes back is output, and it is the minority of your total usage. Most people assume output is the expensive part. It is not.
+  </p>
+
+  <h3>Long sessions are exponentially expensive</h3>
+
+  <p>
+    Message 1 in a session might use 5,000 input tokens. Message 10 uses 50,000. Message 20 uses 150,000+. Every message includes the full conversation history. Token cost per message is not linear, it is compounding.
+  </p>
+
+  <h3>Cache hits save 90% on input costs</h3>
+
+  <p>
+    Anthropic's prompt cache means that repeated context (CLAUDE.md, previously read files) is cached and charged at 10% of the normal rate. If your cache hit rate is low, you are paying 10x more than necessary for the same context. A healthy session has 60-80% cache hit rates. Below 40% means something is wrong with your session structure.
+  </p>
+
+  <h3>Model choice changes everything</h3>
+
+  <p>
+    Opus costs $15/$75 per million input/output tokens. Sonnet costs $3/$15. Haiku costs $0.25/$1.25. A task done on Opus that could have been done on Sonnet costs 5x more. A task done on Opus that could have been done on Haiku costs 60x more. Without tracking which model handles which tasks, you cannot optimize this.
+  </p>
+
+  <h2>A faster way to count your tokens</h2>
+
+  <p>
+    We built a <a href="/cost-dashboard/analyze">free token analyzer for Claude Code</a> that handles all of this. Drop your JSONL session files in, and it gives you:
+  </p>
+
+  <ul>
+    <li>Total tokens by type (input, output, cache creation, cache read)</li>
+    <li>Dollar cost breakdown by model tier</li>
+    <li>Per-session analysis showing which sessions were expensive and why</li>
+    <li>Cache efficiency percentage so you know if caching is working</li>
+    <li>Per-file breakdown showing which files consume the most tokens</li>
+    <li>Historical tracking so you can see cost trends over days and weeks</li>
+    <li>Model cost optimizer that shows savings if you routed tasks to cheaper models</li>
+  </ul>
+
+  <p>
+    It runs entirely in your browser. No data leaves your machine. No account needed. Your session logs contain sensitive code, so privacy is not optional here.
+  </p>
+
+  <h2>What to do once you have the numbers</h2>
+
+  <p>
+    Counting tokens is not the goal. Spending less while getting the same output is the goal. Once you can see your token breakdown, the fixes are usually obvious:
+  </p>
+
+  <ul>
+    <li><strong>Cache hit rate below 50%?</strong> You are starting too many fresh sessions or your context files change too often. Restructure to keep stable context in separate files.</li>
+    <li><strong>One project uses 3x the tokens of another?</strong> Check file sizes and session length in that project. Large files loaded repeatedly are the usual culprit. See our guide on <a href="/blog/claude-code-cost-per-project-tracking">tracking costs per project</a> for a full breakdown.</li>
+    <li><strong>Opus handling simple tasks?</strong> Route formatting, lookups, and simple edits to Sonnet or Haiku. Save Opus for complex reasoning.</li>
+    <li><strong>Sessions averaging 20+ messages?</strong> Break them into shorter sessions. The compounding context cost makes long sessions disproportionately expensive.</li>
+  </ul>
+
+  <p>
+    Most users find 30-50% of their token usage is avoidable once they can see where it goes. That is $30-100 per month on a Max plan, or hundreds of dollars on API billing.
+  </p>
+
+  <h2>The bottom line</h2>
+
+  <p>
+    You cannot optimize what you cannot measure. Claude Code gives you no built-in way to count tokens, but the data is sitting in your session logs. Parse it manually, build a script, or use our <a href="/cost-dashboard/analyze">free analyzer</a> to get the breakdown instantly. Either way, start counting. The numbers will surprise you.
+  </p>
+
+  <p>
+    If you want to go deeper, read about <a href="/blog/why-claude-code-bill-higher-than-expected">the five hidden cost drivers</a> that make most Claude Code bills higher than expected. And if you need ongoing cost tracking with budget alerts and historical trends, <a href="/cost-dashboard">CostPilot</a> is built for exactly that. Join the waitlist for early access.
+  </p>
+</BlogPost>

@@ -1,0 +1,196 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="5 business workflows you can automate with Claude Code today"
+  description="Claude Code is not just for writing code. It can handle email triage, content production, data analysis, client onboarding, and financial tracking. Here are five workflows that replace hours of manual work with a single terminal session."
+  date="April 7, 2026"
+  readTime="10 min read"
+  keywords={["automate business with claude code", "claude code business workflows", "claude code automation examples", "claude code for business owners", "ai business automation workflows", "claude code use cases", "claude code practical examples", "automate with ai terminal"]}
+  relatedPosts={[
+    { title: "How to write a CLAUDE.md file that actually makes Claude Code useful", slug: "claude-md-file-guide-best-practices" },
+    { title: "How to use Claude Code for business: a practical guide", slug: "how-to-use-claude-code-for-business" },
+    { title: "Is Claude Code Max worth it? A real cost breakdown with numbers", slug: "is-claude-code-max-worth-it" },
+  ]}
+  faq={[
+    { question: "Do I need to know how to code to use Claude Code for business?", answer: "Basic terminal familiarity helps. You need to be comfortable opening a terminal, navigating directories, and running commands. But you do not need to be a programmer. Claude Code writes the code for you based on your instructions." },
+    { question: "How much does it cost to automate business workflows with Claude Code?", answer: "Claude Code Max starts at $100/month for the 5x plan. For most business automation workflows, this provides enough usage for daily operation. API billing is also available for automated processes at per-token rates." },
+    { question: "Can Claude Code access my email and other business tools?", answer: "Claude Code can interact with any service that has an API or command-line interface. Email (via IMAP/SMTP), calendars, databases, spreadsheets, and web APIs are all accessible. MCP servers extend this further with pre-built integrations." },
+    { question: "Is it safe to give Claude Code access to business data?", answer: "Claude Code runs locally on your machine. Your data is processed through Anthropic's API with their data handling policies, but files stay on your computer. For sensitive data, you can set rules in CLAUDE.md that prevent Claude from reading or logging specific directories." },
+  ]}
+>
+  <p>
+    Most people discover Claude Code as a coding tool. Write a function. Fix a bug. Refactor a module. That is where it starts. But the terminal is a gateway to everything on your computer, and Claude Code can use all of it.
+  </p>
+
+  <p>
+    We have been running a real business through Claude Code for over a month. Not as an experiment in capability but as the actual operational layer. Here are five workflows that moved from manual to automated, with real implementation details for each.
+  </p>
+
+  <h2>1. Email triage and response drafting</h2>
+
+  <p>
+    <strong>The problem:</strong> You check email 10 times a day. Most messages need a quick reply, a few need research, and some need to be ignored. The checking alone consumes an hour daily.
+  </p>
+
+  <p>
+    <strong>The automation:</strong> Claude Code connects to your inbox via IMAP, reads new messages, and categorizes each one by urgency and type. For routine inquiries, it drafts a response in your voice. For complex threads, it summarizes the key points and flags what needs your decision.
+  </p>
+
+  <p>
+    <strong>How it works in practice:</strong>
+  </p>
+
+  <ul>
+    <li>A Python script connects to your email server using IMAP credentials stored in your .env file</li>
+    <li>Claude reads each unread message and scores it: urgent (needs reply today), standard (reply this week), or noise (newsletters, notifications)</li>
+    <li>For urgent messages, it drafts a reply based on your communication style, past responses, and any relevant context from your project files</li>
+    <li>Drafted replies wait for your approval before sending. One command to review all drafts. One command to send the approved ones.</li>
+  </ul>
+
+  <p>
+    <strong>Time saved:</strong> 45-60 minutes per day. The reading and categorizing is instant. The drafting eliminates the blank-page problem for every reply.
+  </p>
+
+  <h2>2. Content production pipeline</h2>
+
+  <p>
+    <strong>The problem:</strong> You need consistent content for SEO, social media, or email newsletters. Writing one piece takes 2-3 hours. Maintaining a schedule feels impossible when client work piles up.
+  </p>
+
+  <p>
+    <strong>The automation:</strong> Claude Code generates content from research to published draft. It reads your voice guidelines, checks your content calendar, researches the topic, writes the piece, and formats it for your platform.
+  </p>
+
+  <p>
+    <strong>How it works in practice:</strong>
+  </p>
+
+  <ul>
+    <li>Your content strategy lives in a structured file (topics, keywords, target audience, tone guidelines)</li>
+    <li>Claude picks the next topic from the calendar, researches it by reading relevant sources and your existing content</li>
+    <li>It writes the draft following your voice guide: sentence length, vocabulary level, trademark phrases, topics to avoid</li>
+    <li>A separate review agent reads the draft with fresh eyes and checks for logical errors, tone consistency, and factual accuracy</li>
+    <li>The final draft gets committed to your website repo and deployed</li>
+  </ul>
+
+  <p>
+    <strong>Time saved:</strong> 2-3 hours per piece. We publish multiple blog posts per session using this pipeline. The quality review step catches issues that manual proofreading misses because the reviewer has no fatigue or familiarity blindness.
+  </p>
+
+  <h2>3. Client onboarding automation</h2>
+
+  <p>
+    <strong>The problem:</strong> Every new client requires the same 15 steps: create their project folder, set up their credentials, send the welcome email, schedule the kickoff, add them to your tracking system. You do this manually every time and inevitably forget step 11.
+  </p>
+
+  <p>
+    <strong>The automation:</strong> One command creates the entire client setup. Claude Code builds the project structure, populates templates with client details, sends the welcome sequence, and updates your project management system.
+  </p>
+
+  <p>
+    <strong>How it works in practice:</strong>
+  </p>
+
+  <ul>
+    <li>You provide the client name, contact info, and project type</li>
+    <li>Claude creates a standardized project directory with all template files (scope document, status tracker, decision log, communication templates)</li>
+    <li>It pre-fills every template with the client's details and your standard terms</li>
+    <li>The welcome email goes out (with your approval) from your business email</li>
+    <li>The client gets added to your SQLite tracking database with project milestones and follow-up dates</li>
+  </ul>
+
+  <p>
+    <strong>Time saved:</strong> 30-45 minutes per new client. More importantly, nothing gets forgotten. The checklist is baked into the automation.
+  </p>
+
+  <h2>4. Financial tracking and reporting</h2>
+
+  <p>
+    <strong>The problem:</strong> Subscription costs creep up. Ad spend needs monitoring. Revenue from different products needs to be tracked separately. Building a financial picture means logging into five dashboards and combining data manually.
+  </p>
+
+  <p>
+    <strong>The automation:</strong> Claude Code pulls data from your payment processor API, ad platform API, and subscription records. It generates a daily financial snapshot: revenue, costs, margins, and trend comparisons.
+  </p>
+
+  <p>
+    <strong>How it works in practice:</strong>
+  </p>
+
+  <ul>
+    <li>API connections to LemonSqueezy (or Stripe), Google Ads, and your subscription tracker pull the latest numbers</li>
+    <li>Claude calculates key metrics: daily revenue, daily costs, margin per product, cost per acquisition, return on ad spend</li>
+    <li>It compares against yesterday, last week, and last month to spot trends</li>
+    <li>Red flags get called out explicitly: ad spend exceeding budget, conversion rates dropping, unexpected charges</li>
+    <li>The report gets delivered to your preferred channel (terminal output, Telegram message, or saved to a daily log file)</li>
+  </ul>
+
+  <p>
+    <strong>Time saved:</strong> 20-30 minutes per day. The real value is not the time but the consistency. You get the financial picture every day, not just when you remember to check.
+  </p>
+
+  <h2>5. Data analysis and reporting</h2>
+
+  <p>
+    <strong>The problem:</strong> You have data in spreadsheets, databases, and analytics platforms. Getting useful insights means exporting, cleaning, combining, and analyzing. By the time you have the answer, you have forgotten the question.
+  </p>
+
+  <p>
+    <strong>The automation:</strong> Claude Code reads your data sources directly, runs the analysis, and presents findings in plain language with supporting numbers.
+  </p>
+
+  <p>
+    <strong>How it works in practice:</strong>
+  </p>
+
+  <ul>
+    <li>Claude connects to your SQLite databases, reads CSV exports, or queries APIs directly</li>
+    <li>You ask questions in natural language: "Which product had the highest margin last month?" or "Show me the trend in signup-to-purchase conversion over the last 90 days"</li>
+    <li>Claude writes and runs the analysis code, interprets the results, and explains what the numbers mean for your business</li>
+    <li>For recurring reports, the analysis gets saved as a reusable script that runs on schedule</li>
+  </ul>
+
+  <p>
+    <strong>Time saved:</strong> Variable, but the bigger win is accessibility. Questions you would never bother answering because the data wrangling was not worth it become trivial to investigate.
+  </p>
+
+  <h2>The pattern behind all five</h2>
+
+  <p>
+    Every workflow follows the same structure:
+  </p>
+
+  <ol>
+    <li><strong>Data in.</strong> Claude Code reads from files, APIs, databases, or email.</li>
+    <li><strong>Logic.</strong> Categorize, calculate, generate, or transform.</li>
+    <li><strong>Human checkpoint.</strong> For anything that goes external (emails, posts, financial decisions), you approve before it executes.</li>
+    <li><strong>Data out.</strong> Results go to the right place: a file, a message, a database entry, or a deployed page.</li>
+  </ol>
+
+  <p>
+    The human checkpoint is not optional. Automation without oversight is a liability. The goal is to eliminate the repetitive parts of each workflow while keeping your judgment on the decisions that matter.
+  </p>
+
+  <h2>What you need to get started</h2>
+
+  <ul>
+    <li><strong>Claude Code subscription.</strong> Max 5x ($100/month) covers most business automation workloads.</li>
+    <li><strong>A CLAUDE.md file.</strong> This tells Claude about your business, your tools, and your rules. Read our <a href="/blog/claude-md-file-guide-best-practices">complete CLAUDE.md guide</a> to set one up.</li>
+    <li><strong>API credentials.</strong> For each service you want to automate, you need API access. Most SaaS tools provide this on paid plans.</li>
+    <li><strong>A structured project directory.</strong> Claude Code works best when your files are organized. Scripts in one place, data in another, configuration separate from both.</li>
+  </ul>
+
+  <p>
+    The fastest way to set all of this up is with a pre-built system. The <a href="/#pricing">AI OS Blueprint</a> includes the directory structure, the CLAUDE.md configuration, the skill system for reusable workflows, and the memory architecture for persistent context. It is what we built this business on, and it has been in production since day one.
+  </p>
+
+  <p>
+    Start with one workflow. Pick the one that eats the most of your time each week. Automate it. Then move to the next. Within a month, you will have reclaimed hours every week that used to disappear into repetitive work.
+  </p>
+
+  <p>
+    Want to know how much those automated sessions actually cost in tokens? The <a href="/cost-dashboard/analyze">free CostPilot analyzer</a> breaks down every session so you can optimize your workflow and your spending at the same time.
+  </p>
+</BlogPost>

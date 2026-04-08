@@ -8,7 +8,7 @@ const jsonLd = {
       "@type": "Organization",
       "name": "Nova Labs",
       "url": "https://nova-labs.dev",
-      "description": "AI-first business building digital products. An experiment by AckNova Automations.",
+      "description": "AI-powered business tools and digital products by AckNova Automations.",
       "foundingDate": "2026-03-07"
     },
     {
@@ -69,9 +69,15 @@ const jsonLd = {
     {
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "Do I need coding experience?", "acceptedAnswer": { "@type": "Answer", "text": "No. The AI OS Blueprint is designed for non-technical entrepreneurs. You copy, paste, and customize." }},
-        { "@type": "Question", "name": "Does this work with ChatGPT?", "acceptedAnswer": { "@type": "Answer", "text": "The system is built specifically for Claude Code by Anthropic. ChatGPT does not support the skills and automation architecture used in AI OS." }},
-        { "@type": "Question", "name": "How long does setup take?", "acceptedAnswer": { "@type": "Answer", "text": "Most users have their AI OS running within 1 hour. The playbook includes step-by-step instructions and a clone-ready repository." }}
+        { "@type": "Question", "name": "Do I need to know how to code?", "acceptedAnswer": { "@type": "Answer", "text": "You need to be comfortable using a terminal and copy-pasting commands. The system is built with Claude Code, which handles the technical parts. The playbook walks you through every step." }},
+        { "@type": "Question", "name": "Does this work with ChatGPT?", "acceptedAnswer": { "@type": "Answer", "text": "No, this is specifically for Claude Code (Anthropic). Claude Code has unique features (skills, hooks, memory) that make this system possible." }},
+        { "@type": "Question", "name": "Do I need Claude Max?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code works with a Claude Max ($100/mo) or Claude Pro ($20/mo + API credits) subscription. The playbook works with both." }},
+        { "@type": "Question", "name": "How quickly can I get started?", "acceptedAnswer": { "@type": "Answer", "text": "The basic setup takes about 1 hour. Within a day you'll have a working system for your daily tasks." }},
+        { "@type": "Question", "name": "How much time will this actually save me?", "acceptedAnswer": { "@type": "Answer", "text": "Most business owners spend 5-10 hours per week on content, email, admin, and planning. With AI OS, your AI handles the bulk of that. Even saving just 2 hours per week makes this a $47 investment that pays for itself on day one." }},
+        { "@type": "Question", "name": "Are there ongoing costs?", "acceptedAnswer": { "@type": "Answer", "text": "Only your Claude subscription ($20/mo for Pro, $100/mo for Max). The playbook and system are one-time purchases. No hidden fees, no upsells." }},
+        { "@type": "Question", "name": "What if it doesn't work for me?", "acceptedAnswer": { "@type": "Answer", "text": "30-day money-back guarantee, no questions asked. If you're not happy, email support@nova-labs.dev and you get a full refund." }},
+        { "@type": "Question", "name": "You have 90+ free blog posts. Why should I pay?", "acceptedAnswer": { "@type": "Answer", "text": "The blog teaches concepts. The playbook gives you a working system you can clone and run in 1 hour. Instead of piecing together tips from blog posts, you get the complete architecture, pre-built skills, context templates, and the exact repo structure that Nova Labs uses in production." }},
+        { "@type": "Question", "name": "What exactly do I download?", "acceptedAnswer": { "@type": "Answer", "text": "A PDF playbook (65+ pages) with step-by-step instructions, plus access to a GitHub repository you can clone. The repo contains the complete AI OS: folder structure, CLAUDE.md configuration, 5 business skills, context templates, and memory system. You clone it, fill in your business details, and run it with Claude Code." }}
       ]
     }
   ]
@@ -93,6 +99,7 @@ const jsonLd = {
       </a>
       <div class="flex items-center gap-6">
         <a href="/free-chapter" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Free Guide</a>
+        <a href="/contextkit" class="text-text-muted hover:text-text text-sm transition-colors">ContextKit</a>
         <a href="/cost-dashboard" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">CostPilot</a>
         <a href="/skills" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Skills</a>
         <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
@@ -130,7 +137,7 @@ const jsonLd = {
     <div class="section-container relative z-10 text-center max-w-4xl">
       <div class="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light border border-surface-lighter mb-8 text-sm text-text-muted">
         <span class="w-2 h-2 bg-success rounded-full pulse-ring"></span>
-        Used by solopreneurs and small teams
+        Built for Claude Code users
       </div>
 
       <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
@@ -237,6 +244,34 @@ const jsonLd = {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WHO THIS IS NOT FOR -->
+  <!-- ============================================ -->
+  <section class="py-12 relative">
+    <div class="section-container max-w-3xl">
+      <div class="fade-in">
+        <div class="p-6 rounded-xl bg-surface-light/30 border border-surface-lighter/50">
+          <h3 class="text-lg font-semibold mb-4 text-text-dim">This is NOT for you if:</h3>
+          <div class="grid md:grid-cols-2 gap-3 text-sm text-text-dim">
+            {[
+              "You don't use Claude Code (this requires Anthropic's CLI tool)",
+              "You're looking for a no-code drag-and-drop builder",
+              "You want ChatGPT or Cursor automation (different tools, different approach)",
+              "You're not comfortable running terminal commands",
+            ].map((item) => (
+              <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-red-400/60 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -504,8 +539,8 @@ const jsonLd = {
 
           <div class="mt-8 grid grid-cols-3 gap-4 text-center">
             <div>
-              <p class="text-2xl font-bold text-primary-light">67+</p>
-              <p class="text-text-dim text-xs">Blog posts published autonomously</p>
+              <p class="text-2xl font-bold text-primary-light">92+</p>
+              <p class="text-text-dim text-xs">Pages of content published</p>
             </div>
             <div>
               <p class="text-2xl font-bold text-primary-light">30+</p>
@@ -711,6 +746,70 @@ const jsonLd = {
   <div class="section-divider" aria-hidden="true"></div>
 
   <!-- ============================================ -->
+  <!-- COSTPILOT BANNER -->
+  <!-- ============================================ -->
+  <section class="py-16 relative">
+    <div class="section-container max-w-3xl">
+      <div class="glass-card p-8 md:p-10 border-primary/20 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-[60px]" aria-hidden="true"></div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="px-2.5 py-1 rounded-md bg-success/15 text-success text-xs font-bold uppercase tracking-wider">Free tool</span>
+          </div>
+          <h3 class="text-2xl md:text-3xl font-bold mb-3">See where your Claude Code tokens go</h3>
+          <p class="text-text-muted text-lg mb-6">
+            Upload your session files, get instant breakdown of token usage, cache analysis, and cost estimates. 100% client-side — your data never leaves your browser.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="/cost-dashboard/analyze" class="btn-primary inline-flex items-center gap-2">
+              Try the free analyzer
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a href="/cost-dashboard" class="btn-secondary inline-flex items-center gap-2">
+              Learn about CostPilot Pro
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- CONTEXTKIT BANNER                           -->
+  <!-- ============================================ -->
+  <section class="py-16 relative">
+    <div class="section-container max-w-3xl">
+      <div class="glass-card p-8 md:p-10 border-accent/20 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-[60px]" aria-hidden="true"></div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="px-2.5 py-1 rounded-md bg-accent/15 text-accent-light text-xs font-bold uppercase tracking-wider">New - Free tool</span>
+          </div>
+          <h3 class="text-2xl md:text-3xl font-bold mb-3">Generate the perfect CLAUDE.md in 30 seconds</h3>
+          <p class="text-text-muted text-lg mb-6">
+            Answer 5 questions about your project, get a production-ready config file. Works with Claude Code, Cursor, Codex, and Gemini CLI. No signup needed.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="/contextkit/generate" class="btn-primary inline-flex items-center gap-2">
+              Generate your CLAUDE.md
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </a>
+            <a href="/contextkit" class="btn-secondary inline-flex items-center gap-2">
+              Learn about ContextKit Pro
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- ============================================ -->
   <!-- PRICING -->
   <!-- ============================================ -->
   <section class="py-24 relative" id="pricing">
@@ -732,11 +831,7 @@ const jsonLd = {
         <div class="grid md:grid-cols-3 gap-6">
           <!-- Skill Pack -->
           <div class="glass-card p-8 flex flex-col relative" id="skillpack-card">
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-success rounded-full text-sm font-semibold text-white">
-              Starter
-            </div>
-
-            <h3 class="text-2xl font-bold mb-2 mt-2">Skill Pack</h3>
+            <h3 class="text-2xl font-bold mb-2">Skill Pack</h3>
             <div class="flex items-baseline gap-1 mb-6">
               <span class="text-4xl font-black">$9</span>
               <span class="text-text-dim">one-time</span>
@@ -761,20 +856,25 @@ const jsonLd = {
             <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/42602dd3-c435-4294-88d2-d871f76ff5c6" class="btn-secondary w-full text-center checkout-link" data-value="9" data-product="skillpack">Get the Skill Pack - $9</a>
           </div>
 
-          <!-- Playbook -->
-          <div class="glass-card p-8 flex flex-col relative" id="playbook-card">
-            <h3 class="text-2xl font-bold mb-2">Playbook</h3>
+          <!-- Playbook — RECOMMENDED -->
+          <div class="glass-card glow-border p-8 flex flex-col relative border-primary/30" id="playbook-card">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
+              Recommended
+            </div>
+
+            <h3 class="text-2xl font-bold mb-2 mt-2">Playbook</h3>
             <div class="flex items-baseline gap-1 mb-6">
-              <span class="text-4xl font-black">$47</span>
+              <span class="text-4xl font-black gradient-text">$47</span>
               <span class="text-text-dim">one-time</span>
             </div>
 
             <ul class="space-y-3 mb-8 flex-grow">
               {[
-                'The complete playbook (PDF)',
+                'The complete playbook (65+ pages)',
                 'Cloneable AI OS system',
-                '5 business skills',
+                '5 business skills included',
                 'Nova Labs case study',
+                'Step-by-step terminal instructions',
               ].map((item) => (
                 <li class="flex items-center gap-3 text-text-muted">
                   <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -785,18 +885,18 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-secondary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook - $47</a>
           </div>
 
           <!-- Bundle -->
-          <div class="glass-card glow-border p-8 flex flex-col relative border-primary/30">
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary rounded-full text-sm font-semibold text-white">
+          <div class="glass-card p-8 flex flex-col relative">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-surface-lighter rounded-full text-sm font-semibold text-text-muted">
               Best value
             </div>
 
-            <h3 class="text-2xl font-bold mb-2">Bundle</h3>
+            <h3 class="text-2xl font-bold mb-2 mt-2">Bundle</h3>
             <div class="flex items-baseline gap-1 mb-6">
-              <span class="text-4xl font-black gradient-text">$97</span>
+              <span class="text-4xl font-black">$97</span>
               <span class="text-text-dim">one-time</span>
             </div>
 
@@ -819,7 +919,7 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-primary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle - $97</a>
           </div>
         </div>
 
@@ -919,6 +1019,14 @@ const jsonLd = {
               q: 'What if it doesn\'t work for me?',
               a: '30-day money-back guarantee, no questions asked. If you\'re not happy, email support@nova-labs.dev and you get a full refund.'
             },
+            {
+              q: 'You have 90+ free blog posts. Why should I pay?',
+              a: 'The blog teaches concepts. The playbook gives you a working system you can clone and run in 1 hour. Instead of piecing together tips from blog posts, you get the complete architecture, pre-built skills, context templates, and the exact repo structure that Nova Labs uses in production. It\'s the difference between reading about cooking and getting the recipe with all ingredients prepared.'
+            },
+            {
+              q: 'What exactly do I download?',
+              a: 'A PDF playbook (65+ pages) with step-by-step instructions, plus access to a GitHub repository you can clone. The repo contains the complete AI OS: folder structure, CLAUDE.md configuration, 5 business skills (content writer, email triage, meeting prep, daily planner, weekly review), context templates, and memory system. You clone it, fill in your business details, and run it with Claude Code.'
+            },
           ].map((faq) => (
             <details class="glass-card group cursor-pointer">
               <summary class="p-6 flex items-center justify-between font-semibold text-lg list-none select-none">
@@ -984,7 +1092,7 @@ const jsonLd = {
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="text-center md:text-left">
           <p class="text-text-dim text-sm">
-            <span class="text-primary-light font-semibold">Nova Labs</span> - An AI-first business experiment by AckNova Automations
+            <span class="text-primary-light font-semibold">Nova Labs</span> - AI-powered business tools by AckNova Automations
           </p>
           <p class="text-text-dim/60 text-xs mt-1">
             &copy; 2026 Nova Labs. All rights reserved.

@@ -1,0 +1,205 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="Claude Code subagents: how to run parallel tasks and finish work faster"
+  description="Claude Code can spawn subagents that work on independent tasks simultaneously. This is the difference between waiting for sequential work and getting three things done at once. Here is how subagents work and when to use them."
+  date="April 7, 2026"
+  readTime="9 min read"
+  keywords={["claude code subagents", "claude code parallel agents", "claude code agent tool", "claude code multitasking", "claude code speed up workflow", "claude code concurrent tasks", "claude code worktree", "run multiple claude code tasks"]}
+  relatedPosts={[
+    { title: "How to write a CLAUDE.md file that actually makes Claude Code useful", slug: "claude-md-file-guide-best-practices" },
+    { title: "Claude Code hooks explained: make your AI do what you tell it", slug: "claude-code-hooks-for-business" },
+    { title: "How to build your first Claude Code skill in 10 minutes", slug: "build-first-claude-code-skill" },
+  ]}
+  faq={[
+    { question: "What are Claude Code subagents?", answer: "Subagents are independent Claude Code instances that run in parallel within a session. The main agent spawns them to handle tasks that do not depend on each other, so multiple pieces of work happen simultaneously instead of sequentially." },
+    { question: "Do subagents cost extra?", answer: "Subagents consume tokens from the same billing as your main session. They are not a separate product. The cost increase comes from doing more work in parallel, but the total tokens used is often similar to doing the same work sequentially because subagents have smaller context windows." },
+    { question: "Can subagents edit the same file?", answer: "Subagents can work on different files simultaneously. For tasks that might touch the same files, you can use git worktrees to give each subagent an isolated copy of the repository, preventing conflicts." },
+    { question: "How many subagents can run at once?", answer: "There is no hard limit from Claude Code itself, but practical limits come from rate limits on your account and the complexity of coordination. Two to four concurrent subagents is a practical sweet spot for most workflows." },
+  ]}
+>
+  <p>
+    The single biggest speed improvement in Claude Code is not a faster model or a bigger context window. It is subagents. One main agent that delegates independent tasks to separate workers, all running at the same time.
+  </p>
+
+  <p>
+    Most people use Claude Code as a single thread: do this, then do that, then do the next thing. That works, but for sessions with multiple independent tasks, you are leaving half your productivity on the table.
+  </p>
+
+  <h2>What subagents actually are</h2>
+
+  <p>
+    A subagent is a fresh Claude Code instance spawned by your main session. It gets its own context window, its own tools, and works independently. The main agent sends it a task, continues with other work, and picks up the result when the subagent finishes.
+  </p>
+
+  <p>
+    Think of it like this: you are the project manager. Instead of doing every task yourself, you assign independent tasks to team members who work in parallel. You only handle the tasks that depend on each other.
+  </p>
+
+  <p>
+    The technical mechanism is the Agent tool. When Claude Code identifies that two or more tasks have no dependencies between them, it can launch multiple subagents in a single response. Each subagent gets a complete brief: what to do, why, and what context it needs.
+  </p>
+
+  <h2>When subagents make sense</h2>
+
+  <h3>Research and exploration</h3>
+
+  <p>
+    You need to understand three different parts of a codebase before making a change. Instead of reading one area at a time, spawn three subagents that each explore a different area simultaneously. Results come back together, and you have the full picture in one round instead of three.
+  </p>
+
+  <h3>Independent file changes</h3>
+
+  <p>
+    You need to update the API endpoint, the frontend component, and the test file. None of these changes depend on the others being done first. Three subagents, three files, one round of work.
+  </p>
+
+  <h3>Testing and validation</h3>
+
+  <p>
+    After making changes, you want to run the test suite, check for linting errors, and verify the build. These are independent checks. Launch all three as subagents and get all results at once.
+  </p>
+
+  <h3>Content and documentation</h3>
+
+  <p>
+    Writing three blog posts. Generating API docs for three modules. Creating test data for three features. Any batch of similar but independent writing tasks benefits from parallel execution.
+  </p>
+
+  <h2>When subagents do not make sense</h2>
+
+  <p>
+    Not everything should be parallelized:
+  </p>
+
+  <ul>
+    <li><strong>Sequential dependencies.</strong> If task B needs the output of task A, they must run in order. Forcing parallelism here creates errors or wasted work.</li>
+    <li><strong>Same-file edits.</strong> Two subagents editing the same file will create conflicts. Use worktrees (more on this below) or sequence these tasks.</li>
+    <li><strong>Simple tasks.</strong> Spawning a subagent has overhead. For a task that takes 10 seconds, running it directly is faster than delegating.</li>
+    <li><strong>Tasks requiring human judgment.</strong> If a task needs you to make a decision midway, a subagent cannot pause and ask. Keep these in the main thread.</li>
+  </ul>
+
+  <h2>Git worktrees for isolation</h2>
+
+  <p>
+    The most powerful subagent pattern uses git worktrees. A worktree gives each subagent its own copy of the repository, so they can make changes to any file without conflicting with each other or with your main working directory.
+  </p>
+
+  <p>
+    Here is when to use worktrees:
+  </p>
+
+  <ul>
+    <li>Two subagents might touch overlapping files</li>
+    <li>You want to review each subagent's changes independently before merging</li>
+    <li>The task involves experimental changes you might want to discard</li>
+  </ul>
+
+  <p>
+    Without worktrees, subagents work directly in your repository. This is fine when they touch completely different files, but risky when there is any overlap.
+  </p>
+
+  <h2>How to structure subagent prompts</h2>
+
+  <p>
+    The quality of subagent output depends almost entirely on the prompt. A subagent starts with a blank context. It does not know what you discussed in the main session. It does not know what other subagents are doing. You need to brief it like a colleague who just walked into the room.
+  </p>
+
+  <p>
+    Good subagent prompts include:
+  </p>
+
+  <ol>
+    <li><strong>What to accomplish.</strong> The concrete deliverable, not a vague goal.</li>
+    <li><strong>Why it matters.</strong> Context that helps the subagent make judgment calls.</li>
+    <li><strong>What you already know.</strong> File paths, patterns discovered, things tried.</li>
+    <li><strong>What tools to use or avoid.</strong> Read-only research? Full editing? Specific directories to focus on?</li>
+    <li><strong>Expected output format.</strong> Should it write code, return a summary, or create a file?</li>
+  </ol>
+
+  <p>
+    A bad prompt: "Fix the tests." A good prompt: "The test file at src/auth/login.test.ts has 3 failing tests after we changed the JWT expiry from 1 hour to 15 minutes. Update the test expectations to match the new 15-minute expiry. Run the tests to confirm they pass."
+  </p>
+
+  <h2>Real workflow examples</h2>
+
+  <h3>Example 1: Feature implementation</h3>
+
+  <p>
+    You want to add a dark mode toggle to your app. The main agent plans the approach and identifies three independent pieces:
+  </p>
+
+  <ol>
+    <li>Subagent 1: Create the toggle component and state management</li>
+    <li>Subagent 2: Write the dark mode CSS variables and theme definitions</li>
+    <li>Subagent 3: Update the settings page layout to include the toggle</li>
+  </ol>
+
+  <p>
+    All three run simultaneously. The main agent then integrates the results, handles any overlap, and runs the test suite.
+  </p>
+
+  <h3>Example 2: Code review</h3>
+
+  <p>
+    You have a pull request with changes across the API, frontend, and database layers. Instead of reviewing sequentially:
+  </p>
+
+  <ol>
+    <li>Subagent 1 (read-only): Review API changes for security issues</li>
+    <li>Subagent 2 (read-only): Review frontend changes for UX problems</li>
+    <li>Subagent 3 (read-only): Review database migration for data integrity</li>
+  </ol>
+
+  <p>
+    Each subagent is a specialist. The main agent combines their findings into a unified review.
+  </p>
+
+  <h3>Example 3: SEO content batch</h3>
+
+  <p>
+    You need five blog posts for your product. Each post targets a different keyword and has no dependency on the others. Five subagents, five posts, one session. This is exactly how we produce content at Nova Labs, and it turns what used to be a full day of writing into a single session.
+  </p>
+
+  <h2>Common mistakes</h2>
+
+  <ul>
+    <li><strong>Launching too many subagents at once.</strong> Rate limits apply across all subagents. Four concurrent agents hitting the API hard will trigger limits faster than one agent working steadily.</li>
+    <li><strong>Vague delegation.</strong> "Research this topic" produces generic results. "Find the three most upvoted Reddit threads in r/ClaudeAI about token costs and summarize the main complaints" produces actionable intelligence.</li>
+    <li><strong>Not verifying subagent output.</strong> Subagents work independently but are not infallible. Always review their output before building on it, especially for code changes.</li>
+    <li><strong>Parallelizing everything.</strong> Some tasks benefit from the main agent's accumulated context. A complex debugging session where each step builds on the previous finding should stay in the main thread.</li>
+  </ul>
+
+  <h2>Setting up your project for subagent success</h2>
+
+  <p>
+    The better your project is organized, the better subagents perform. A few structural choices that help:
+  </p>
+
+  <ul>
+    <li><strong>Clear directory structure.</strong> Subagents navigate by file paths. A well-organized project means less exploration and faster results.</li>
+    <li><strong>A good CLAUDE.md.</strong> Subagents inherit your project's CLAUDE.md instructions. Rules about coding style, testing conventions, and file organization apply to subagents automatically. This is why a solid <a href="/blog/claude-md-file-guide-best-practices">CLAUDE.md file</a> matters so much.</li>
+    <li><strong>Modular code.</strong> Code with clear boundaries between modules is easier to work on in parallel. Tightly coupled code forces sequential work.</li>
+    <li><strong>Git hygiene.</strong> Worktree-based subagents need a clean git state. Uncommitted changes and dangling branches make isolation harder.</li>
+  </ul>
+
+  <h2>The productivity math</h2>
+
+  <p>
+    A typical Claude Code session might involve five tasks that take 2-3 minutes each sequentially: 10-15 minutes total. With subagents handling three of those tasks in parallel, the session drops to 6-8 minutes. That is not revolutionary for one session. But across a full day of development sessions, you are recovering hours.
+  </p>
+
+  <p>
+    The real win is not time savings per task. It is the ability to think bigger about what you can accomplish in a single session. When parallel execution is available, you stop breaking work into tiny chunks and start tackling entire features at once.
+  </p>
+
+  <p>
+    Want to see how much your current Claude Code workflow costs and where the tokens go? Try our <a href="/cost-dashboard/analyze">free cost analyzer</a>. Upload a session log and see the full breakdown, including how much you could save by optimizing your approach.
+  </p>
+
+  <p>
+    And if you want the complete playbook for setting up Claude Code as a business operating system, with subagent patterns, skill systems, memory architecture, and everything we use to run Nova Labs, check out the <a href="/#pricing">AI OS Blueprint</a>.
+  </p>
+</BlogPost>

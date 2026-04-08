@@ -1,0 +1,219 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Why does Claude Code not follow my instructions?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code reads your CLAUDE.md file at the start of each session to understand your project's conventions and preferences. If the file is missing, empty, or poorly structured, Claude falls back to its training defaults. Vague instructions, missing test commands, and no file structure map are the most common reasons Claude ignores what you want." }},
+    { "@type": "Question", "name": "What should I put in my CLAUDE.md to improve output quality?", "acceptedAnswer": { "@type": "Answer", "text": "The highest-impact sections are: code conventions with specific rules (not vague phrases), your exact test commands so Claude can verify its work, a file structure map so Claude knows where things go, and a list of things Claude should NOT do. Negative instructions are just as important as positive ones." }},
+    { "@type": "Question", "name": "How do I stop Claude Code from adding semicolons or using the wrong libraries?", "acceptedAnswer": { "@type": "Answer", "text": "Add explicit negative rules to your CLAUDE.md. For example: 'No semicolons. Use Tailwind, never styled-components or CSS modules. No default exports.' Claude reads these on session start and overrides its defaults. The more specific the rule, the more reliably it sticks." }},
+    { "@type": "Question", "name": "How long should my CLAUDE.md be?", "acceptedAnswer": { "@type": "Answer", "text": "Aim for 50-150 lines. Every line is loaded into context at the start of every session. Bloated CLAUDE.md files waste tokens and dilute the instructions that actually matter. Remove anything that doesn't directly change Claude's coding behavior." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Why Claude Code ignores half your instructions (and how to fix it)"
+  description="You tell Claude Code to use Tailwind. It reaches for styled-components. You say no semicolons. It adds them anyway. Here's why this happens and how to fix it with a better CLAUDE.md."
+  date="April 8, 2026"
+  readTime="8 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "Claude Code subagents: run parallel tasks", slug: "claude-code-subagents-parallel-tasks" },
+  ]}
+>
+  <p>
+    You tell Claude Code to use Tailwind. It reaches for styled-components. You say no semicolons. It adds them everywhere. You ask it to write a test. It uses Jest when your project runs Vitest.
+  </p>
+
+  <p>
+    This isn't a bug. It's a configuration problem. And the fix is simpler than you think.
+  </p>
+
+  <h2>Why Claude Code falls back to defaults</h2>
+
+  <p>
+    Claude Code reads your <code>CLAUDE.md</code> file once at the start of each session. That file is its only source of project-specific context. Everything it knows about your conventions, your stack, your preferences, comes from there.
+  </p>
+
+  <p>
+    If that file is missing, it guesses based on what it's seen in training data. If it's there but vague, it still guesses. If it's there but bloated with irrelevant content, the important rules get diluted.
+  </p>
+
+  <p>
+    Most developers either skip the file entirely or write one that looks complete but doesn't actually change Claude's behavior. Both produce the same result: inconsistent output that requires constant correction.
+  </p>
+
+  <h2>The 5 most common CLAUDE.md mistakes</h2>
+
+  <h3>1. Instructions that are too vague</h3>
+
+  <p>
+    "Write clean, maintainable code" tells Claude nothing it doesn't already assume about itself. "Use named exports, kebab-case file names, and no default exports" tells Claude exactly what to do and gives you something concrete to verify.
+  </p>
+
+  <p>
+    Every rule in your CLAUDE.md should be specific enough that you can look at Claude's output and immediately tell whether it followed the rule or not. If you can't check it, Claude can't reliably follow it either.
+  </p>
+
+  <h3>2. Missing test commands</h3>
+
+  <p>
+    Claude can write tests. What it can't do is verify whether they pass if you haven't told it how to run them. Without a test command in your CLAUDE.md, Claude either skips verification entirely or guesses at the command and fails silently.
+  </p>
+
+  <p>
+    One line fixes this:
+  </p>
+
+  <pre><code>## Testing
+Run tests: `npx vitest`
+Test files go next to source files (e.g., user-service.test.ts)</code></pre>
+
+  <p>
+    Now Claude knows how to run your tests and where to put them. That's two fewer things to correct on every task.
+  </p>
+
+  <h3>3. No file structure map</h3>
+
+  <p>
+    Without a file structure section, Claude creates new files wherever seems reasonable. Sometimes it's right. Often it's not, especially in projects with non-obvious conventions like co-located tests, feature-based folders, or domain separation.
+  </p>
+
+  <p>
+    A short tree in your CLAUDE.md eliminates most placement mistakes:
+  </p>
+
+  <pre><code>## File Structure
+src/
+  app/          # Next.js App Router pages
+  components/   # Reusable UI components
+  lib/          # Business logic and utilities
+  hooks/        # Custom React hooks
+  types/        # Shared TypeScript types</code></pre>
+
+  <p>
+    This also helps Claude find existing code before reimplementing it. If it knows your utilities live in <code>lib/</code>, it checks there before writing a new one.
+  </p>
+
+  <h3>4. Telling Claude what TO do but not what NOT to do</h3>
+
+  <p>
+    Most CLAUDE.md files list positive instructions. Very few include negative ones. That's a mistake, because Claude's defaults are strong and sometimes the only way to override them is to say explicitly: don't do this.
+  </p>
+
+  <p>
+    Some of the most effective rules are negative:
+  </p>
+
+  <pre><code>## Important
+- Do not add features or refactoring beyond what was asked
+- Never use inline styles or CSS modules, only Tailwind
+- Do not wrap everything in try/catch
+- No default exports
+- Do not add console.log statements</code></pre>
+
+  <p>
+    "Do not add features beyond what was asked" is particularly valuable. Without it, Claude helpfully adds error handling, loading states, and edge case logic to code you asked it to touch for a different reason. That scope creep compounds across a session.
+  </p>
+
+  <h3>5. Loading everything at once</h3>
+
+  <p>
+    Your CLAUDE.md is loaded into context at the start of every session. Every line costs tokens. A 600-line file that includes your README, deployment docs, contributor guidelines, and the full history of your architecture decisions wastes a significant chunk of your context window on content Claude rarely needs.
+  </p>
+
+  <p>
+    Trim it to what actually changes Claude's behavior during coding. If a section doesn't affect what code Claude writes, it doesn't belong in CLAUDE.md.
+  </p>
+
+  <h2>Before and after: what a useful CLAUDE.md looks like</h2>
+
+  <p>
+    Here's a typical first-attempt CLAUDE.md that doesn't work:
+  </p>
+
+  <pre><code># My Project
+
+This is a web application built with modern technologies.
+Please write good, clean code following best practices.
+Use appropriate testing where necessary.
+Make sure the code is maintainable and well-documented.</code></pre>
+
+  <p>
+    Every line here is either something Claude already assumes or too vague to act on. Claude's output will be the same as if this file didn't exist.
+  </p>
+
+  <p>
+    Here's a version that actually changes behavior:
+  </p>
+
+  <pre><code># Project Configuration
+
+## Overview
+Next.js 14 App Router, TypeScript strict mode, Tailwind CSS, Supabase for auth and database. B2B dashboard application.
+
+## Code Style
+- Named exports only, no default exports
+- No semicolons (Prettier handles this)
+- Strict TypeScript, no `any` type, no type assertions without comment
+- Use `cn()` from lib/utils for conditional Tailwind classes
+- Prefer early returns over nested conditionals
+- Server Components by default, "use client" only when you need interactivity
+
+## Testing
+- Framework: Vitest + Testing Library
+- Run: `npx vitest`
+- Co-locate test files next to source: `user-service.test.ts`
+
+## File Structure
+src/app/       # Pages and layouts (App Router)
+src/components # Reusable UI components
+src/lib/       # Business logic and utilities
+src/hooks/     # Custom React hooks
+src/types/     # Shared TypeScript types
+
+## Rules
+- Read existing code in the relevant area before suggesting changes
+- Do not modify files outside the scope of the task
+- Do not add error handling, logging, or tests unless explicitly asked
+- Do not add features beyond what was asked
+- Use App Router patterns throughout (no Pages Router patterns)</code></pre>
+
+  <p>
+    This version is 35 lines. Every line is actionable. Claude will write noticeably different code with this file than without it.
+  </p>
+
+  <h2>Quick wins you can apply right now</h2>
+
+  <p>
+    If you want to improve Claude's output today without rewriting your entire CLAUDE.md, add these three things:
+  </p>
+
+  <ul>
+    <li><strong>Your exact test command.</strong> One line: <code>Run tests: `npm test`</code>. Claude will run it after making changes.</li>
+    <li><strong>Your primary styling approach.</strong> Tailwind, CSS modules, styled-components, plain CSS. Be explicit and add a "never use X" line for the alternatives you don't want.</li>
+    <li><strong>The scope rule.</strong> Add: "Do not modify files outside the scope of the task. Do not add features beyond what was asked." This alone reduces a large class of corrections.</li>
+  </ul>
+
+  <p>
+    These three additions take five minutes and fix the most common frustrations immediately.
+  </p>
+
+  <h2>Generate a properly structured one in 30 seconds</h2>
+
+  <p>
+    Writing a CLAUDE.md from scratch is straightforward once you know the structure. But getting the rules right for your specific stack takes time, and it's easy to miss sections that matter.
+  </p>
+
+  <p>
+    <a href="/contextkit/generate">ContextKit's free generator</a> asks you about your stack, conventions, and workflow, then produces a CLAUDE.md with the sections and rules that are actually relevant to your setup. No signup, runs in your browser, copy to clipboard in one click.
+  </p>
+
+  <p>
+    If you want a complete picture of how CLAUDE.md fits into a larger Claude Code workflow, the <a href="/blog/how-to-write-the-perfect-claude-md">full CLAUDE.md guide</a> covers every section in detail with stack-specific examples for React, Python, and Go.
+  </p>
+</BlogPost>

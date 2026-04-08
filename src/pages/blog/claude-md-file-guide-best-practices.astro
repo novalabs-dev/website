@@ -1,0 +1,267 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+---
+
+<BlogPost
+  title="How to write a CLAUDE.md file that actually makes Claude Code useful"
+  description="CLAUDE.md is the most important file in your Claude Code setup. It tells Claude who you are, how your project works, and what rules to follow. Most people either skip it or write one that does nothing. Here is how to write one that transforms your workflow."
+  date="April 7, 2026"
+  readTime="11 min read"
+  keywords={["claude.md file", "claude code claude.md", "how to write claude.md", "claude code configuration", "claude code setup guide", "claude.md best practices", "claude code project instructions", "claude code customization"]}
+  relatedPosts={[
+    { title: "How to build your first Claude Code skill in 10 minutes", slug: "build-first-claude-code-skill" },
+    { title: "Claude Code hooks explained: make your AI do what you tell it", slug: "claude-code-hooks-for-business" },
+    { title: "The 7 MCP servers every solopreneur should connect to Claude Code", slug: "mcp-servers-for-solopreneurs" },
+  ]}
+  faq={[
+    { question: "What is a CLAUDE.md file?", answer: "CLAUDE.md is a markdown file in your project root that Claude Code reads at the start of every conversation. It contains project instructions, coding conventions, and rules that guide Claude's behavior for your specific codebase." },
+    { question: "Where do I put my CLAUDE.md file?", answer: "Place it in the root directory of your project. Claude Code automatically detects and loads it. You can also create a personal CLAUDE.md in ~/.claude/ for instructions that apply across all projects." },
+    { question: "Does CLAUDE.md work with other AI coding tools?", answer: "CLAUDE.md is specific to Claude Code. Other tools have similar concepts (like .cursorrules for Cursor) but the format and capabilities are different." },
+    { question: "How long should a CLAUDE.md file be?", answer: "Keep it under 200 lines for best results. Claude loads the entire file into context every conversation, so bloated files waste tokens. Focus on rules and conventions that prevent mistakes, not obvious information." },
+  ]}
+>
+  <p>
+    Claude Code reads one file before it does anything else: your CLAUDE.md. This file sits in your project root and tells Claude how to behave in your specific codebase. What conventions to follow. What tools to use. What mistakes to avoid.
+  </p>
+
+  <p>
+    Most developers either skip this file entirely or write a few generic lines that add nothing. Both approaches waste the most powerful configuration option Claude Code offers.
+  </p>
+
+  <p>
+    After running Claude Code as the operational layer of a real business for over 30 days, here is what actually works in a CLAUDE.md file and what is just noise.
+  </p>
+
+  <h2>What CLAUDE.md does under the hood</h2>
+
+  <p>
+    When you start a Claude Code session, the first thing it does is look for CLAUDE.md files. It checks three locations in order:
+  </p>
+
+  <ol>
+    <li><strong>~/.claude/CLAUDE.md</strong> - Your personal global instructions. Apply to every project.</li>
+    <li><strong>Your project root CLAUDE.md</strong> - Project-specific instructions. This is the one that matters most.</li>
+    <li><strong>Any .claude/rules/*.md files</strong> - Additional rules files for organizing large instruction sets.</li>
+  </ol>
+
+  <p>
+    Claude loads all of these into its context window before your first message. They act as system-level instructions that shape every response, every edit, every terminal command Claude runs during the session.
+  </p>
+
+  <p>
+    This means two things. First, your CLAUDE.md is extremely powerful because Claude treats it as authoritative instructions. Second, every line costs tokens. A 500-line CLAUDE.md that is mostly filler actively hurts you by consuming context that could go toward understanding your actual code.
+  </p>
+
+  <h2>The structure that works</h2>
+
+  <p>
+    After iterating through dozens of versions, here is the structure that consistently produces good results:
+  </p>
+
+  <h3>1. Identity and context (3-5 lines)</h3>
+
+  <p>
+    Tell Claude what the project is and who it is working for. This is not documentation. It is calibration.
+  </p>
+
+  <pre><code># My Project - System Instructions
+
+You are working on [Project Name], a [type of project] built with [stack].
+The primary user is [role]. The codebase prioritizes [key value: speed, safety, simplicity].</code></pre>
+
+  <p>
+    Why this matters: Claude makes thousands of micro-decisions during a session. Should it add error handling or keep it simple? Should it use a class or a function? These decisions should align with your project's values, and this section calibrates that.
+  </p>
+
+  <h3>2. Architecture overview (10-15 lines)</h3>
+
+  <p>
+    Not a complete architecture document. Just enough that Claude knows where things live.
+  </p>
+
+  <pre><code>## Architecture
+- Frontend: React + TypeScript in src/components/
+- API: Express routes in src/api/
+- Database: PostgreSQL, migrations in db/migrations/
+- Tests: Jest, co-located with source files as *.test.ts
+- Config: Environment variables in .env (never commit this)</code></pre>
+
+  <p>
+    The goal is to prevent Claude from guessing. Without this section, Claude will explore your filesystem to figure out the structure, burning tokens and sometimes getting it wrong. With it, Claude goes straight to the right directory.
+  </p>
+
+  <h3>3. Hard rules (5-10 lines)</h3>
+
+  <p>
+    These are the things Claude must always or never do. Write them as commands, not suggestions.
+  </p>
+
+  <pre><code>## Rules
+- NEVER delete files. Move to .trash/ instead.
+- NEVER push to main without confirmation.
+- Always run tests before committing.
+- Use snake_case for Python, camelCase for TypeScript.
+- Do not add comments unless the logic is non-obvious.</code></pre>
+
+  <p>
+    This is the highest-value section. Every rule here prevents a class of mistakes permanently. One line like "NEVER delete files" saves you from the moment Claude decides to clean up by removing something important.
+  </p>
+
+  <h3>4. Workflow patterns (5-10 lines)</h3>
+
+  <p>
+    How you want Claude to approach common tasks. Not every possible task, just the recurring ones where Claude's default behavior does not match your preference.
+  </p>
+
+  <pre><code>## Workflows
+- Before editing a file, always read it first.
+- When fixing a bug, write a failing test first, then fix.
+- For new features, check if a similar pattern exists before creating new abstractions.
+- Prefer editing existing files over creating new ones.</code></pre>
+
+  <h3>5. External systems (only if relevant)</h3>
+
+  <p>
+    If Claude interacts with APIs, deployment tools, or external services, document the connection points. Skip this section if your project is self-contained.
+  </p>
+
+  <h2>What to leave out</h2>
+
+  <p>
+    Knowing what not to include is as important as knowing what to include. These are common CLAUDE.md mistakes:
+  </p>
+
+  <ul>
+    <li><strong>Obvious conventions.</strong> You do not need to tell Claude to use proper indentation or write valid syntax. It already does this.</li>
+    <li><strong>Full API documentation.</strong> Claude can read your source code. Do not paste API specs into CLAUDE.md. Point to the file instead.</li>
+    <li><strong>History and changelogs.</strong> CLAUDE.md is for instructions, not a journal. Keep historical context in git commits or separate docs.</li>
+    <li><strong>Aspirational rules you do not enforce.</strong> If you write "always write unit tests" but you do not actually run tests, Claude will follow the rule and you will spend sessions debugging test failures for code that never needed tests.</li>
+    <li><strong>Duplicate information.</strong> If your README already explains the project structure, do not copy it into CLAUDE.md. Reference it: "Read README.md for project setup details."</li>
+  </ul>
+
+  <h2>Advanced patterns</h2>
+
+  <h3>Rules files for organization</h3>
+
+  <p>
+    If your CLAUDE.md grows past 100 lines, split rules into separate files under <code>.claude/rules/</code>. Each file is a focused set of instructions for a specific domain:
+  </p>
+
+  <pre><code>.claude/
+  rules/
+    guardrails.md      # Safety rules
+    testing.md         # How to write and run tests
+    deployment.md      # Deploy procedures
+    code-style.md      # Formatting and naming conventions</code></pre>
+
+  <p>
+    Claude loads all of these automatically. This keeps your root CLAUDE.md clean and focused on the big picture while rules files handle the details.
+  </p>
+
+  <h3>Tiered context loading</h3>
+
+  <p>
+    For larger projects, tell Claude to load context on demand rather than reading everything upfront:
+  </p>
+
+  <pre><code>## Context Loading
+- Read context/INDEX.md first to determine which files are relevant.
+- Load only the files needed for the current task.
+- Never load all context files at once.</code></pre>
+
+  <p>
+    This pattern can cut token usage by 40-60% in projects with extensive documentation or configuration.
+  </p>
+
+  <h3>Model routing</h3>
+
+  <p>
+    If you use Claude Code with API billing, you can route different types of work to different models:
+  </p>
+
+  <pre><code>## Model Routing
+- Use Haiku for simple file searches and formatting tasks.
+- Use Sonnet for code generation and refactoring.
+- Use Opus for architecture decisions and complex debugging.</code></pre>
+
+  <h2>A real example</h2>
+
+  <p>
+    Here is a condensed version of a CLAUDE.md that runs a production business. This is not a template to copy. It is a reference for the kind of specificity that makes Claude Code genuinely useful:
+  </p>
+
+  <pre><code># Project - System Handbook
+
+## Identity
+You are the operational AI for a SaaS business. You make decisions and execute.
+
+## Architecture
+- Skills (.claude/skills/) - Workflow packages with scripts
+- Context (context/) - Domain knowledge, voice guide, ICP
+- Data (data/) - SQLite databases for persistence
+- Args (args/) - Runtime configuration (YAML)
+
+## Rules
+- NEVER use rm. Move to .trash/ instead.
+- Never send external communications without confirmation.
+- Never commit .env files.
+- Check existing scripts before writing new ones.
+- When uncertain about intent, ask rather than guess.
+
+## How to Operate
+1. Find the skill first. Check .claude/skills/ before starting any task.
+2. No skill? Create one if the task is repeatable.
+3. Apply args before running. Read args/ files for runtime behavior.
+4. Log decisions to daily log: memory/logs/YYYY-MM-DD.md</code></pre>
+
+  <p>
+    Notice what is not here: no long explanations, no obvious rules, no history. Every line either prevents a mistake or directs Claude to the right place.
+  </p>
+
+  <h2>Measuring if your CLAUDE.md works</h2>
+
+  <p>
+    A good CLAUDE.md reduces three things:
+  </p>
+
+  <ol>
+    <li><strong>Corrections per session.</strong> If you constantly tell Claude "no, not like that," your CLAUDE.md is missing a rule.</li>
+    <li><strong>Exploration time.</strong> If Claude spends the first minute of every session reading random files to understand the project, your architecture section is too thin.</li>
+    <li><strong>Token waste.</strong> If sessions are expensive because Claude loads too much context, your CLAUDE.md might be too long or missing a tiered loading instruction.</li>
+  </ol>
+
+  <p>
+    Track these informally. When you notice a recurring correction, add it as a rule. When Claude consistently goes to the wrong directory, update the architecture section. Your CLAUDE.md should evolve with your project.
+  </p>
+
+  <h2>Getting started</h2>
+
+  <p>
+    If you do not have a CLAUDE.md yet, start with this minimal version:
+  </p>
+
+  <pre><code># [Project Name]
+
+## Stack
+[One line describing your tech stack]
+
+## Structure
+[3-5 lines showing where things live]
+
+## Rules
+- [Your biggest recurring frustration with Claude, stated as a rule]
+- [Your second biggest frustration]
+- [One safety rule about destructive operations]</code></pre>
+
+  <p>
+    Three rules are better than zero. You can always add more as patterns emerge. The important thing is having the file at all, because without it Claude Code starts every session blind.
+  </p>
+
+  <p>
+    If you want a complete, production-tested CLAUDE.md template along with the full skill system, memory architecture, and workflow automation that goes with it, the <a href="/#pricing">AI OS Blueprint</a> includes everything we use to run this business. Tested in production. Not theoretical.
+  </p>
+
+  <p>
+    And if you are finding that Claude Code costs more than you expected, our <a href="/cost-dashboard/analyze">free cost analyzer</a> shows exactly where your tokens go. Upload a session log and see the breakdown in seconds.
+  </p>
+</BlogPost>
