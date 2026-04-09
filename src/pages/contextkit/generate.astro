@@ -450,6 +450,7 @@ import Layout from '../../layouts/Layout.astro';
         codeEl.textContent = output.content;
         fnameEl.textContent = output.filename;
         container.classList.remove('hidden');
+        document.getElementById('shared-banner').classList.add('hidden');
         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // Track
@@ -508,29 +509,53 @@ import Layout from '../../layouts/Layout.astro';
           btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Link copied!';
           setTimeout(() => { btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg> Share config'; }, 2000);
           if (typeof gtag === 'function') gtag('event', 'contextkit_share', { language: config.language, framework: config.framework });
+        }).catch(() => {
+          // Fallback: show URL in prompt
+          const params = new URLSearchParams();
+          if (config.language) params.set('l', config.language);
+          if (config.formats && config.formats.length) params.set('fm', config.formats.join(','));
+          window.prompt('Copy this share link:', `${window.location.origin}${window.location.pathname}?${params.toString()}`);
         });
       });
+
+      // Allowlists for URL param validation
+      const validLangs = new Set(['typescript','javascript','python','go','rust','java','csharp','ruby','php','swift','kotlin','other']);
+      const validFrameworks = new Set(['react','nextjs','vue','nuxt','svelte','astro','express','fastapi','django','flask','rails','laravel','spring','gin','none','other']);
+      const validProjectTypes = new Set(['web-app','api','cli','library','mobile','monorepo']);
+      const validTests = new Set(['jest','vitest','pytest','go-test','rspec','junit','phpunit','playwright','cypress','none']);
+      const validLinters = new Set(['eslint','prettier','biome','ruff','black','golangci-lint','rubocop','clippy','none']);
+      const validConventions = new Set(['no-comments','no-unnecessary-abstractions','error-handling','security-first','tdd','strict-types','functional','small-functions']);
+      const validFormats = new Set(['claude','cursor','codex','gemini']);
+
+      function validateParam(value, allowlist) {
+        return value && allowlist.has(value) ? value : null;
+      }
 
       // Load shared config from URL params
       function loadFromUrl() {
         const params = new URLSearchParams(window.location.search);
         if (!params.has('l')) return false;
-        config.language = params.get('l');
-        config.framework = params.get('f') || null;
-        config.projectType = params.get('p') || null;
-        config.testFramework = params.get('t') || null;
-        config.linter = params.get('li') || null;
-        config.conventions = params.get('c') ? params.get('c').split(',') : [];
-        config.formats = params.get('fm') ? params.get('fm').split(',') : ['claude'];
 
-        // Activate UI selections
+        // Validate all params against allowlists
+        config.language = validateParam(params.get('l'), validLangs);
+        if (!config.language) return false; // Invalid language = invalid share link
+        config.framework = validateParam(params.get('f'), validFrameworks);
+        config.projectType = validateParam(params.get('p'), validProjectTypes);
+        config.testFramework = validateParam(params.get('t'), validTests);
+        config.linter = validateParam(params.get('li'), validLinters);
+        config.conventions = params.get('c') ? params.get('c').split(',').filter(c => validConventions.has(c)) : [];
+        config.formats = params.get('fm') ? params.get('fm').split(',').filter(f => validFormats.has(f)) : ['claude'];
+        if (config.formats.length === 0) config.formats = ['claude'];
+
+        // Activate UI selections (safe: iterate buttons instead of querySelector with user input)
         function selectOption(containerId, value) {
           if (!value) return;
           const container = document.getElementById(containerId);
           if (!container) return;
-          container.querySelectorAll('.option-btn, .option-btn-lg').forEach(b => b.classList.remove('active'));
-          const btn = container.querySelector(`[data-value="${value}"]`);
-          if (btn) btn.classList.add('active');
+          container.querySelectorAll('.option-btn, .option-btn-lg').forEach(b => {
+            b.classList.remove('active');
+            if (b.dataset.value === value) b.classList.add('active');
+          });
         }
         selectOption('lang-select', config.language);
         selectOption('framework-select', config.framework);
@@ -540,16 +565,17 @@ import Layout from '../../layouts/Layout.astro';
         // Formats (multi-select)
         const fmtContainer = document.getElementById('format-select');
         if (fmtContainer) {
-          fmtContainer.querySelectorAll('.option-btn-lg').forEach(b => b.classList.remove('active'));
-          config.formats.forEach(f => {
-            const btn = fmtContainer.querySelector(`[data-value="${f}"]`);
-            if (btn) btn.classList.add('active');
+          fmtContainer.querySelectorAll('.option-btn-lg').forEach(b => {
+            b.classList.remove('active');
+            if (config.formats.includes(b.dataset.value)) b.classList.add('active');
           });
         }
-        // Conventions (checkboxes)
+        // Conventions: uncheck ALL first, then check only URL-specified ones
+        document.querySelectorAll('#conventions-select input[type="checkbox"]').forEach(cb => cb.checked = false);
         config.conventions.forEach(c => {
-          const cb = document.querySelector(`#conventions-select input[value="${c}"]`);
-          if (cb) cb.checked = true;
+          document.querySelectorAll('#conventions-select input[type="checkbox"]').forEach(cb => {
+            if (cb.value === c) cb.checked = true;
+          });
         });
 
         // Jump to step 5 and auto-generate
