@@ -1,0 +1,325 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What are Claude Code custom instructions?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code custom instructions live in a file called CLAUDE.md in your project root. This file is loaded automatically at the start of every session. It tells Claude about your project structure, coding conventions, testing setup, and any rules you want enforced. There is no separate 'custom instructions' settings panel in Claude Code — CLAUDE.md is the entire system." }},
+    { "@type": "Question", "name": "Where do I put my CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "Put your main CLAUDE.md in the project root. Claude Code also supports a ~/.claude/CLAUDE.md for global rules that apply across all projects. For section-specific rules within a project, create a .claude/rules/ directory and add individual markdown files. Claude loads these based on your working directory." }},
+    { "@type": "Question", "name": "What should I put in my CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "The most useful sections are: project overview (stack, purpose), file structure (where things live), coding conventions (naming, patterns, formatting), testing setup (framework, how to run tests), build and deploy commands, and guardrails (what Claude should never do, like deleting files directly). Start with what changes the most behavior, not with everything at once." }},
+    { "@type": "Question", "name": "Do custom instructions work in Cursor and other AI coding tools?", "acceptedAnswer": { "@type": "Answer", "text": "Each tool has its own config file. Cursor reads .cursorrules, Gemini CLI reads GEMINI.md, and GitHub Copilot reads AGENTS.md. The content is largely the same (coding conventions, file structure, testing setup), but the file name and some tool-specific directives differ. You can generate all formats from one source using a tool like ContextKit." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code custom instructions: how to make Claude Code follow your rules every time"
+  description="CLAUDE.md is Claude Code's custom instructions system. Here's what to put in it, where it lives, and how to make it actually work."
+  date="April 9, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "Why Claude Code ignores your instructions (and how to fix it)", slug: "why-claude-code-ignores-instructions" },
+  ]}
+>
+  <p>
+    Claude Code does not have a settings panel where you configure custom instructions. There is no gear icon, no "system prompt" field, no preferences screen. The custom instructions system is a single markdown file in your project root: <code>CLAUDE.md</code>.
+  </p>
+
+  <p>
+    Every time you start a Claude Code session in a project, it reads that file first. Everything in it applies to the entire conversation. Get this file right and Claude follows your rules on the first try, every time. Leave it empty and you spend half your session correcting behavior that should have been automatic.
+  </p>
+
+  <h2>What CLAUDE.md actually is</h2>
+
+  <p>
+    <code>CLAUDE.md</code> is a plain markdown file. Claude Code reads it at session start and injects the contents as persistent context. There is nothing special about the format; you write it the same way you would write any other technical documentation.
+  </p>
+
+  <p>
+    The difference from a README is the audience. A README explains your project to humans. <code>CLAUDE.md</code> explains your project to Claude, with a focus on what Claude specifically needs to know to work correctly: where files live, which commands to run, what patterns to follow, and what to avoid.
+  </p>
+
+  <p>
+    Claude Code supports three locations for these files:
+  </p>
+
+  <ul>
+    <li><code>~/.claude/CLAUDE.md</code> — Global rules that apply to every project on your machine</li>
+    <li><code>CLAUDE.md</code> — Project-level rules in your repo root</li>
+    <li><code>.claude/rules/*.md</code> — Section-specific rules loaded based on working directory context</li>
+  </ul>
+
+  <p>
+    Most teams start with just the project-level file. The global file is useful for personal preferences that travel across projects (your preferred code style, output format habits). The rules directory is for larger projects where you need different rules for different parts of the codebase.
+  </p>
+
+  <h2>Without CLAUDE.md vs with CLAUDE.md</h2>
+
+  <p>
+    Here is what a typical Claude Code session looks like without any custom instructions:
+  </p>
+
+  <pre><code>You: Add a new API endpoint for user preferences
+
+Claude: I'll create the endpoint. Here's the code:
+
+// Added to routes.js
+app.get('/api/user/preferences', async (req, res) =&gt; {'{'}
+  const userId = req.query.userId;
+  ...
+{'}'})</code></pre>
+
+  <p>
+    Three problems: wrong file (your project uses a router factory pattern, not raw Express), wrong location (endpoints go in <code>src/routes/</code> not the root), and missing the auth middleware that every endpoint needs.
+  </p>
+
+  <p>
+    With a <code>CLAUDE.md</code> that covers these conventions:
+  </p>
+
+  <pre><code>You: Add a new API endpoint for user preferences
+
+Claude: I'll add the endpoint following your router factory pattern
+with the auth middleware applied. Creating src/routes/preferences.js...</code></pre>
+
+  <p>
+    Same request. Right output on the first try. The difference is context, not capability.
+  </p>
+
+  <h2>What to put in your CLAUDE.md</h2>
+
+  <h3>Project overview</h3>
+
+  <p>
+    Start with two or three sentences about what the project is and what stack it uses. Claude does not need a sales pitch; it needs to know whether this is a Next.js app, a Python CLI, a Go microservice, or something else entirely.
+  </p>
+
+  <pre><code># My Project
+
+A REST API for managing construction project timesheets.
+Stack: Node.js, Express, PostgreSQL, TypeScript.
+Deployed to Railway via GitHub Actions.</code></pre>
+
+  <h3>File structure</h3>
+
+  <p>
+    Tell Claude where things live. This prevents it from creating files in the wrong location, which is one of the most common problems in projects with non-standard directory structures.
+  </p>
+
+  <pre><code>## File Structure
+
+- src/routes/       — Express route handlers (one file per resource)
+- src/services/     — Business logic (no direct DB access here)
+- src/models/       — Database queries and schema definitions
+- src/middleware/   — Shared middleware (auth, validation, logging)
+- tests/            — Jest tests, mirroring src/ structure
+- scripts/          — One-off scripts, not part of the app</code></pre>
+
+  <h3>Coding conventions</h3>
+
+  <p>
+    Be specific. "Use best practices" does nothing. "Always use named exports, never default exports" changes actual output.
+  </p>
+
+  <pre><code>## Conventions
+
+- TypeScript strict mode is enabled. No implicit any.
+- Named exports only, no default exports.
+- Use async/await, not .then() chains.
+- Error handling: throw errors up to the route handler,
+  never swallow them in services.
+- Database queries go in model files only.
+  Services call models, routes call services.
+- All new routes need the authenticateUser middleware applied.</code></pre>
+
+  <h3>Testing setup</h3>
+
+  <p>
+    If Claude does not know how your tests work, it will either write tests in the wrong format or skip writing them entirely. Give it the framework, the test runner command, and any important patterns.
+  </p>
+
+  <pre><code>## Testing
+
+Framework: Jest with ts-jest
+Run tests: npm test
+Run single file: npx jest tests/routes/preferences.test.ts
+Coverage: npm run test:coverage
+
+Test files mirror src/ structure.
+A new file at src/routes/preferences.ts
+gets a test at tests/routes/preferences.test.ts.
+Use supertest for route testing, not direct function calls.</code></pre>
+
+  <h3>Build and deploy commands</h3>
+
+  <p>
+    One section, a few lines. Claude needs to know how to build the project, how to run it locally, and what to check before it considers a task done.
+  </p>
+
+  <pre><code>## Commands
+
+Build: npm run build
+Dev: npm run dev (runs on port 3001)
+Lint: npm run lint
+Type check: npx tsc --noEmit
+Deploy: push to main, GitHub Actions handles the rest</code></pre>
+
+  <h3>Guardrails</h3>
+
+  <p>
+    Guardrails are the most underused section. They define what Claude should never do, which is often more important than telling it what to do. Common ones:
+  </p>
+
+  <pre><code>## Guardrails
+
+- Never delete files directly. Move to .trash/ using mv instead.
+- Never run database migrations without confirming the migration plan first.
+- Never commit .env files or expose API keys in output.
+- Never push to main directly. All changes go through pull requests.
+- Do not install new dependencies without asking first.</code></pre>
+
+  <p>
+    The "never delete files" guardrail alone has saved countless developers from accidental data loss. Claude is fast, and fast plus destructive is a bad combination without guardrails.
+  </p>
+
+  <h2>Directory-specific rules with .claude/rules/</h2>
+
+  <p>
+    For larger codebases, a single <code>CLAUDE.md</code> can get unwieldy. Claude Code supports a <code>.claude/rules/</code> directory where you can put separate rule files for different parts of your project.
+  </p>
+
+  <pre><code>.claude/
+  rules/
+    frontend.md      — React component conventions, CSS rules
+    api.md           — API design, authentication patterns
+    database.md      — Migration rules, query patterns
+    deployment.md    — Deploy checklist, environment specifics</code></pre>
+
+  <p>
+    These files are loaded in addition to the root <code>CLAUDE.md</code>, not instead of it. Use them when a section is growing large enough that it would distract from the main file, or when different team members work in different parts of the codebase and need different context loaded.
+  </p>
+
+  <p>
+    The naming is up to you. Claude Code reads all files in <code>.claude/rules/</code> and loads them as additional context. There is no automatic filtering by directory — they are all loaded together.
+  </p>
+
+  <h2>Global instructions across all projects</h2>
+
+  <p>
+    Some rules apply everywhere. Your personal code style preferences, output format habits, how you want Claude to communicate. These go in <code>~/.claude/CLAUDE.md</code>.
+  </p>
+
+  <pre><code># Global Claude Instructions
+
+## Output format
+- Keep explanations short. Show code first, explain after if needed.
+- Do not narrate what you're about to do. Just do it.
+- When you're not sure about something, ask before doing.
+
+## Code style
+- Prefer explicit over clever.
+- Comments explain why, not what.
+- Variable names should be unambiguous even without context.</code></pre>
+
+  <p>
+    The project-level <code>CLAUDE.md</code> takes precedence over the global file when there are conflicts. Use the global file for defaults, the project file for overrides.
+  </p>
+
+  <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 2rem 0; background: #f8fafc;">
+    <p style="margin: 0 0 0.5rem 0; font-weight: 600;">Skip the manual setup</p>
+    <p style="margin: 0 0 1rem 0;">Want to skip the manual setup? ContextKit generates production-ready CLAUDE.md files in 30 seconds. Answer a few questions about your project and get a complete, well-structured config ready to drop into your repo.</p>
+    <a href="https://nova-labs.dev/contextkit/generate" style="display: inline-block; background: #1a1a2e; color: white; padding: 0.5rem 1.25rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">Generate my CLAUDE.md</a>
+  </div>
+
+  <h2>These work across other AI coding tools too</h2>
+
+  <p>
+    <code>CLAUDE.md</code> is Claude Code's format, but every major AI coding tool has the same concept:
+  </p>
+
+  <ul>
+    <li><strong>Cursor</strong> reads <code>.cursorrules</code> in your project root</li>
+    <li><strong>Gemini CLI</strong> reads <code>GEMINI.md</code></li>
+    <li><strong>GitHub Copilot / Codex</strong> reads <code>AGENTS.md</code></li>
+  </ul>
+
+  <p>
+    The content is 80% identical across formats: project overview, file structure, conventions, testing setup, commands. The remaining 20% is tool-specific directives. If you use multiple tools, you end up maintaining four files that say roughly the same thing, slowly drifting out of sync as you update one and forget the others.
+  </p>
+
+  <p>
+    The clean solution is to pick one format as your source, then generate the others. Or use a tool that handles the translation automatically. The worst approach is updating them manually one at a time.
+  </p>
+
+  <h2>Common mistakes and how to avoid them</h2>
+
+  <h3>Too vague</h3>
+
+  <p>
+    "Follow best practices" and "write clean code" are not instructions. Claude already tries to do those things. Instructions that change behavior are specific: "use camelCase for variables, PascalCase for classes, SCREAMING_SNAKE_CASE for constants," not "follow naming conventions."
+  </p>
+
+  <h3>Too long</h3>
+
+  <p>
+    A 2000-word <code>CLAUDE.md</code> with exhaustive documentation of every edge case is not better than a focused 400-word file. Claude reads the whole thing on every session start. Bloated context dilutes the signal. Put the important rules first and keep everything else short.
+  </p>
+
+  <h3>Out of date</h3>
+
+  <p>
+    Your <code>CLAUDE.md</code> is documentation. It rots the same way all documentation rots. Add "update CLAUDE.md" to your PR checklist for any change that affects conventions, structure, or commands. A file that tells Claude your test runner is Jest when you migrated to Vitest six months ago is worse than no file at all.
+  </p>
+
+  <h3>No guardrails</h3>
+
+  <p>
+    Guardrails are the section most developers skip. They are also the most important section. Write down the things you never want Claude to do automatically. You will be glad you did the first time it would have done one of them.
+  </p>
+
+  <h2>A minimal starting template</h2>
+
+  <p>
+    If you have nothing in your <code>CLAUDE.md</code> yet, start here and expand as you find gaps:
+  </p>
+
+  <pre><code># Project Name
+
+One sentence describing what this project is.
+Stack: [languages, frameworks, databases].
+
+## File Structure
+
+[list your key directories and what goes in them]
+
+## Conventions
+
+[3-5 specific rules about code style and patterns]
+
+## Commands
+
+Build: [command]
+Test: [command]
+Dev: [command]
+
+## Guardrails
+
+- Never delete files directly. Use mv to .trash/.
+- Never commit credentials or .env files.
+- [add your project-specific rules here]</code></pre>
+
+  <p>
+    For more on structuring these files effectively, see the <a href="/blog/claude-code-cost-optimization-complete-guide">complete guide to Claude Code cost optimization</a> which covers how context file structure affects both quality and token spend.
+  </p>
+
+  <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 2rem 0; background: #f8fafc;">
+    <p style="margin: 0 0 0.5rem 0; font-weight: 600;">Your CLAUDE.md in 30 seconds</p>
+    <p style="margin: 0 0 1rem 0;">Want to skip the manual setup? ContextKit generates production-ready CLAUDE.md files in 30 seconds. Fill in your project details once, get a complete config you can actually use, and stop writing boilerplate by hand.</p>
+    <a href="https://nova-labs.dev/contextkit/generate" style="display: inline-block; background: #1a1a2e; color: white; padding: 0.5rem 1.25rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">Generate my CLAUDE.md for free</a>
+  </div>
+
+</BlogPost>

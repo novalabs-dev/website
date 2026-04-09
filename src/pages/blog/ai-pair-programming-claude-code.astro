@@ -1,0 +1,226 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is AI pair programming with Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "AI pair programming with Claude Code is a workflow where the AI acts as a full coding partner inside your terminal, not just an autocomplete engine. You plan work together, split tasks, review each other's code, and debug collaboratively. Claude Code can read your entire codebase, run commands, and spawn subagents for parallel workstreams, making it a fundamentally different experience from IDE-based AI assistants." }},
+    { "@type": "Question", "name": "How is Claude Code different from GitHub Copilot for pair programming?", "acceptedAnswer": { "@type": "Answer", "text": "GitHub Copilot suggests code inline as you type. Claude Code operates as a terminal agent that understands your full project context, can navigate files, run tests, and execute multi-step workflows. With a CLAUDE.md config file, it knows your conventions, architecture decisions, and guardrails before you type a single prompt. The collaboration is broader and more persistent." }},
+    { "@type": "Question", "name": "What is CLAUDE.md and why does it matter for AI pair programming?", "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is a markdown config file in your project root that Claude Code reads at session start. It contains your project structure, coding conventions, testing setup, and any rules you want the AI to follow. For pair programming, it functions like onboarding notes for a new developer: instead of explaining context every session, you write it once and the AI shows up ready to work." }},
+    { "@type": "Question", "name": "When does AI pair programming break down?", "acceptedAnswer": { "@type": "Answer", "text": "AI pair programming struggles with tasks that require deep domain judgment, decisions that span organizational context the AI has no access to, and novel architecture decisions with no clear prior art. It also breaks down when your project context file is outdated or missing, because the AI is working blind. Repetitive implementation, test writing, refactoring, and debugging are where it performs best." }}
+  ]
+};
+---
+
+<BlogPost
+  title="AI pair programming with Claude Code: what it actually looks like in practice"
+  description="AI pair programming with Claude Code goes beyond autocomplete. Here is what the actual workflow looks like, where it works well, and where it falls short."
+  date="April 9, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Claude Code subagents and parallel tasks", slug: "claude-code-subagents-parallel-tasks" },
+    { title: "Claude Code alternatives compared", slug: "claude-code-alternatives-compared" },
+    { title: "Build your first Claude Code skill", slug: "build-first-claude-code-skill" },
+  ]}
+>
+  <p>
+    AI pair programming has become one of those terms that means something different to everyone who uses it. For most developers it means autocomplete that understands slightly more context. You type, the AI suggests the next few lines, you accept or reject. That's it.
+  </p>
+
+  <p>
+    That's not what Claude Code does.
+  </p>
+
+  <p>
+    Claude Code is a terminal agent. It reads your entire codebase, runs commands, creates and edits files, and can spawn parallel subagents to tackle multiple workstreams at once. The collaboration model is fundamentally different, and if you approach it like a smarter Copilot you'll miss most of what it can do.
+  </p>
+
+  <p>
+    This is a breakdown of what AI pair programming with Claude Code actually looks like, based on daily use across real projects.
+  </p>
+
+  <h2>What makes Claude Code different</h2>
+
+  <p>
+    The core difference is context and autonomy. Copilot-style tools see your current file and maybe a few related ones. Claude Code, when configured properly, understands your entire project before you say a word.
+  </p>
+
+  <p>
+    That configuration lives in <code>CLAUDE.md</code>, a markdown file in your project root. It's loaded at the start of every session. You use it to tell Claude about your stack, your directory structure, your naming conventions, your testing setup, and any guardrails you want it to respect. Done once, it applies to every session afterward.
+  </p>
+
+  <p>
+    The result is an AI that shows up to work already knowing your codebase. You don't spend the first ten minutes of every session re-explaining the architecture or which patterns you use. It's already there.
+  </p>
+
+  <p>
+    The second difference is that Claude Code can act, not just suggest. It runs tests. It reads error output and adjusts. It navigates your file tree and makes changes across multiple files in a single pass. You can interrupt, redirect, or take over at any point, but the AI is doing actual work, not just generating text for you to copy-paste.
+  </p>
+
+  <h2>Planning together</h2>
+
+  <p>
+    Before writing a line of code, the most underrated thing you can do with Claude Code is plan. Describe the feature you want to build, then ask it to push back on the approach, identify edge cases, or propose a simpler path.
+  </p>
+
+  <p>
+    This is where the pair programming metaphor is most accurate. A good pair partner doesn't just implement what you describe. They ask questions. They notice when your approach conflicts with how the rest of the codebase works. They suggest the three-line solution when you've described a thirty-line one.
+  </p>
+
+  <p>
+    Claude Code does this well when your <code>CLAUDE.md</code> is solid. It can say "your current pattern for API endpoints does X, but what you're describing would require Y, which conflicts with how you handle auth here." That kind of response is only possible because it has project context.
+  </p>
+
+  <p>
+    A useful workflow: describe the feature in plain language and ask Claude to summarize the implementation plan before touching any code. Review it. Correct the misunderstandings. Then proceed. The ten minutes spent here saves an hour of backtracking later.
+  </p>
+
+  <h2>Divide and conquer with subagents</h2>
+
+  <p>
+    Claude Code can spawn subagents: parallel instances that work on separate tasks simultaneously. This is where it stops feeling like pair programming and starts feeling like running a small team.
+  </p>
+
+  <p>
+    A practical example: you need to add a new API endpoint, write the tests for it, update the documentation, and check if any existing tests break. Sequentially, that's thirty minutes of back-and-forth. With subagents, you can split it: one agent writes the implementation, another writes the tests, another scans for conflicts. You review the combined output when they're done.
+  </p>
+
+  <p>
+    The constraint is context. Each subagent needs enough information to work independently without stepping on the others. Give each a clear scope and tell it what files to avoid. Your <code>CLAUDE.md</code> provides the shared baseline. Task-specific instructions go in the prompt.
+  </p>
+
+  <p>
+    This pattern scales best for tasks that decompose cleanly. Feature implementations with clear boundaries, test suites, refactoring passes on isolated modules. It breaks down when tasks are deeply interdependent, because subagents don't share state.
+  </p>
+
+  <h2>Test-driven pairing</h2>
+
+  <p>
+    Two approaches work well here, depending on how you prefer to work.
+  </p>
+
+  <p>
+    The first: you write the tests, Claude writes the implementation. Describe what you want the code to do by writing tests that would pass if it worked. Hand those to Claude with the context of your existing codebase. It implements until the tests pass. This keeps you in control of behavior, and the AI handles the repetitive implementation work.
+  </p>
+
+  <p>
+    The second: Claude writes the tests based on a spec you provide, you review and approve them, then Claude implements. This is faster but requires more review on the test side, because an AI that writes its own tests against its own implementation can pass tests that miss the actual intent.
+  </p>
+
+  <p>
+    Both approaches work. The first is more reliable for critical paths. The second is faster for CRUD-style features where the behavior is obvious and the value is just getting it done.
+  </p>
+
+  <p>
+    Either way, having your test runner and commands in <code>CLAUDE.md</code> matters. Claude should know how to run your test suite without being told every session. Put it in the config once.
+  </p>
+
+  <h2>Code review sessions</h2>
+
+  <p>
+    Claude Code is a capable code reviewer when you give it the right frame. Not "review this file" (too vague), but "review this PR diff for security issues in the auth flow" or "check if this follows our error handling pattern from <code>CLAUDE.md</code>."
+  </p>
+
+  <p>
+    Specific reviews are more useful than general ones. Ask it to look for one category of issue at a time. Ask it to justify each comment with a reference to your conventions or a concrete reason. Vague AI feedback is noise; specific, reasoned feedback is signal.
+  </p>
+
+  <p>
+    One pattern that works well: after implementing a feature, ask Claude to review it as a security engineer would, then separately as a junior developer maintaining it six months from now. Two different review frames surface different problems.
+  </p>
+
+  <p>
+    This isn't a replacement for human code review on critical paths. It's a pre-review pass that catches the obvious issues before a human spends time on them.
+  </p>
+
+  <h2>Debugging sessions</h2>
+
+  <p>
+    Debugging is where the terminal agent model shows its value most clearly. You paste an error. Claude reads it, asks for the relevant file, reads that, traces through the logic, and proposes a fix. You can iterate in-session with actual command output rather than copying and pasting between windows.
+  </p>
+
+  <p>
+    The pattern: paste the error, paste the stack trace, and tell Claude what you expected to happen. Don't over-explain. The best debugging sessions start sparse and add information as needed. Claude asks for what it needs.
+  </p>
+
+  <p>
+    Where it struggles: bugs that require runtime state that Claude can't observe, issues that only appear in production environments with specific data, or problems rooted in architectural decisions the AI doesn't have context for. In those cases, it can still help you think through the problem, but it can't solve it unilaterally.
+  </p>
+
+  <h2>The context problem</h2>
+
+  <p>
+    Your AI pair programmer is only as good as the context you give it. ContextKit generates the project config that makes Claude Code understand your codebase. One setup, every session covered. <a href="https://nova-labs.dev/contextkit/generate">Generate your CLAUDE.md free at ContextKit.</a>
+  </p>
+
+  <p>
+    A <code>CLAUDE.md</code> that's missing, outdated, or too vague produces an AI that makes confident wrong assumptions. It invents conventions that don't exist. It duplicates abstractions you've already built. It misses patterns you've established across the codebase.
+  </p>
+
+  <p>
+    Maintaining your context file is as important as maintaining your tests. When you change a convention, update it. When you restructure directories, update it. When you add a new dependency or framework, add it. The file is the onboarding document for every future session.
+  </p>
+
+  <h2>When AI pair programming breaks down</h2>
+
+  <p>
+    Honest assessment: there are categories of work where this doesn't help much, and a few where it actively gets in the way.
+  </p>
+
+  <p>
+    <strong>Novel architecture decisions.</strong> When you're designing something genuinely new, with no prior art in the codebase, the AI defaults to generic patterns. It can help you think through tradeoffs, but don't expect it to produce a design that fits your specific constraints without significant guidance.
+  </p>
+
+  <p>
+    <strong>Organizational context.</strong> Decisions that depend on business priorities, team dynamics, or political constraints the AI has no access to. The AI optimizes for technical correctness. You optimize for what will actually ship and get maintained.
+  </p>
+
+  <p>
+    <strong>Long-running state-dependent debugging.</strong> Problems that require watching the system behave over time, observing production metrics, or reproducing issues that depend on accumulated state. The AI can analyze logs you paste, but it can't watch the system.
+  </p>
+
+  <p>
+    <strong>Learning unfamiliar territory.</strong> If you're trying to learn a new framework or language, letting the AI write the code robs you of the learning. Use it to explain, not to implement, when the goal is understanding.
+  </p>
+
+  <p>
+    <strong>Tasks where scope isn't clear.</strong> If you're not sure what you want, the AI will build something confidently that misses the point. Unclear input produces confident incorrect output. Clarify what you want first, even if it's just for yourself.
+  </p>
+
+  <h2>What the daily workflow actually looks like</h2>
+
+  <p>
+    A realistic session: you open a terminal, start Claude Code, and it loads your <code>CLAUDE.md</code>. You describe the task. It asks a clarifying question or two. You answer. It proposes an implementation plan. You approve or redirect. It writes the code, runs the tests, catches a failure, fixes it, and presents the result. You review, request changes, and iterate until it's right. Total time: depends on complexity, but the AI absorbs the repetitive parts and you stay focused on the decisions.
+  </p>
+
+  <p>
+    The sessions that go badly are almost always the ones where you skipped the planning step, where the context file is stale, or where the scope was unclear from the start. Fix those three things and the workflow holds up consistently.
+  </p>
+
+  <h2>Token costs in practice</h2>
+
+  <p>
+    Pair programming with a terminal agent is expensive on tokens. Long context windows, multi-file reads, iterative debugging loops, all of it adds up fast. If you're on a per-token plan, this matters.
+  </p>
+
+  <p>
+    Pair programming burns more tokens. Track where they go with <a href="https://nova-labs.dev/cost-dashboard/analyze">CostPilot's free usage analyzer</a>, so you know which sessions are cost-effective and which are burning budget on tasks that don't need this level of AI involvement.
+  </p>
+
+  <p>
+    Not every task needs the full agent treatment. Simple edits, quick lookups, and single-file changes are often faster done manually or with a lighter tool. Save the full pair programming sessions for work that's complex enough to benefit from them.
+  </p>
+
+  <h2>Getting started</h2>
+
+  <p>
+    If you haven't used Claude Code as an actual pair partner (as opposed to just an AI assistant you ask questions), start with one task. Pick something with clear boundaries: a feature with a spec, a bug with a reproduction case, a refactor with a clear goal. Write a minimal <code>CLAUDE.md</code> if you don't have one. Run the session from end to end.
+  </p>
+
+  <p>
+    The first session will be slower than working alone because you're learning the workflow. The second will be about the same. By the third, you'll have calibrated expectations for what to delegate, what to direct, and what to do yourself. That calibration is what makes pair programming with AI actually productive.
+  </p>
+
+</BlogPost>

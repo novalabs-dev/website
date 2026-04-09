@@ -1,0 +1,234 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Are any AI coding tools actually free in 2026?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, several are genuinely free and not just free trials. Claude Code has a free tier for limited monthly usage, Gemini CLI is free with a Google account, Continue.dev and Aider are open source with no usage fees (you bring your own API key), and Codeium's core features are free for individual developers. The honest caveat: the free tiers of model-backed tools are usage-limited. If you build seriously, you'll likely hit limits and need to decide whether to pay or route through a cheaper model." }},
+    { "@type": "Question", "name": "What is the best free AI tool for solo developers in 2026?", "acceptedAnswer": { "@type": "Answer", "text": "For most solo developers, Continue.dev or Aider are the strongest free options because you control costs by choosing your model (including cheap ones). If you want a managed experience, Claude Code's free tier or GitHub Copilot's free tier are solid starting points. The 'best' depends on your workflow: terminal-first developers tend to prefer Aider or Gemini CLI, IDE-first developers tend to stick with Continue.dev or Cursor." }},
+    { "@type": "Question", "name": "Is GitHub Copilot free in 2026?", "acceptedAnswer": { "@type": "Answer", "text": "GitHub Copilot has a free tier for individual developers with limited completions per month and a capped number of chat requests. It is enough to evaluate the tool and use it lightly, but not enough for heavy daily use. Students and open source maintainers can apply for free access with higher limits through GitHub's program." }},
+    { "@type": "Question", "name": "How do I track costs when using multiple AI developer tools?", "acceptedAnswer": { "@type": "Answer", "text": "Most tools don't surface costs prominently, which makes it easy to overspend without noticing. Tools like CostPilot aggregate usage across Claude, OpenAI, Gemini, and others into a single view so you can see which tools are actually earning their cost. The free tier covers basic tracking; the paid tier adds per-project breakdowns and budget alerts." }}
+  ]
+};
+---
+
+<BlogPost
+  title="The best free AI developer tools in 2026: an honest list"
+  description="A curated list of AI developer tools that are genuinely free in 2026, not just free trials. What each tool does, what costs money, and what to watch out for."
+  date="April 9, 2026"
+  readTime="12 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Best AI tools for business automation in 2026", slug: "best-ai-tools-business-automation-2026" },
+    { title: "Claude Code alternatives compared", slug: "claude-code-alternatives-compared" },
+    { title: "How to audit your AI tool spending", slug: "audit-ai-tool-spending" },
+  ]}
+>
+  <p>
+    "Free" is doing a lot of work in the AI tools market right now. Half the tools that call themselves free are free for exactly one week before a billing prompt appears. A few are free with caps so low they are useless for real work. And some are genuinely, sustainably free in a way that makes them worth building into your workflow.
+  </p>
+
+  <p>
+    This list covers the second and third category. Everything here is free in a meaningful sense: free tiers that are actually useful, or open source tools where your only cost is the model API you choose to connect. No trials, no "free forever" plans that quietly expire.
+  </p>
+
+  <h2>How we picked these</h2>
+
+  <p>
+    Three criteria determined what made the list:
+  </p>
+
+  <ul>
+    <li><strong>Actually free, not just a trial.</strong> The free tier has to be indefinitely available and useful on its own, not a 14-day window to pressure you into upgrading.</li>
+    <li><strong>Useful for real work.</strong> Tools that only work on toy projects or require a paid plan the moment a real codebase is involved are excluded.</li>
+    <li><strong>Actively maintained.</strong> A free tool that hasn't seen a commit in 18 months isn't a free tool, it's abandoned software. Everything here has active development as of early 2026.</li>
+  </ul>
+
+  <p>
+    A few tools that almost made the list didn't because they failed the first criterion. They are noted where relevant so you know what to watch out for.
+  </p>
+
+  <h2>AI coding agents</h2>
+
+  <h3><strong>Claude Code</strong> (free tier)</h3>
+
+  <p>
+    Anthropic's terminal-based coding agent. You run it in your project directory and it can read, write, and execute code across your entire codebase with your permission at each step. The free tier gives you a limited number of messages per month using Claude's models, which is enough to evaluate the tool seriously and use it for smaller projects.
+  </p>
+
+  <p>
+    What it does well: complex multi-file changes, agentic workflows where you give it a goal and it figures out the steps, and handling large codebases through its project config file (CLAUDE.md). The free tier is genuinely useful, not a crippled demo. The limitation is message count, not capability.
+  </p>
+
+  <p>
+    What to watch: the free tier runs out faster than you'd expect on large tasks. If you're refactoring a significant feature, a single session can consume a meaningful chunk of your monthly allocation. It's also only useful if you're comfortable in the terminal.
+  </p>
+
+  <h3><strong>Gemini CLI</strong> (free with Google account)</h3>
+
+  <p>
+    Google's answer to Claude Code. Also terminal-based, also reads a project config file (GEMINI.md), also capable of agentic workflows. The free tier is more generous than Claude Code's: you get a substantial number of requests per day through the Gemini API, enough for serious daily use without hitting limits frequently.
+  </p>
+
+  <p>
+    What it does well: large context windows (Gemini handles very long inputs natively), Google ecosystem integration (Firebase, Cloud Run, Google Cloud in general), and speed on straightforward tasks.
+  </p>
+
+  <p>
+    What to watch: it is newer than Claude Code and the ecosystem around it (extensions, community recipes, GEMINI.md conventions) is less developed. If you use both tools and want to avoid maintaining two config files, that is a real friction point. There are ways to manage it, including generating both from a single source.
+  </p>
+
+  <h3><strong>Aider</strong> (open source)</h3>
+
+  <p>
+    Aider is an open source CLI coding agent you run locally. You bring your own API key for whatever model you want: Claude, GPT-4, Gemini, or a local model via Ollama. There are no Aider-level fees. Your only cost is the model API calls you make.
+  </p>
+
+  <p>
+    This is the most genuinely free option for heavy users because you can route through cheaper models when you don't need frontier capability. A lot of developers use Aider with a mix: frontier model for architecture decisions, cheaper model for routine edits and tests.
+  </p>
+
+  <p>
+    What it does well: Git integration (every change is automatically committed, so nothing is lost), model flexibility, and a strong community with good documentation. If you want to run AI coding assistance without vendor lock-in, Aider is the clearest option.
+  </p>
+
+  <p>
+    What to watch: the terminal-only interface has a learning curve. No GUI, no IDE integration. If you work primarily in VS Code or JetBrains, you will find Aider's workflow less comfortable than the IDE-native tools below.
+  </p>
+
+  <h2>IDE-native coding assistants</h2>
+
+  <h3><strong>Continue.dev</strong> (open source)</h3>
+
+  <p>
+    Continue.dev is an open source IDE extension for VS Code and JetBrains. Like Aider, you bring your own API keys and choose your models. The extension itself is free and always will be. You can wire it up to Claude, OpenAI, Gemini, Ollama, or any OpenAI-compatible endpoint.
+  </p>
+
+  <p>
+    For developers who live in their IDE, Continue.dev is the most practical path to a genuinely free AI coding assistant. You get inline completions, chat, codebase-aware context, and the ability to build custom slash commands for your own workflows.
+  </p>
+
+  <p>
+    What to watch: configuration takes more upfront work than managed tools. You need to understand model selection, context window sizes, and how different models handle code tasks. The documentation is good but the first hour of setup is more involved than just signing up for Copilot.
+  </p>
+
+  <h3><strong>Cursor</strong> (free tier)</h3>
+
+  <p>
+    Cursor is a VS Code fork with AI features built into the editor. The free tier gives you a meaningful number of completions and chat requests per month. It is one of the most polished AI coding experiences available and the free tier is genuinely usable, not a bait-and-switch.
+  </p>
+
+  <p>
+    What it does well: the autocomplete quality is high, the chat understands your codebase context well, and the overall UX is smoother than most alternatives. If you want AI coding assistance without any configuration overhead, Cursor is the fastest path to something useful.
+  </p>
+
+  <p>
+    What to watch: the free tier has a hard cap on requests per month. If you use it heavily, you will hit it. The paid plan is $20/month, which is fair for what you get, but this does mean Cursor is more of a "generous free trial" than a tool you can rely on indefinitely without paying.
+  </p>
+
+  <h3><strong>GitHub Copilot</strong> (free tier)</h3>
+
+  <p>
+    GitHub added a proper free tier in late 2024 after years of paid-only. Individual developers now get a limited number of completions and chat messages per month at no cost. It works in VS Code, JetBrains, and a growing list of editors.
+  </p>
+
+  <p>
+    What it does well: the IDE integration is mature, it works without any configuration, and for developers already in the GitHub ecosystem it is the lowest friction option. The multi-model support (Claude, GPT-4, Gemini available depending on tier) is a recent addition that makes it more competitive.
+  </p>
+
+  <p>
+    What to watch: the free tier limits are lower than Cursor's and you'll hit them faster if you use chat heavily. It is fine for occasional use or light workflows. For daily driver use on serious projects, it runs short.
+  </p>
+
+  <h3><strong>Codeium / Windsurf</strong> (free tier)</h3>
+
+  <p>
+    Codeium has been offering a genuinely free tier for individual developers since before most of its competitors. The core autocomplete features are free with no message caps. Windsurf is their newer agentic IDE product, which has a more limited free tier but includes a capable AI agent experience.
+  </p>
+
+  <p>
+    Codeium's autocomplete is fast and the free tier is one of the least restricted in the market. If you want completions without a monthly request counter hanging over you, Codeium is worth trying.
+  </p>
+
+  <p>
+    What to watch: Windsurf's agent features and the more capable models are behind a paywall. The free tier is autocomplete-focused. If you want agentic capabilities (the AI taking multi-step actions in your codebase), you will run into limits quickly.
+  </p>
+
+  <h2>Config and context management</h2>
+
+  <h3><strong>ContextKit</strong> (free tier)</h3>
+
+  <p>
+    If you use more than one AI coding tool, you end up with multiple config files in your repo root: CLAUDE.md for Claude Code, GEMINI.md for Gemini CLI, .cursorrules for Cursor, AGENTS.md for Copilot. They all contain roughly the same information about your project conventions, but they drift apart over time as you update one and forget the others.
+  </p>
+
+  <p>
+    <a href="/contextkit">ContextKit</a> solves this by letting you define your project conventions once and generate all four formats from a single source. The free tier handles single projects and covers the core generate-and-export workflow.
+  </p>
+
+  <p>
+    What it does well: the main value is preventing drift between config files. Once you've experienced the pain of an AI tool giving you inconsistent output because your .cursorrules is six months out of date, the appeal of a single source of truth becomes obvious.
+  </p>
+
+  <p>
+    What to watch: if you only use one AI coding tool, there is no problem to solve here. ContextKit is most useful when you are genuinely multi-tool. The free tier is also limited to one project, so teams with multiple active repos will want to evaluate whether the paid tier makes sense.
+  </p>
+
+  <h2>Code review and analysis</h2>
+
+  <h3><strong>CodeRabbit</strong> (free for open source)</h3>
+
+  <p>
+    CodeRabbit is an AI code review bot that installs into your GitHub or GitLab repository and reviews pull requests automatically. For open source projects, it is free with no usage limits. For private repositories, the free tier gives you a limited number of reviews per month.
+  </p>
+
+  <p>
+    What it does well: it catches things human reviewers miss under time pressure, it is consistent (no reviewer fatigue on the fifth PR of the day), and it understands context across the PR rather than reviewing files in isolation.
+  </p>
+
+  <p>
+    What to watch: like any AI reviewer, it generates false positives. Teams that haven't used it before will spend some time in the first week dismissing suggestions that don't apply. This decreases as the tool learns your patterns, but it is worth setting expectations with your team upfront.
+  </p>
+
+  <h2>Documentation</h2>
+
+  <h3><strong>Mintlify Writer</strong> (free tier)</h3>
+
+  <p>
+    Mintlify Writer generates docstrings and inline documentation from your code. The VS Code extension is free and works without an account for basic use. It understands function signatures, infers parameter intent from variable names and usage, and generates documentation that is usually better than what most developers would write by hand.
+  </p>
+
+  <p>
+    What to watch: AI-generated docstrings sometimes describe what the code does rather than why, which is the more useful information. They work best as a starting point you edit, not as final output you commit directly.
+  </p>
+
+  <h2>Tracking costs across all these tools</h2>
+
+  <p>
+    One problem with running multiple AI tools is that costs spread across platforms and become invisible. Claude usage in one tool, Gemini in another, OpenAI in a third. Each platform has its own dashboard and none of them show you the full picture.
+  </p>
+
+  <p>
+    <a href="/costpilot">CostPilot</a> aggregates usage across Claude, OpenAI, Gemini, and other providers into a single view. You connect your API keys and it pulls usage data automatically. The free tier covers basic tracking across up to three providers, which is enough for most individual developers. The paid tier adds per-project cost breakdowns, budget alerts, and team-level reporting.
+  </p>
+
+  <p>
+    It is not essential if you use only one tool. But if you are running Aider with mixed models or using Continue.dev with a combination of providers, having one place to see what you're actually spending prevents the kind of bill surprise that is common when API costs are spread across five separate dashboards.
+  </p>
+
+  <h2>The honest summary</h2>
+
+  <p>
+    Most of the AI developer tool market is still figuring out its pricing. Free tiers exist to acquire users, and the limits are set to convert you, not to serve you. That said, the open source tools (Aider, Continue.dev) and the genuinely generous free tiers (Codeium, Gemini CLI) are worth building into your workflow without any hesitation about future costs.
+  </p>
+
+  <p>
+    For the managed tools with capped free tiers (Cursor, Claude Code, GitHub Copilot), the honest advice is: use the free tier to decide if the tool fits your workflow, then make a clear decision about whether the paid plan is worth it for you. Don't anchor to the free tier if the tool is genuinely improving your work. Don't pay for something you're only using out of habit.
+  </p>
+
+  <p>
+    The best setup for most developers in 2026 is one open source tool (Aider or Continue.dev) as a cost-controlled fallback, one managed tool (Claude Code or Cursor) for high-value tasks where quality matters more than cost, and a config management approach that keeps your project context consistent across both.
+  </p>
+
+</BlogPost>
