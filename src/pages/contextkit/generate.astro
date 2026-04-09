@@ -234,7 +234,11 @@ import Layout from '../../layouts/Layout.astro';
           <div id="output-container" class="hidden">
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-bold text-lg" id="output-filename">CLAUDE.md</h3>
-              <div class="flex gap-2">
+              <div class="flex gap-2 flex-wrap">
+                <button id="share-btn" class="btn-secondary !py-2 !px-4 !text-sm" title="Share your config">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  Share config
+                </button>
                 <button id="copy-btn" class="btn-primary !py-2 !px-4 !text-sm">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
                   Copy to clipboard
@@ -243,6 +247,14 @@ import Layout from '../../layouts/Layout.astro';
                   Download file
                 </button>
               </div>
+            </div>
+            <!-- Share toast -->
+            <div id="share-toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-success/90 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
+              Link copied — share it with your team!
+            </div>
+            <!-- Shared config banner -->
+            <div id="shared-banner" class="hidden mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-primary-light text-center">
+              Shared configuration — click Generate to customize it
             </div>
             <div class="relative">
               <pre id="output-code" class="bg-[#0d1117] border border-surface-lighter rounded-xl p-6 text-sm text-text-muted overflow-x-auto max-h-[600px] overflow-y-auto font-mono leading-relaxed whitespace-pre-wrap"></pre>
@@ -269,13 +281,23 @@ import Layout from '../../layouts/Layout.astro';
       </div>
 
       <!-- Pro upsell -->
-      <div class="glass-card p-6 text-center border-primary/20">
-        <p class="text-text-muted text-sm mb-3">
-          Need to manage CLAUDE.md files across multiple projects?
+      <div class="glass-card p-6 border-primary/20">
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <div class="flex-1 text-center sm:text-left">
+            <p class="font-bold text-text mb-1">Managing multiple projects?</p>
+            <p class="text-text-muted text-sm">Pro saves configs per project, tracks version history, and syncs across your team.</p>
+          </div>
+          <a href="/contextkit#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm whitespace-nowrap">
+            Join Pro waitlist
+          </a>
+        </div>
+      </div>
+
+      <!-- Social proof + share prompt -->
+      <div class="text-center mt-6">
+        <p class="text-text-dim text-xs">
+          Built by <a href="https://nova-labs.dev" class="text-primary-light/70 hover:text-primary-light">Nova Labs</a> — the AI-run developer tools company
         </p>
-        <a href="/contextkit#waitlist" class="text-primary-light hover:underline text-sm font-semibold">
-          Join the Pro waitlist - save projects, version history, team sharing
-        </a>
       </div>
     </div>
   </section>
@@ -466,6 +488,82 @@ import Layout from '../../layouts/Layout.astro';
         URL.revokeObjectURL(url);
         if (typeof gtag === 'function') gtag('event', 'contextkit_download', { format: config.formats[0] });
       });
+
+      // Share config link
+      document.getElementById('share-btn').addEventListener('click', () => {
+        const params = new URLSearchParams();
+        if (config.language) params.set('l', config.language);
+        if (config.framework) params.set('f', config.framework);
+        if (config.projectType) params.set('p', config.projectType);
+        if (config.testFramework) params.set('t', config.testFramework);
+        if (config.linter) params.set('li', config.linter);
+        if (config.conventions && config.conventions.length) params.set('c', config.conventions.join(','));
+        if (config.formats && config.formats.length) params.set('fm', config.formats.join(','));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          const toast = document.getElementById('share-toast');
+          toast.classList.remove('hidden');
+          setTimeout(() => toast.classList.add('hidden'), 3000);
+          const btn = document.getElementById('share-btn');
+          btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Link copied!';
+          setTimeout(() => { btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg> Share config'; }, 2000);
+          if (typeof gtag === 'function') gtag('event', 'contextkit_share', { language: config.language, framework: config.framework });
+        });
+      });
+
+      // Load shared config from URL params
+      function loadFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has('l')) return false;
+        config.language = params.get('l');
+        config.framework = params.get('f') || null;
+        config.projectType = params.get('p') || null;
+        config.testFramework = params.get('t') || null;
+        config.linter = params.get('li') || null;
+        config.conventions = params.get('c') ? params.get('c').split(',') : [];
+        config.formats = params.get('fm') ? params.get('fm').split(',') : ['claude'];
+
+        // Activate UI selections
+        function selectOption(containerId, value) {
+          if (!value) return;
+          const container = document.getElementById(containerId);
+          if (!container) return;
+          container.querySelectorAll('.option-btn, .option-btn-lg').forEach(b => b.classList.remove('active'));
+          const btn = container.querySelector(`[data-value="${value}"]`);
+          if (btn) btn.classList.add('active');
+        }
+        selectOption('lang-select', config.language);
+        selectOption('framework-select', config.framework);
+        selectOption('project-type-select', config.projectType);
+        selectOption('test-select', config.testFramework);
+        selectOption('lint-select', config.linter);
+        // Formats (multi-select)
+        const fmtContainer = document.getElementById('format-select');
+        if (fmtContainer) {
+          fmtContainer.querySelectorAll('.option-btn-lg').forEach(b => b.classList.remove('active'));
+          config.formats.forEach(f => {
+            const btn = fmtContainer.querySelector(`[data-value="${f}"]`);
+            if (btn) btn.classList.add('active');
+          });
+        }
+        // Conventions (checkboxes)
+        config.conventions.forEach(c => {
+          const cb = document.querySelector(`#conventions-select input[value="${c}"]`);
+          if (cb) cb.checked = true;
+        });
+
+        // Jump to step 5 and auto-generate
+        currentStep = totalSteps;
+        showStep(currentStep);
+        const output = generateOutput(config);
+        const container = document.getElementById('output-container');
+        document.getElementById('output-code').textContent = output.content;
+        document.getElementById('output-filename').textContent = output.filename;
+        container.classList.remove('hidden');
+        document.getElementById('shared-banner').classList.remove('hidden');
+        if (typeof gtag === 'function') gtag('event', 'contextkit_shared_view', { language: config.language });
+        return true;
+      }
 
       // Generator
       function generateOutput(cfg) {
@@ -707,8 +805,10 @@ docs/           # Documentation
 scripts/        # Build and utility scripts`;
       }
 
-      // Init
-      showStep(1);
+      // Init — load shared config from URL or start fresh
+      if (!loadFromUrl()) {
+        showStep(1);
+      }
     })();
   </script>
 </Layout>
