@@ -1,0 +1,342 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Where can I find CLAUDE.md templates?", "acceptedAnswer": { "@type": "Answer", "text": "You can start with the examples in this article, use Claude Code's built-in /init command to generate a starter, or use ContextKit's free generator at nova-labs.dev/contextkit/generate which walks you through a guided wizard for your specific stack." }},
+    { "@type": "Question", "name": "How long should a CLAUDE.md template be?", "acceptedAnswer": { "@type": "Answer", "text": "Between 50 and 150 lines for most projects. Every line is loaded into context at session start, so keep it to instructions that actually change Claude's behavior. Remove anything that restates defaults Claude already knows." }},
+    { "@type": "Question", "name": "Can I use one CLAUDE.md template for all my projects?", "acceptedAnswer": { "@type": "Answer", "text": "No. Each project should have its own CLAUDE.md tailored to its specific stack, conventions, and structure. Templates give you a starting point, but you should always customize for your project's actual setup." }},
+    { "@type": "Question", "name": "What sections should every CLAUDE.md have?", "acceptedAnswer": { "@type": "Answer", "text": "At minimum: project overview (stack and purpose), file structure, coding conventions, testing setup, and guardrails. Add build commands and deployment info if Claude needs to run builds or deploys." }}
+  ]
+};
+---
+
+<BlogPost
+  title="CLAUDE.md starter templates: copy-paste configs for React, Python, Go, and more"
+  description="Stop staring at a blank CLAUDE.md. Here are production-ready starter templates for 8 common stacks, plus what to customize for your specific project."
+  date="April 9, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "Managing CLAUDE.md across multiple projects", slug: "manage-claudemd-multiple-projects" },
+    { title: "Why Claude Code ignores half your instructions", slug: "why-claude-code-ignores-instructions" },
+  ]}
+>
+  <p>
+    The hardest part of setting up Claude Code isn't installing it. It's writing the CLAUDE.md file. You know it matters. You've seen the difference between sessions with a good config and sessions without one. But you open a new project, create the file, and stare at it for five minutes wondering what to put in there.
+  </p>
+
+  <p>
+    Here are starter templates for 8 common project types. Copy the one that matches your stack, customize the project-specific parts, and you're running in under two minutes.
+  </p>
+
+  <h2>How to use these templates</h2>
+
+  <p>
+    Each template below is a starting point. After pasting it into your project root as <code>CLAUDE.md</code>, do three things:
+  </p>
+
+  <ol>
+    <li>Replace the project name and purpose with your own</li>
+    <li>Adjust file paths to match your actual directory structure</li>
+    <li>Remove any conventions that don't match how you work</li>
+  </ol>
+
+  <p>
+    The templates err on the side of being specific. It's easier to delete a line you don't need than to realize three sessions later that you forgot to include something important.
+  </p>
+
+  <h2>Next.js (App Router + TypeScript)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Next.js 14 App Router, TypeScript (strict), Tailwind CSS, Prisma + PostgreSQL.
+
+## File Structure
+- /app — routes, layouts, and pages (App Router conventions)
+- /components — reusable UI components (one component per file)
+- /lib — business logic, utilities, type definitions
+- /lib/db — Prisma client and database queries
+- /prisma — schema.prisma and migrations
+- /public — static assets
+
+## Conventions
+- Server Components by default. Only add 'use client' when you need browser APIs or interactivity
+- Named exports only, no default exports (except page.tsx and layout.tsx)
+- Zod for all input validation (API routes and form data)
+- Tailwind classes only, no CSS modules or styled-components
+- Errors: use error.tsx boundaries at layout level
+- Loading: use loading.tsx for async data in layouts
+
+## Testing
+- Vitest for unit and integration tests
+- Tests co-located: MyComponent.test.tsx next to MyComponent.tsx
+- Playwright for e2e tests in /e2e/
+- Run: `npm test` (unit), `npx playwright test` (e2e)
+
+## Commands
+- Dev: `npm run dev`
+- Build: `npm run build`
+- Lint: `npm run lint`
+- Database: `npx prisma migrate dev`, `npx prisma studio`
+
+## Guardrails
+- Never modify prisma/migrations/ directly — use `prisma migrate dev`
+- Ask before deleting database tables or columns
+- Do not add libraries without checking if an existing one covers the need</code></pre>
+
+  <h2>React + Vite + TypeScript</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+React 18, TypeScript (strict), Vite, Tailwind CSS, React Query + Axios.
+
+## File Structure
+- /src/components — UI components, one per directory with index.tsx + styles
+- /src/hooks — custom React hooks
+- /src/pages — route-level components
+- /src/api — API client functions (Axios instances, endpoint wrappers)
+- /src/types — shared TypeScript types and interfaces
+- /src/utils — pure utility functions
+
+## Conventions
+- Functional components only, no class components
+- Custom hooks for any logic shared between 2+ components
+- React Query for all server state (no useState for API data)
+- Tailwind for styling, no CSS-in-JS
+- Props interfaces defined in the same file as the component
+- Prefer composition over prop drilling — use React Context sparingly
+
+## Testing
+- Vitest + React Testing Library
+- Tests co-located: Button.test.tsx next to Button.tsx
+- Test behavior, not implementation — query by role/text, not by class/id
+- Mock API calls with msw
+
+## Commands
+- Dev: `npm run dev`
+- Build: `npm run build`
+- Test: `npm test`
+- Preview: `npm run preview`</code></pre>
+
+  <h2>Python (FastAPI)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Python 3.12, FastAPI, SQLAlchemy 2.0 + PostgreSQL, Pydantic v2, uv for packages.
+
+## File Structure
+- /app — main application package
+- /app/api — route handlers (one file per resource)
+- /app/models — SQLAlchemy models
+- /app/schemas — Pydantic request/response schemas
+- /app/services — business logic (no direct DB access in routes)
+- /app/core — config, security, dependencies
+- /tests — mirrors /app structure
+
+## Conventions
+- Type hints on all functions (parameters and return types)
+- Pydantic models for all API input/output — never return raw dicts
+- Dependency injection via FastAPI Depends() for DB sessions, auth, etc
+- Services handle business logic, routes handle HTTP concerns
+- Async endpoints for I/O-bound operations
+- f-strings for string formatting, no .format() or %
+
+## Testing
+- pytest with pytest-asyncio for async tests
+- Fixtures in conftest.py, scoped appropriately (function/module/session)
+- Use test database, never mock SQLAlchemy — test against real queries
+- Run: `pytest` or `pytest -x --tb=short` for fast feedback
+
+## Commands
+- Dev: `uvicorn app.main:app --reload`
+- Test: `pytest`
+- Lint: `ruff check . && ruff format --check .`
+- Install: `uv sync`</code></pre>
+
+  <h2>Django</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Python 3.12, Django 5, Django REST Framework, PostgreSQL, Celery + Redis.
+
+## File Structure
+- /apps — Django apps (each app is self-contained)
+- /apps/[name]/models.py — data models
+- /apps/[name]/serializers.py — DRF serializers
+- /apps/[name]/views.py — API views
+- /apps/[name]/urls.py — URL routing
+- /apps/[name]/tests/ — app-specific tests
+- /config — Django settings, root URLs, WSGI/ASGI config
+- /templates — Django templates (if using server-side rendering)
+
+## Conventions
+- Fat models, thin views — business logic lives in model methods or services
+- DRF serializers for all API validation and serialization
+- Class-based views for CRUD, function views for custom endpoints
+- Celery tasks for anything taking >500ms (email, PDF generation, API calls)
+- Migrations: one migration per logical change, never squash in feature branches
+- Settings: base.py + local.py + production.py pattern
+
+## Testing
+- pytest-django
+- Factory Boy for test data, not fixtures
+- Run: `pytest`
+- Coverage: `pytest --cov=apps/`</code></pre>
+
+  <h2>Go (API server)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Go 1.22, Chi router, sqlc + PostgreSQL, zerolog for logging.
+
+## File Structure
+- /cmd/server — main entry point
+- /internal/api — HTTP handlers and middleware
+- /internal/domain — business logic and domain types
+- /internal/storage — database queries (sqlc generated) and repository implementations
+- /internal/config — environment and configuration loading
+- /migrations — SQL migration files (goose)
+- /sqlc — sqlc configuration and queries
+
+## Conventions
+- Accept interfaces, return structs
+- Errors are values — wrap with fmt.Errorf("operation: %w", err), check with errors.Is/As
+- Context flows through the call chain — first parameter on all functions that do I/O
+- No global state — pass dependencies via constructor injection
+- Table-driven tests for functions with multiple cases
+- Struct tags: json for API, db for database
+
+## Testing
+- Standard library testing package + testify for assertions
+- Tests in the same package (white-box testing)
+- Integration tests with real database (use testcontainers)
+- Run: `go test ./...`
+- Lint: `golangci-lint run`
+
+## Commands
+- Dev: `go run ./cmd/server`
+- Build: `go build -o bin/server ./cmd/server`
+- Migrate: `goose -dir migrations up`
+- Generate: `sqlc generate`</code></pre>
+
+  <h2>Astro + Tailwind (static site)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Astro 4, Tailwind CSS, TypeScript, deployed on Netlify.
+
+## File Structure
+- /src/pages — file-based routing (.astro files)
+- /src/layouts — page layouts (Layout.astro, BlogPost.astro)
+- /src/components — reusable Astro/HTML components
+- /src/content — markdown/MDX content collections
+- /public — static assets (images, fonts, favicons)
+- /src/styles — global CSS (minimal, most styling via Tailwind)
+
+## Conventions
+- Astro components for static content, React/Svelte islands only for interactivity
+- Tailwind for all styling — no separate CSS files per component
+- Content collections for blog posts, docs, or any structured content
+- SEO: every page needs title, description, and og:image meta tags
+- Images: use Astro Image component for automatic optimization
+- Links: relative paths for internal, full URLs for external
+
+## Commands
+- Dev: `npm run dev`
+- Build: `npm run build`
+- Preview: `npm run preview`
+- Deploy: push to main (Netlify auto-deploys)</code></pre>
+
+  <h2>Flutter (mobile app)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Flutter 3, Dart, Riverpod for state management, Dio for HTTP, GoRouter.
+
+## File Structure
+- /lib/features — feature-first organization (auth/, home/, settings/)
+- /lib/features/[name]/presentation — screens and widgets
+- /lib/features/[name]/domain — models and business logic
+- /lib/features/[name]/data — repositories and data sources
+- /lib/shared — shared widgets, utils, theme
+- /lib/core — app-wide config, routing, DI setup
+
+## Conventions
+- Feature-first architecture with clean separation (presentation/domain/data)
+- Riverpod providers for all state management — no setState except in trivial widgets
+- Immutable data classes with freezed for domain models
+- GoRouter for declarative navigation
+- Responsive: use LayoutBuilder/MediaQuery, test on 3 screen sizes minimum
+- Null safety: no dynamic types, handle null cases explicitly
+
+## Testing
+- Widget tests for all screens (pump + finder pattern)
+- Unit tests for domain logic and repositories
+- Integration tests for critical user flows
+- Run: `flutter test`</code></pre>
+
+  <h2>Rust (CLI tool)</h2>
+
+  <pre><code># Project: [Your Project Name]
+
+## Stack
+Rust (stable), clap for CLI args, serde for serialization, tokio for async.
+
+## File Structure
+- /src/main.rs — entry point, CLI arg parsing
+- /src/lib.rs — library root, public API
+- /src/commands — subcommand implementations
+- /src/config — configuration loading and validation
+- /src/error — custom error types (thiserror)
+- /tests — integration tests
+
+## Conventions
+- Custom error type with thiserror, use anyhow in main only
+- Clippy clean: `cargo clippy -- -D warnings` must pass
+- No unwrap() in library code — propagate errors with ?
+- Derive Debug, Clone on all public types
+- Builder pattern for complex struct construction
+- Documentation comments on all public items
+
+## Commands
+- Dev: `cargo run -- [args]`
+- Build: `cargo build --release`
+- Test: `cargo test`
+- Lint: `cargo clippy`
+- Format: `cargo fmt`</code></pre>
+
+  <h2>What to customize after pasting</h2>
+
+  <p>
+    Templates get you started but they can't know your project. After pasting, spend two minutes on these:
+  </p>
+
+  <ul>
+    <li><strong>Remove what you don't use.</strong> If the template mentions Prisma and you use Drizzle, change it or remove it. Wrong instructions are worse than no instructions.</li>
+    <li><strong>Add your actual file paths.</strong> Check that directory names match. If your components live in <code>/src/ui/</code> instead of <code>/src/components/</code>, Claude needs to know.</li>
+    <li><strong>Add project-specific guardrails.</strong> What should Claude never touch? Legacy code it shouldn't refactor? A billing module that needs extra care? Add those.</li>
+    <li><strong>Include current focus.</strong> A one-line note about what you're working on right now helps Claude pick up context faster at session start.</li>
+  </ul>
+
+  <h2>Generate instead of copy-paste</h2>
+
+  <p>
+    If you work across multiple stacks or start new projects frequently, try <a href="/contextkit/generate">ContextKit's free CLAUDE.md generator</a>. It walks you through a 5-step wizard where you pick your language, framework, and conventions, and generates a production-ready config. It also exports to .cursorrules, AGENTS.md, and GEMINI.md if you use multiple AI coding tools.
+  </p>
+
+  <p>
+    No account needed. Your code stays in your browser. You get a config file you can use immediately.
+  </p>
+
+</BlogPost>

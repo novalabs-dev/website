@@ -1,0 +1,181 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the difference between GEMINI.md and CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "GEMINI.md is Google's Gemini CLI configuration file, while CLAUDE.md is Anthropic's Claude Code configuration file. Both serve the same purpose: telling the AI about your project, conventions, and rules. The format is similar (both use markdown), but the tool-specific features differ. Claude Code supports skills, memory directives, and subagent rules. Gemini CLI supports tool mappings and function declarations." }},
+    { "@type": "Question", "name": "Can I use the same config file for both Gemini CLI and Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "No, each tool reads its own file. Claude Code reads CLAUDE.md, Gemini CLI reads GEMINI.md. However, the core content (conventions, file structure, testing rules) can be largely the same. Tools like ContextKit let you generate both from a single configuration." }},
+    { "@type": "Question", "name": "Which is better for coding, Gemini CLI or Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Both are capable but have different strengths. Claude Code excels at complex multi-file changes, agentic workflows, and long-running tasks. Gemini CLI benefits from Google's ecosystem integration and Gemini's large context window. Many developers use both depending on the task." }},
+    { "@type": "Question", "name": "How do I configure Gemini CLI?", "acceptedAnswer": { "@type": "Answer", "text": "Create a GEMINI.md file in your project root. Use the same structure as a CLAUDE.md: project overview, file structure, conventions, and testing setup. Gemini CLI reads this at session start. You can also add a .gemini/settings.json for tool-specific configuration." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Gemini CLI vs Claude Code: how project configs differ (and how to manage both)"
+  description="Google's Gemini CLI uses GEMINI.md, Anthropic's Claude Code uses CLAUDE.md. Here is what each tool expects, where the configs overlap, and how to maintain both without duplicating work."
+  date="April 9, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "Claude Code alternatives compared", slug: "claude-code-alternatives-compared" },
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+  ]}
+>
+  <p>
+    The AI coding tool landscape just got more interesting. Google launched Gemini CLI as a direct answer to Claude Code, and it follows the same pattern: a terminal-based AI agent that reads a project config file from your repo root. Claude Code reads <code>CLAUDE.md</code>. Gemini CLI reads <code>GEMINI.md</code>. Same concept, different file, different ecosystem.
+  </p>
+
+  <p>
+    If you're using both tools, or considering switching, you need to understand what each config format supports, where they overlap, and how to avoid maintaining two files that slowly drift apart.
+  </p>
+
+  <h2>What they share</h2>
+
+  <p>
+    Both CLAUDE.md and GEMINI.md are plain markdown files in your project root. Both are loaded at session start and provide project context for the entire conversation. The core sections are nearly identical:
+  </p>
+
+  <ul>
+    <li>Project overview (stack, purpose)</li>
+    <li>File structure (where things live)</li>
+    <li>Coding conventions (naming, patterns, style)</li>
+    <li>Testing setup (framework, where tests live, how to run them)</li>
+    <li>Build and deploy commands</li>
+    <li>Guardrails (what the AI should avoid doing)</li>
+  </ul>
+
+  <p>
+    For a standard project, 80% of the content is identical between the two files. The difference is in the remaining 20%: tool-specific directives that each agent understands.
+  </p>
+
+  <h2>What's different in CLAUDE.md</h2>
+
+  <p>
+    Claude Code's config format has evolved to support its agent architecture. Beyond the standard sections, CLAUDE.md supports:
+  </p>
+
+  <ul>
+    <li><strong>Skill definitions</strong> — You can define reusable workflows that Claude knows how to execute. "Deploy to staging," "run the full test suite and fix failures," "create a new API endpoint following our pattern."</li>
+    <li><strong>Memory directives</strong> — Claude Code has persistent memory across sessions. You can tell it what to remember, what to forget, and how to reference past context.</li>
+    <li><strong>Subagent rules</strong> — Claude Code can spawn subagents for parallel tasks. Your config can define how those agents should behave.</li>
+    <li><strong>.claude/rules/ directory</strong> — Section-specific rule files that are loaded based on your working directory within the project.</li>
+  </ul>
+
+  <p>
+    These features are specific to Claude Code's architecture and won't be interpreted by other tools. If Gemini CLI encounters them, they're just text in the context window, which wastes tokens without changing behavior.
+  </p>
+
+  <h2>What's different in GEMINI.md</h2>
+
+  <p>
+    Gemini CLI's config is newer and still evolving. Its unique features include:
+  </p>
+
+  <ul>
+    <li><strong>Tool mappings</strong> — Gemini CLI supports MCP tools and custom tool definitions. Your GEMINI.md can specify which tools are available and how they map to commands.</li>
+    <li><strong>Settings reference</strong> — You can point to <code>.gemini/settings.json</code> for tool-level configuration (model selection, safety settings, tool permissions).</li>
+    <li><strong>Google ecosystem hooks</strong> — If you're using Firebase, Cloud Run, or other Google services, Gemini CLI has native integrations that you can configure in GEMINI.md.</li>
+  </ul>
+
+  <p>
+    Gemini CLI also benefits from Gemini's larger context window, which means your config file can be longer without the same token-cost concerns. But longer configs aren't necessarily better configs. The same rule applies: only include what changes the AI's behavior.
+  </p>
+
+  <h2>The multi-tool problem</h2>
+
+  <p>
+    If you use both tools, you now have two config files to maintain. Add Cursor (.cursorrules) and GitHub Copilot (AGENTS.md) and you're looking at four files, all saying roughly the same thing about your coding conventions, but each slowly drifting as you update one and forget the others.
+  </p>
+
+  <p>
+    Your repo root looks like this:
+  </p>
+
+  <pre><code>my-project/
+  CLAUDE.md         # Claude Code config
+  GEMINI.md         # Gemini CLI config
+  .cursorrules      # Cursor config
+  AGENTS.md         # Copilot/Codex config
+  package.json
+  ...</code></pre>
+
+  <p>
+    Four files. Same coding conventions in each. If you change your test runner from Jest to Vitest, you need to update all four. If you restructure your directory layout, four updates. This doesn't scale.
+  </p>
+
+  <h2>Three strategies for managing both</h2>
+
+  <h3>Strategy 1: Pick one source, generate the rest</h3>
+
+  <p>
+    Write your conventions in one format (whichever tool you use most), then generate the others. A simple script or <a href="/contextkit/generate">a tool like ContextKit</a> can translate between formats. The core conventions (80% of the content) are identical across formats, so the translation is mostly a formatting exercise.
+  </p>
+
+  <p>
+    This works well if you have a clear primary tool and the others are secondary.
+  </p>
+
+  <h3>Strategy 2: Shared base + tool-specific overrides</h3>
+
+  <p>
+    Create a <code>PROJECT-CONTEXT.md</code> with all the shared conventions, then have each tool-specific file import or reference it. Claude Code doesn't natively support imports, but you can use a build step:
+  </p>
+
+  <pre><code># Simple script to generate tool configs from shared base
+cat PROJECT-CONTEXT.md claude-specific.md > CLAUDE.md
+cat PROJECT-CONTEXT.md gemini-specific.md > GEMINI.md</code></pre>
+
+  <p>
+    Run this after editing your shared conventions and the tool-specific files stay in sync.
+  </p>
+
+  <h3>Strategy 3: Use a configuration manager</h3>
+
+  <p>
+    <a href="/contextkit">ContextKit</a> is built for exactly this problem. You define your project conventions once in a guided wizard, and it generates all four config formats. When you need to update, you change it in one place and re-export. No drift, no duplication.
+  </p>
+
+  <p>
+    The free tier handles single projects. If you juggle multiple projects across multiple tools, it becomes essential rather than convenient.
+  </p>
+
+  <h2>Which tool should you choose?</h2>
+
+  <p>
+    This isn't a "which is better" question. Both tools are good and getting better fast. The practical choice depends on:
+  </p>
+
+  <ul>
+    <li><strong>Ecosystem:</strong> Heavy on Google Cloud/Firebase? Gemini CLI integrates natively. Heavy on terminal workflows and complex codebases? Claude Code's agent architecture is more mature.</li>
+    <li><strong>Model preference:</strong> Claude's reasoning is strong for complex refactoring and architecture decisions. Gemini's context window handles massive codebases well.</li>
+    <li><strong>Team alignment:</strong> If your team is already on one tool, adding a second creates config maintenance overhead. The productivity gain needs to exceed that cost.</li>
+    <li><strong>Cost:</strong> Both have free tiers and paid plans. Compare based on your actual usage patterns rather than list prices.</li>
+  </ul>
+
+  <p>
+    Many developers use both: Claude Code for complex multi-file changes and agentic workflows, Gemini CLI for quick questions and Google-ecosystem tasks. Having proper configs for both tools means each session starts productive regardless of which tool you reach for.
+  </p>
+
+  <h2>Quick setup for teams using both</h2>
+
+  <p>
+    If your team has decided to support both tools, here's the minimum viable setup:
+  </p>
+
+  <ol>
+    <li>Write your shared conventions in a CLAUDE.md (it's the most widely documented format)</li>
+    <li>Copy it to GEMINI.md and remove Claude-specific directives (skills, memory, subagent rules)</li>
+    <li>Add tool-specific sections to each file (Gemini tool mappings, Claude skills)</li>
+    <li>Add both files to version control</li>
+    <li>Include "update config files" in your PR checklist for convention changes</li>
+  </ol>
+
+  <p>
+    Or skip the manual work entirely: <a href="/contextkit/generate">generate both configs from ContextKit</a> in two minutes. Free, no account needed, and your conventions stay consistent across every tool your team uses.
+  </p>
+
+</BlogPost>

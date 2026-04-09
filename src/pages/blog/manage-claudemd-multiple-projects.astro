@@ -1,0 +1,248 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does Claude Code support multiple CLAUDE.md files?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code reads CLAUDE.md from your current working directory, plus any .claude/rules/ files. You can also nest CLAUDE.md files in subdirectories for monorepo setups. Each project gets its own context automatically based on where you run Claude Code." }},
+    { "@type": "Question", "name": "How do I share CLAUDE.md conventions across projects?", "acceptedAnswer": { "@type": "Answer", "text": "You have three options: maintain a personal template you copy into new projects, use a global ~/.claude/CLAUDE.md for cross-project defaults, or use a tool like ContextKit that lets you manage and version multiple project configs from one place." }},
+    { "@type": "Question", "name": "Should every project have its own CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Even if projects share conventions, each CLAUDE.md should be specific to that project's stack, structure, and testing setup. Generic CLAUDE.md files that try to cover everything end up helping with nothing. Specific beats comprehensive." }},
+    { "@type": "Question", "name": "How do I keep CLAUDE.md files in sync across repos?", "acceptedAnswer": { "@type": "Answer", "text": "Most teams version their CLAUDE.md alongside the code in each repo and accept some drift. For tighter control, use a shared template with project-specific overrides, or use ContextKit's multi-project management to maintain a single source of truth." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to manage CLAUDE.md files across multiple projects without going insane"
+  description="Freelancers, agency devs, and indie hackers juggle 5-15 projects. Each needs its own CLAUDE.md. Here is a practical system for managing them all without copy-paste chaos."
+  date="April 9, 2026"
+  readTime="9 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "How to set up Claude Code for a new project", slug: "set-up-claude-code-new-project" },
+  ]}
+>
+  <p>
+    You have six active projects. A Next.js SaaS, a Python data pipeline, two client sites, an internal tool, and that side project you keep meaning to finish. Each one has different conventions, different stacks, and different things Claude Code needs to know.
+  </p>
+
+  <p>
+    So you write a CLAUDE.md for project one. It works great. Claude stops using semicolons, uses your preferred test runner, follows your file structure. Then you start project two and realize you need to write another one from scratch. By project four, you're copying chunks from project one, editing them halfway, and ending up with a Frankenstein config that confuses Claude more than it helps.
+  </p>
+
+  <p>
+    This is the multi-project CLAUDE.md problem, and nearly everyone who uses Claude Code seriously runs into it. Here's how to solve it.
+  </p>
+
+  <h2>Why one-size-fits-all CLAUDE.md files don't work</h2>
+
+  <p>
+    The instinct is to write one master CLAUDE.md and drop it everywhere. Don't. A CLAUDE.md that says "use TypeScript strict mode, Tailwind, Vitest, Supabase" is actively harmful in your Python project. Claude reads it at session start, loads it into context, and then spends the entire session fighting between what the file says and what the code actually is.
+  </p>
+
+  <p>
+    Every line in your CLAUDE.md costs tokens. Lines that don't apply to the current project are wasted tokens that could be used for actual work. Worse, contradictory instructions cause Claude to make inconsistent choices, the AI equivalent of a developer who read two conflicting style guides and picks randomly.
+  </p>
+
+  <p>
+    Each project needs its own CLAUDE.md. The question is how to make that manageable.
+  </p>
+
+  <h2>The three-layer system</h2>
+
+  <p>
+    After managing configs across dozens of projects, the pattern that works is three layers:
+  </p>
+
+  <h3>Layer 1: Global defaults (~/.claude/CLAUDE.md)</h3>
+
+  <p>
+    Claude Code supports a global config at <code>~/.claude/CLAUDE.md</code>. This is read for every project on your machine. Put things here that are true everywhere:
+  </p>
+
+  <pre><code>## Global Preferences
+- Prefer named exports over default exports
+- Never use `rm` — move to .trash/ instead
+- Write tests for new functions, co-located with source
+- Use descriptive variable names, no abbreviations
+- Commit messages: imperative mood, under 72 characters</code></pre>
+
+  <p>
+    Keep this short. 10-20 lines max. Anything stack-specific does not belong here.
+  </p>
+
+  <h3>Layer 2: Project-specific CLAUDE.md</h3>
+
+  <p>
+    This is the main config per project. It defines the stack, conventions, file structure, and project-specific behavior. This is where most of the value lives.
+  </p>
+
+  <pre><code>## Project: InvoiceFlow
+Next.js 14 App Router, TypeScript strict, Tailwind, Prisma + Postgres.
+
+## Architecture
+- /app — routes and layouts (App Router)
+- /components — shared UI components
+- /lib — business logic, no framework imports
+- /prisma — schema and migrations
+
+## Conventions
+- Server components by default, 'use client' only when needed
+- Zod for all validation (API inputs and form data)
+- Prisma for all DB access, no raw SQL
+- Error boundaries at layout level, not per-component</code></pre>
+
+  <h3>Layer 3: Subdirectory overrides (.claude/rules/)</h3>
+
+  <p>
+    For monorepos or projects with distinct sections, Claude Code reads <code>.claude/rules/*.md</code> files. Use these for section-specific rules:
+  </p>
+
+  <pre><code># .claude/rules/api.md
+API routes use Next.js Route Handlers. Always validate input with Zod.
+Return consistent error shapes: error string + code number.
+
+# .claude/rules/testing.md
+Use Vitest for unit tests, Playwright for e2e.
+Mock external APIs with msw, never mock the database.</code></pre>
+
+  <p>
+    This layered approach means you write the global stuff once, the project stuff once per repo, and the specialized stuff only where it matters.
+  </p>
+
+  <h2>Managing the copy-paste problem</h2>
+
+  <p>
+    Even with layers, you still need to write that Layer 2 config for every new project. And every project has some overlap: most of your Next.js projects share similar conventions, most of your Python projects use the same test setup.
+  </p>
+
+  <p>
+    Three approaches, from manual to automated:
+  </p>
+
+  <h3>Option 1: Template directory</h3>
+
+  <p>
+    Keep a folder of starter CLAUDE.md files organized by stack:
+  </p>
+
+  <pre><code>~/templates/claudemd/
+  nextjs-app-router.md
+  python-fastapi.md
+  astro-tailwind.md
+  react-native.md
+  go-api.md</code></pre>
+
+  <p>
+    When starting a new project, copy the right template and customize. Simple, works, but you have to remember to update the templates when you learn something new. Most people don't.
+  </p>
+
+  <h3>Option 2: Generator script</h3>
+
+  <p>
+    Write a script that scans your project structure and generates a starter CLAUDE.md. Check for package.json (Node), pyproject.toml (Python), go.mod (Go), and extract the stack from dependencies. This gets you 70% of the way there.
+  </p>
+
+  <p>
+    The problem: scripts are good at detecting what's installed but bad at understanding how you use it. They'll see Prisma is installed but won't know your convention of putting all queries in <code>/lib/db/</code>.
+  </p>
+
+  <h3>Option 3: Use a dedicated tool</h3>
+
+  <p>
+    <a href="/contextkit">ContextKit</a> is built exactly for this problem. It's a free CLAUDE.md generator that walks you through a 5-step wizard: pick your language, framework, and conventions, and it generates a production-ready CLAUDE.md. It also exports to .cursorrules, AGENTS.md, and GEMINI.md if you use multiple tools.
+  </p>
+
+  <p>
+    The advantage over templates is that the generator knows about common patterns per stack and suggests conventions you might not think of. It's like a checklist you walk through rather than a blank page you stare at.
+  </p>
+
+  <h2>What belongs in every project config</h2>
+
+  <p>
+    Regardless of how you create them, every project CLAUDE.md should cover these six areas:
+  </p>
+
+  <ol>
+    <li><strong>Stack declaration</strong> — Language, framework, major libraries. One line is enough.</li>
+    <li><strong>File structure</strong> — Where the main directories are and what goes in each.</li>
+    <li><strong>Coding conventions</strong> — Naming, imports, error handling. The stuff that varies between projects.</li>
+    <li><strong>Testing setup</strong> — Which runner, where tests live, what to mock (and what not to).</li>
+    <li><strong>Build and deploy</strong> — How to build, how to run locally, where it deploys.</li>
+    <li><strong>Guardrails</strong> — What Claude should never do autonomously in this project.</li>
+  </ol>
+
+  <p>
+    Skip any area that's standard for the stack and not project-specific. If your Python project uses pytest with default config, you don't need to mention it. Claude already knows.
+  </p>
+
+  <h2>Keeping configs up to date</h2>
+
+  <p>
+    The hardest part of multi-project CLAUDE.md management isn't creating them. It's maintaining them. You add a new library, change your test setup, or restructure the codebase, and the CLAUDE.md silently becomes wrong. Claude keeps following the old instructions, you get confused output, and you spend twenty minutes debugging before you realize the config is stale.
+  </p>
+
+  <p>
+    Three practices that help:
+  </p>
+
+  <ul>
+    <li><strong>Review CLAUDE.md during major refactors.</strong> If you're moving to a new test framework or restructuring directories, update the config in the same PR.</li>
+    <li><strong>Add a quarterly reminder.</strong> Set a recurring task to review your active project configs. Takes 10 minutes per project.</li>
+    <li><strong>Let Claude tell you.</strong> If Claude keeps doing something wrong, check whether your CLAUDE.md is the cause. Often the fix is updating one line in the config rather than repeating the instruction every session.</li>
+  </ul>
+
+  <h2>The monorepo case</h2>
+
+  <p>
+    Monorepos need special attention. You have a root CLAUDE.md for shared conventions, plus each package or app might need its own rules. The layering system handles this:
+  </p>
+
+  <pre><code>my-monorepo/
+  CLAUDE.md              # shared conventions
+  .claude/rules/
+    ci.md                 # CI/CD rules
+  packages/
+    api/
+      CLAUDE.md           # API-specific rules
+    web/
+      CLAUDE.md           # Frontend-specific rules
+    shared/
+      CLAUDE.md           # Shared library rules</code></pre>
+
+  <p>
+    When you <code>cd packages/api</code> and start Claude Code, it reads the API-specific CLAUDE.md. The root config sets the baseline. This is built into Claude Code's resolution order, no special setup needed.
+  </p>
+
+  <h2>When switching between projects mid-day</h2>
+
+  <p>
+    The reality of freelancing or agency work is context-switching between projects multiple times a day. Claude Code handles this automatically: close the terminal, open a new one in the next project, and Claude reads that project's CLAUDE.md. No state bleeds between sessions.
+  </p>
+
+  <p>
+    But there's a productivity trap: you spend the first few minutes of each project remembering where you left off. A one-line "current focus" note at the top of your CLAUDE.md helps:
+  </p>
+
+  <pre><code>## Current Focus
+Working on payment integration. Stripe checkout flow is half-done.
+See /app/api/stripe/ for the webhook handler that needs testing.</code></pre>
+
+  <p>
+    Update this before you switch away. When you come back, Claude reads it and knows exactly where to pick up.
+  </p>
+
+  <h2>Bottom line</h2>
+
+  <p>
+    Managing CLAUDE.md across multiple projects comes down to: don't try to share one config, use layers to reduce duplication, and have a system for creating new configs quickly. Whether that's a template folder, a generator, or <a href="/contextkit/generate">ContextKit's free wizard</a>, the goal is the same: every project gets a specific, accurate config without you writing it from scratch each time.
+  </p>
+
+  <p>
+    The developers getting the most out of Claude Code aren't the ones writing the fanciest prompts. They're the ones with clean, current configs in every project they touch.
+  </p>
+
+</BlogPost>
