@@ -3,19 +3,19 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Nova Labs on Product Hunt | AI OS Blueprint - April 14, 2026"
-  description="Nova Labs is launching the AI OS Blueprint on Product Hunt. Build your own AI Operating System with Claude Code. Coming April 14, 2026."
+  title="ContextKit on Product Hunt | Free CLAUDE.md Generator - Nova Labs"
+  description="ContextKit generates optimized CLAUDE.md files for any project in 30 seconds. Free, runs in your browser. Launching on Product Hunt April 14, 2026."
 >
   <!-- REDIRECT: Uncomment and replace URL when the Product Hunt listing goes live -->
-  <!-- <meta http-equiv="refresh" content="0;url=https://www.producthunt.com/posts/YOUR-LISTING-SLUG" slot="head" /> -->
+  <!-- <meta http-equiv="refresh" content="0;url=https://www.producthunt.com/posts/contextkit" slot="head" /> -->
 
-  <meta property="og:title" content="Nova Labs on Product Hunt | AI OS Blueprint" slot="head" />
-  <meta property="og:description" content="An AI built a real business in 24 days with $100. Get the blueprint. Launching on Product Hunt April 14, 2026." slot="head" />
+  <meta property="og:title" content="ContextKit on Product Hunt | Free CLAUDE.md Generator" slot="head" />
+  <meta property="og:description" content="Generate optimized config files for Claude Code, Cursor, Gemini CLI, and Copilot in 30 seconds. Free, no account needed." slot="head" />
   <meta property="og:type" content="website" slot="head" />
   <meta property="og:url" content="https://nova-labs.dev/producthunt" slot="head" />
   <meta name="twitter:card" content="summary_large_image" slot="head" />
-  <meta name="twitter:title" content="Nova Labs on Product Hunt | AI OS Blueprint" slot="head" />
-  <meta name="twitter:description" content="An AI built a real business in 24 days with $100. Get the blueprint. Launching on Product Hunt April 14, 2026." slot="head" />
+  <meta name="twitter:title" content="ContextKit on Product Hunt" slot="head" />
+  <meta name="twitter:description" content="Generate optimized CLAUDE.md files in 30 seconds. Free, runs in your browser." slot="head" />
 
   <!-- NAV -->
   <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
@@ -25,8 +25,8 @@ import Layout from '../layouts/Layout.astro';
       </a>
       <div class="flex items-center gap-6">
         <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
-        <a href="/#pricing" class="btn-primary !py-2.5 !px-5 !text-sm">
-          Get the playbook
+        <a href="/contextkit/generate" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Try ContextKit free
         </a>
       </div>
     </div>
@@ -45,15 +45,15 @@ import Layout from '../layouts/Layout.astro';
         <svg class="w-5 h-5" viewBox="0 0 40 40" fill="currentColor">
           <path d="M22.667 20H17.333v-5.333h5.334a2.667 2.667 0 010 5.333zM20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0zm2.667 25.333h-5.334V30.667h-4V9.333h9.334a6.667 6.667 0 010 13.334v2.666z"/>
         </svg>
-        Coming to Product Hunt
+        Launching on Product Hunt
       </div>
 
       <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6 tracking-tight">
-        An AI built a business in <span class="gradient-text">24 days</span>
+        Generate the perfect <span class="gradient-text">CLAUDE.md</span> in 30 seconds
       </h1>
 
       <p class="text-xl text-text-muted max-w-2xl mx-auto mb-4 leading-relaxed">
-        $100 budget. Full autonomy. 54 blog posts. 62 web pages. Email nurture system. Google Ads campaigns. All run by Claude Code. Now the exact blueprint is available.
+        Every AI coding tool needs a config file. Claude Code needs CLAUDE.md. Cursor needs .cursorrules. Gemini CLI needs GEMINI.md. Stop writing them from scratch.
       </p>
 
       <p class="text-text-dim mb-12">
@@ -88,12 +88,12 @@ import Layout from '../layouts/Layout.astro';
 
         <script>
           (function() {
-            const launch = new Date('2026-04-14T08:01:00Z'); // PH launches at 12:01 AM PT = 08:01 UTC
+            const launch = new Date('2026-04-14T08:01:00Z');
             function tick() {
               const now = new Date();
               const diff = launch.getTime() - now.getTime();
               if (diff <= 0) {
-                document.getElementById('countdown').innerHTML = '<p class="text-lg font-bold text-[#ff6154]">We are live!</p>';
+                document.getElementById('countdown').innerHTML = '<a href="https://www.producthunt.com/posts/contextkit" class="text-lg font-bold text-[#ff6154] hover:underline">We are live! Check us out &rarr;</a>';
                 return;
               }
               const d = Math.floor(diff / 86400000);
@@ -109,46 +109,93 @@ import Layout from '../layouts/Layout.astro';
         </script>
       </div>
 
-      <!-- Month 1 numbers -->
+      <!-- What ContextKit does -->
       <div class="glass-card p-8 mb-10 text-left max-w-xl mx-auto">
-        <h2 class="text-lg font-bold mb-4 text-center">The numbers (month 1)</h2>
+        <h2 class="text-lg font-bold mb-6 text-center">How it works</h2>
+        <div class="space-y-4">
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">1</span>
+            <div>
+              <p class="font-semibold text-text">Pick your stack</p>
+              <p class="text-text-muted text-sm">12+ languages, 16+ frameworks</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">2</span>
+            <div>
+              <p class="font-semibold text-text">Set your conventions</p>
+              <p class="text-text-muted text-sm">Testing, linting, project-specific rules</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">3</span>
+            <div>
+              <p class="font-semibold text-text">Get your config file</p>
+              <p class="text-text-muted text-sm">Copy, download, or share a link with your team</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supports -->
+      <div class="glass-card p-8 mb-10 text-left max-w-xl mx-auto">
+        <h2 class="text-lg font-bold mb-4 text-center">Works with every AI coding tool</h2>
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">54</span>
-            <span class="text-text-muted">blog posts written</span>
+            <span class="text-lg font-black text-primary-light">CLAUDE.md</span>
+            <span class="text-text-muted">Claude Code</span>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">62</span>
-            <span class="text-text-muted">web pages built</span>
+            <span class="text-lg font-black text-primary-light">.cursorrules</span>
+            <span class="text-text-muted">Cursor</span>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">375</span>
-            <span class="text-text-muted">visitors in 24 days</span>
+            <span class="text-lg font-black text-primary-light">GEMINI.md</span>
+            <span class="text-text-muted">Gemini CLI</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-lg font-black text-primary-light">AGENTS.md</span>
+            <span class="text-text-muted">GitHub Copilot</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="glass-card p-8 mb-10 text-left max-w-xl mx-auto">
+        <h2 class="text-lg font-bold mb-4 text-center">Built by an AI-run company</h2>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl font-black text-primary-light">107</span>
+            <span class="text-text-muted">pages on nova-labs.dev</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-2xl font-black text-primary-light">2</span>
+            <span class="text-text-muted">free developer tools</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-2xl font-black text-primary-light">0</span>
+            <span class="text-text-muted">human developers</span>
           </div>
           <div class="flex items-center gap-3">
             <span class="text-2xl font-black text-primary-light">$100</span>
-            <span class="text-text-muted">total starting budget</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">24/7</span>
-            <span class="text-text-muted">autonomous operation</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">1hr</span>
-            <span class="text-text-muted">setup time for you</span>
+            <span class="text-text-muted">starting budget</span>
           </div>
         </div>
       </div>
 
       <!-- CTAs -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-        <a href="/free-chapter" class="btn-secondary !py-3 !px-8">
-          Read 2 chapters free
+        <a href="/contextkit/generate" class="btn-primary !py-3 !px-8">
+          Try ContextKit now (free)
         </a>
-        <a href="/#pricing" class="btn-primary !py-3 !px-8">
-          Get the full blueprint
+        <a href="/cost-dashboard/analyze" class="btn-secondary !py-3 !px-8">
+          Try CostPilot (free)
         </a>
       </div>
+
+      <p class="text-text-dim text-sm">
+        100% free. No account needed. Runs in your browser.
+      </p>
     </div>
   </section>
 
@@ -158,11 +205,13 @@ import Layout from '../layouts/Layout.astro';
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="text-center md:text-left">
           <p class="text-text-dim text-sm">
-            <span class="text-primary-light font-semibold">Nova Labs</span> - AI-powered business tools by AckNova Automations
+            <span class="text-primary-light font-semibold">Nova Labs</span> - AI-powered developer tools by AckNova Automations
           </p>
         </div>
         <div class="flex items-center gap-6 text-sm text-text-dim">
-          <a href="/" class="hover:text-text transition-colors">Playbook</a>
+          <a href="/" class="hover:text-text transition-colors">Home</a>
+          <a href="/contextkit" class="hover:text-text transition-colors">ContextKit</a>
+          <a href="/cost-dashboard" class="hover:text-text transition-colors">CostPilot</a>
           <a href="/blog" class="hover:text-text transition-colors">Blog</a>
           <a href="/terms" class="hover:text-text transition-colors">Terms</a>
         </div>
