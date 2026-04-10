@@ -1,0 +1,205 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the .claude/rules directory?", "acceptedAnswer": { "@type": "Answer", "text": "The .claude/rules/ directory lets you split your Claude Code instructions into separate files instead of putting everything in one CLAUDE.md. Each .md file in .claude/rules/ is loaded alongside your main CLAUDE.md. This is useful for large projects where different parts of the codebase need different rules." }},
+    { "@type": "Question", "name": "When should I use .claude/rules instead of CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Use the rules directory when your CLAUDE.md gets longer than about 200 lines, when different parts of your project need different conventions (frontend vs backend), when you want rules that are easy to toggle on and off, or when multiple team members maintain different rule sets." }},
+    { "@type": "Question", "name": "How does Claude Code load rules from .claude/rules?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code loads all .md files from .claude/rules/ at session start, in addition to the main CLAUDE.md file and the global ~/.claude/CLAUDE.md. All three sources combine into Claude's working context. Files in .claude/rules/ do not override CLAUDE.md — they add to it." }},
+    { "@type": "Question", "name": "Can I have different rules for different directories?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code loads rules based on context. You can name files descriptively (frontend.md, backend.md, testing.md) and include directory-specific instructions in each. Claude reads all of them, so you can reference specific paths in each rule file to make them scoped." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code project rules: how to use the .claude/rules directory for organized configs"
+  description="Your CLAUDE.md is getting long. The .claude/rules directory lets you split instructions into focused files — frontend, backend, testing, guardrails. Here is how to set it up."
+  date="April 10, 2026"
+  readTime="8 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "How to score your CLAUDE.md", slug: "score-your-claudemd" },
+    { title: "How to manage CLAUDE.md across multiple projects", slug: "manage-claudemd-multiple-projects" },
+  ]}
+>
+  <p>
+    Your CLAUDE.md started simple. A few lines about the stack, a test command, some naming rules. Now it is 300 lines long and growing every time you add a new convention. Different sections apply to different parts of the codebase. Finding and editing specific rules means scrolling through everything.
+  </p>
+
+  <p>
+    Claude Code has a built-in solution: the <code>.claude/rules/</code> directory.
+  </p>
+
+  <h2>How it works</h2>
+
+  <p>
+    Create a <code>.claude/rules/</code> directory in your project root. Put markdown files in it. Each file contains a focused set of rules. Claude Code loads all of them at session start, alongside your main CLAUDE.md.
+  </p>
+
+  <pre><code>your-project/
+  CLAUDE.md                    # Core project config
+  .claude/
+    rules/
+      frontend.md              # React conventions, component patterns
+      backend.md               # API routes, database rules
+      testing.md               # Test framework, mocking strategy
+      guardrails.md            # Safety rules, destructive action blocks
+      deployment.md            # Build, deploy, CI/CD rules</code></pre>
+
+  <p>
+    Every <code>.md</code> file in that directory is read automatically. No imports, no configuration, no registration. Just create the files and they work.
+  </p>
+
+  <h2>When to split vs when to keep everything in CLAUDE.md</h2>
+
+  <p>
+    Not every project needs the rules directory. Here is a simple decision framework:
+  </p>
+
+  <ul>
+    <li><strong>CLAUDE.md under 100 lines:</strong> Keep everything in one file. Splitting creates complexity with no benefit.</li>
+    <li><strong>CLAUDE.md between 100-200 lines:</strong> Consider splitting if you have clearly distinct sections (frontend vs backend, testing vs deployment).</li>
+    <li><strong>CLAUDE.md over 200 lines:</strong> Split. A 300-line config is hard to maintain and harder for Claude to prioritize. Focused files are easier to maintain and review.</li>
+  </ul>
+
+  <p>
+    Other reasons to split:
+  </p>
+
+  <ul>
+    <li><strong>Multiple team members</strong> contribute rules. Each person maintains their own rule file. Merge conflicts are less likely when changes happen in separate files.</li>
+    <li><strong>Monorepos</strong> with different stacks in different directories. The frontend team adds to <code>frontend.md</code>; the backend team adds to <code>backend.md</code>.</li>
+    <li><strong>Rules you want to toggle.</strong> Temporarily rename a file to <code>.bak</code> to disable it. Easier than commenting out sections in a large CLAUDE.md.</li>
+  </ul>
+
+  <h2>What goes where</h2>
+
+  <p>
+    The main CLAUDE.md keeps the essentials: project overview, tech stack, file structure. These are the things every Claude Code session needs regardless of what part of the codebase you are working on.
+  </p>
+
+  <p>
+    Rule files handle everything else. Here is a practical split:
+  </p>
+
+  <h3>CLAUDE.md (project core)</h3>
+
+  <pre><code># Project: Inventory Manager
+Stack: Next.js 14, Prisma, PostgreSQL, Tailwind CSS
+
+# File Structure
+- src/app/ — Next.js app router pages
+- src/components/ — Shared React components
+- src/lib/ — Utilities, database client, auth helpers
+- prisma/ — Schema and migrations
+- tests/ — Test files mirroring src/ structure</code></pre>
+
+  <h3>.claude/rules/frontend.md</h3>
+
+  <pre><code># Frontend Conventions
+
+- Functional components only. No class components.
+- Props: define as interface, name as ComponentNameProps.
+- State: prefer server components. Client components only when interactivity is required.
+- Styling: Tailwind utility classes. No CSS modules, no styled-components.
+- New components go in src/components/. Page-specific components go in the page directory.
+- Images: use next/image with explicit width/height. No unoptimized images.</code></pre>
+
+  <h3>.claude/rules/backend.md</h3>
+
+  <pre><code># Backend Conventions
+
+- API routes in src/app/api/. One directory per resource.
+- Use Prisma for all database operations. No raw SQL.
+- Validate request bodies with Zod schemas defined in src/lib/schemas/.
+- Error responses: {'{'} error: string, code: string {'}'} format. Always include HTTP status code.
+- Auth: check session in every API route. Use the auth() helper from src/lib/auth.ts.</code></pre>
+
+  <h3>.claude/rules/testing.md</h3>
+
+  <pre><code># Testing
+
+- Framework: Vitest
+- Run all: npm test
+- Run single: npx vitest run tests/path/to/test.ts
+- Write tests for every new API route and every component with logic.
+- Mock external services with msw. Never mock Prisma — tests hit the test database.
+- Test files: same name as source file with .test.ts suffix.
+- Assertions: use expect().toBe() for primitives, expect().toEqual() for objects.</code></pre>
+
+  <h3>.claude/rules/guardrails.md</h3>
+
+  <pre><code># Guardrails
+
+- Never delete files with rm. Move to .trash/ directory.
+- Never modify prisma/migrations/ files after they have been applied.
+- Never push to main directly. All changes go through feature branches.
+- Never install new dependencies without asking first.
+- Never modify .env files. Environment variables are managed externally.
+- Do not create files outside of src/, tests/, or prisma/ without confirmation.</code></pre>
+
+  <h2>How Claude loads everything together</h2>
+
+  <p>
+    At session start, Claude Code reads three things:
+  </p>
+
+  <ol>
+    <li><code>~/.claude/CLAUDE.md</code> — Your global config (personal preferences that apply everywhere)</li>
+    <li><code>CLAUDE.md</code> — Your project config (the core file in the repo root)</li>
+    <li><code>.claude/rules/*.md</code> — All rule files in the directory</li>
+  </ol>
+
+  <p>
+    These combine into one context. There is no hierarchy; rules from all sources apply equally. If two files contradict each other, Claude uses the more specific instruction, but it is better to avoid contradictions entirely.
+  </p>
+
+  <h2>Naming conventions for rule files</h2>
+
+  <p>
+    Name files by what they cover, not by when they were created. Good names:
+  </p>
+
+  <ul>
+    <li><code>frontend.md</code>, <code>backend.md</code>, <code>testing.md</code></li>
+    <li><code>react-components.md</code>, <code>api-routes.md</code>, <code>database.md</code></li>
+    <li><code>guardrails.md</code>, <code>deployment.md</code>, <code>git-workflow.md</code></li>
+  </ul>
+
+  <p>
+    Bad names: <code>rules-v2.md</code>, <code>new-rules.md</code>, <code>temp.md</code>. These tell Claude nothing about what is inside.
+  </p>
+
+  <h2>Team workflows</h2>
+
+  <p>
+    The rules directory works well for teams because:
+  </p>
+
+  <ul>
+    <li><strong>Separate ownership.</strong> The frontend lead maintains <code>frontend.md</code>. The backend lead maintains <code>backend.md</code>. No stepping on each other.</li>
+    <li><strong>Easier code review.</strong> When someone changes a rule, the diff is in a focused file, not buried in a 300-line config.</li>
+    <li><strong>Composable.</strong> A new team member can add their own rule file without touching existing ones.</li>
+  </ul>
+
+  <p>
+    Commit the rules directory to your repo. These are project conventions; they should be versioned alongside the code they describe.
+  </p>
+
+  <h2>Generate your starting point</h2>
+
+  <p>
+    If you are starting from scratch, the <a href="/contextkit/generate">ContextKit Generator</a> builds a complete CLAUDE.md that covers all five key categories: structure, architecture, conventions, testing, and guardrails. From there you can split sections into separate rule files as your project grows.
+  </p>
+
+  <p>
+    Already have a config? The <a href="/contextkit/analyze">ContextKit Analyzer</a> scores your existing setup and tells you exactly which categories are missing. It works with both standalone CLAUDE.md files and combined configs from the rules directory.
+  </p>
+
+  <p>
+    The best time to organize your Claude Code config is when it starts slowing you down. If you are scrolling through a long file looking for the testing section, or if different parts of your codebase need different rules, the rules directory is the solution that is already built into the tool.
+  </p>
+</BlogPost>

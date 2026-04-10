@@ -1,0 +1,206 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can I use my .cursorrules file in Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Not directly. Claude Code reads CLAUDE.md, not .cursorrules. The content is similar (project conventions, file structure, coding rules), but the file names and some directives differ. You need to create a CLAUDE.md with the same information adapted for Claude Code's format." }},
+    { "@type": "Question", "name": "What is the difference between .cursorrules and CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Both files serve the same purpose: telling an AI coding tool about your project. The key differences are: Claude Code uses markdown (CLAUDE.md), while Cursor uses a plain text .cursorrules file. Claude Code also supports a rules directory (.claude/rules/) for section-specific configs, and a global config at ~/.claude/CLAUDE.md. The content categories — structure, conventions, testing, guardrails — are the same." }},
+    { "@type": "Question", "name": "How do I maintain both .cursorrules and CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "You can maintain both manually, or use a tool like ContextKit to generate configs for multiple tools from one source. ContextKit exports to CLAUDE.md, .cursorrules, GEMINI.md, and AGENTS.md formats. The core content stays the same; only tool-specific directives change." }},
+    { "@type": "Question", "name": "Is Claude Code better than Cursor?", "acceptedAnswer": { "@type": "Answer", "text": "They serve different workflows. Cursor is an IDE with AI features built into the editor. Claude Code is a terminal-based agent that reads and writes files directly. Claude Code is stronger for multi-file refactoring, running tests, and complex tasks. Cursor is faster for inline edits and quick completions. Many developers use both." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to migrate from Cursor to Claude Code: convert your rules, config, and workflow"
+  description="Switching from Cursor to Claude Code means translating your .cursorrules to CLAUDE.md. Here is what changes, what stays the same, and how to keep both tools working on the same project."
+  date="April 10, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "Claude Code custom instructions guide", slug: "claude-code-custom-instructions-guide" },
+    { title: "How to score your CLAUDE.md", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    You have been using Cursor. Your <code>.cursorrules</code> file has your project conventions, your preferred patterns, your testing setup. Now you want to try Claude Code, and the first thing you notice is that it ignores your <code>.cursorrules</code> entirely.
+  </p>
+
+  <p>
+    Claude Code reads <code>CLAUDE.md</code>. Different tool, different config file. The content is mostly the same. The translation is straightforward, but there are a few things that change and a few things Claude Code does that Cursor does not.
+  </p>
+
+  <h2>What you are translating</h2>
+
+  <p>
+    Both <code>.cursorrules</code> and <code>CLAUDE.md</code> tell an AI coding tool about your project. The core categories are identical:
+  </p>
+
+  <ul>
+    <li>Project structure and file locations</li>
+    <li>Coding conventions and naming patterns</li>
+    <li>Technology stack and framework details</li>
+    <li>Testing setup and commands</li>
+    <li>Rules and restrictions</li>
+  </ul>
+
+  <p>
+    If your <code>.cursorrules</code> covers these, you already have 80% of a good CLAUDE.md. The remaining 20% comes from Claude Code-specific features.
+  </p>
+
+  <h2>Step 1: copy the content, change the format</h2>
+
+  <p>
+    <code>.cursorrules</code> is typically plain text or loosely formatted. CLAUDE.md is markdown. This matters because Claude Code parses headings and structure to prioritize information.
+  </p>
+
+  <p>
+    Take your existing rules and organize them under clear markdown headings:
+  </p>
+
+  <pre><code># Project Overview
+[Your project description — stack, purpose, one-liners]
+
+# File Structure
+[Directory layout — where components, routes, models, tests live]
+
+# Coding Conventions
+[Naming, formatting, import ordering, component patterns]
+
+# Testing
+[Framework, commands, file naming, mocking strategy]
+
+# Guardrails
+[What to never do — destructive commands, off-limits files, confirmation requirements]</code></pre>
+
+  <p>
+    These five sections are the backbone. You can add more, but if you cover these you are already ahead of most CLAUDE.md files.
+  </p>
+
+  <h2>Step 2: add what Cursor does not need</h2>
+
+  <p>
+    Claude Code is a terminal agent, not an IDE extension. It has capabilities that Cursor does not, and those capabilities need configuration:
+  </p>
+
+  <h3>Shell commands</h3>
+
+  <p>
+    Claude Code runs shell commands directly. It needs to know which commands are safe and which need confirmation.
+  </p>
+
+  <pre><code># Commands
+- Build: `npm run build`
+- Test: `npm test`
+- Lint: `npm run lint`
+- Dev server: `npm run dev`
+
+# Command Safety
+- Never run `rm -rf` — use `mv` to .trash/ instead
+- Never run `git push --force` without confirmation
+- Database migrations require confirmation before applying</code></pre>
+
+  <p>
+    Cursor does not execute shell commands the same way, so your <code>.cursorrules</code> probably does not have this section. Add it.
+  </p>
+
+  <h3>Multi-file operations</h3>
+
+  <p>
+    Claude Code regularly works across multiple files in one session. It reads, edits, creates, and deletes files. Rules about how to handle multi-file changes matter:
+  </p>
+
+  <pre><code># Multi-file Rules
+- Prefer editing existing files over creating new ones
+- When refactoring, update all imports in a single session
+- Run tests after any multi-file change
+- Do not create new files unless the task specifically requires it</code></pre>
+
+  <h3>The rules directory</h3>
+
+  <p>
+    Claude Code supports <code>.claude/rules/*.md</code> for section-specific rules. If your project has a frontend and a backend with different conventions, you can split rules:
+  </p>
+
+  <pre><code>.claude/rules/frontend.md  — React conventions, component patterns
+.claude/rules/backend.md   — API patterns, database rules
+.claude/rules/testing.md   — Test framework, mocking strategy</code></pre>
+
+  <p>
+    Cursor does not have an equivalent. This is useful for monorepos or projects where different directories follow different patterns.
+  </p>
+
+  <h2>Step 3: handle tool-specific directives</h2>
+
+  <p>
+    Some things in your <code>.cursorrules</code> are Cursor-specific and do not apply to Claude Code:
+  </p>
+
+  <ul>
+    <li><strong>Tab completion rules</strong> — Claude Code does not do inline completions. Remove these.</li>
+    <li><strong>Editor-specific commands</strong> — References to Cursor commands or keybindings. Remove.</li>
+    <li><strong>Chat vs compose modes</strong> — Claude Code has one mode. It reads files, makes changes, runs commands. Simplify accordingly.</li>
+  </ul>
+
+  <p>
+    Conversely, add Claude Code-specific directives:
+  </p>
+
+  <ul>
+    <li><strong>Tool preferences:</strong> "Use the Edit tool for small changes, Write for new files"</li>
+    <li><strong>Agent behavior:</strong> "Use subagents for independent research tasks"</li>
+    <li><strong>Permission boundaries:</strong> "Do not push to remote without confirmation"</li>
+  </ul>
+
+  <h2>Step 4: keep both files in sync (or use one source)</h2>
+
+  <p>
+    If you use both Cursor and Claude Code on the same project, you now have two config files with overlapping content. There are two approaches:
+  </p>
+
+  <h3>Option A: maintain both manually</h3>
+
+  <p>
+    This works for small projects. When you update a convention, update both files. The risk is drift: after a few months the files diverge and one tool follows outdated rules.
+  </p>
+
+  <h3>Option B: generate from one source</h3>
+
+  <p>
+    The <a href="/contextkit/generate">ContextKit Generator</a> builds configs for Claude Code, Cursor, Gemini CLI, and GitHub Copilot from one set of inputs. You answer questions about your project once, then export to whichever format you need.
+  </p>
+
+  <p>
+    When you update your project config, regenerate all formats at once. No drift, no forgotten updates.
+  </p>
+
+  <h2>What to expect after switching</h2>
+
+  <p>
+    Claude Code works differently from Cursor. A few things to prepare for:
+  </p>
+
+  <ul>
+    <li><strong>It is terminal-based.</strong> No GUI, no visual diff. You work in your terminal and check results in your editor or browser.</li>
+    <li><strong>It is more autonomous.</strong> Claude Code can chain multiple operations: read a file, make changes, run tests, fix failures, commit. Cursor is more step-by-step.</li>
+    <li><strong>It is better at multi-file tasks.</strong> Refactoring across 10 files, adding a feature that touches routes/models/tests/types — this is where Claude Code shines.</li>
+    <li><strong>It is slower for quick edits.</strong> If you just need to rename a variable on one line, Cursor is faster. Claude Code is built for bigger tasks.</li>
+  </ul>
+
+  <p>
+    The quality of your CLAUDE.md directly affects the quality of Claude Code sessions. A well-configured file means Claude follows your patterns from the first task. A bare-bones file means you spend the first few minutes of every session correcting behavior.
+  </p>
+
+  <h2>Check your migration</h2>
+
+  <p>
+    After creating your CLAUDE.md, run it through the <a href="/contextkit/analyze">ContextKit Analyzer</a> to see how it scores. The analyzer checks five categories (structure, architecture, conventions, testing, guardrails) and tells you exactly what is missing.
+  </p>
+
+  <p>
+    Most files migrated from <code>.cursorrules</code> score around 5-6 on the first pass — they have the content but miss Claude Code-specific sections like guardrails and command safety. The analyzer shows you exactly what to add to get to 8+.
+  </p>
+</BlogPost>

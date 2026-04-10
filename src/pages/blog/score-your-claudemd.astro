@@ -1,0 +1,214 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is a good CLAUDE.md score?", "acceptedAnswer": { "@type": "Answer", "text": "A well-structured CLAUDE.md should score 7 or above out of 10. Most files score between 3 and 5 because they focus on project descriptions rather than actionable rules. Scoring 8+ requires covering all five categories: structure, architecture guidance, coding conventions, testing setup, and guardrails." }},
+    { "@type": "Question", "name": "How do I score my CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "You can paste your CLAUDE.md into the free ContextKit Analyzer at nova-labs.dev/contextkit/analyze. It scores your file across five categories and gives specific suggestions for improvement. The analysis runs entirely in your browser — nothing is uploaded." }},
+    { "@type": "Question", "name": "Why does my CLAUDE.md score low?", "acceptedAnswer": { "@type": "Answer", "text": "The most common reasons for a low score are: missing testing setup (Claude guesses test commands), no file structure section (Claude reads every file instead of going where you tell it), no guardrails (Claude makes destructive changes you did not want), and vague conventions (Claude picks its own style instead of matching yours)." }},
+    { "@type": "Question", "name": "What sections should every CLAUDE.md have?", "acceptedAnswer": { "@type": "Answer", "text": "Every effective CLAUDE.md should have: a project overview (stack and purpose in 2-3 lines), file structure (where important directories and files live), coding conventions (naming, formatting, patterns), testing setup (framework, commands, what to test), and guardrails (actions Claude should never take, like force-pushing or deleting files)." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to score your CLAUDE.md file (and why most configs rate below 5 out of 10)"
+  description="Most CLAUDE.md files miss the sections that actually change Claude Code's behavior. Here is how to score yours, what the five categories are, and how to get from a 3 to an 8."
+  date="April 10, 2026"
+  readTime="9 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "Claude Code custom instructions guide", slug: "claude-code-custom-instructions-guide" },
+    { title: "CLAUDE.md starter templates for every stack", slug: "claudemd-starter-templates" },
+  ]}
+>
+  <p>
+    You wrote a CLAUDE.md file. You put your project name in it, maybe a description of your tech stack, possibly a list of commands. Then you started a Claude Code session and it still ignored your conventions, ran the wrong test command, and created files in the wrong directory.
+  </p>
+
+  <p>
+    The file exists. It just does not work the way you expected.
+  </p>
+
+  <p>
+    After analyzing hundreds of CLAUDE.md files, a pattern emerged. Most files score between 3 and 5 out of 10 on a structured evaluation. They cover the basics but miss the sections that actually change Claude's behavior. The gap between a 4 and an 8 is not more words; it is the right categories.
+  </p>
+
+  <h2>The five categories that matter</h2>
+
+  <p>
+    A CLAUDE.md file does five jobs. Most files only do one or two of them.
+  </p>
+
+  <h3>1. Structure (where things live)</h3>
+
+  <p>
+    This is the most impactful section and the one most files get wrong. Without explicit file structure guidance, Claude reads directory listings and makes guesses. With it, Claude goes directly where you tell it.
+  </p>
+
+  <pre><code># File Structure
+- src/routes/ — API endpoints (one file per resource)
+- src/models/ — Database models (Prisma schema in prisma/)
+- src/middleware/ — Express middleware (auth, logging, validation)
+- tests/ — Mirrors src/ structure. Every route has a test file.
+- scripts/ — One-off scripts. Not imported by the application.</code></pre>
+
+  <p>
+    If your CLAUDE.md does not have a section like this, Claude will create files in the wrong place roughly half the time. The more complex your project, the more this matters.
+  </p>
+
+  <h3>2. Architecture guidance (how things connect)</h3>
+
+  <p>
+    Structure tells Claude where files go. Architecture tells Claude how they relate. This is the difference between "put routes in src/routes/" and "every route uses the controller pattern: route calls controller, controller calls service, service calls model."
+  </p>
+
+  <pre><code># Architecture
+- Routes are thin: validation + controller call only
+- Controllers handle request/response shaping
+- Services contain business logic (never import Express)
+- Models are Prisma-generated, do not edit manually
+- Shared types live in src/types/ and are imported by both frontend and API</code></pre>
+
+  <p>
+    Without this, Claude generates working code that does not match your patterns. It puts business logic in route handlers, mixes concerns, and creates one-off patterns that diverge from the rest of your codebase.
+  </p>
+
+  <h3>3. Coding conventions (how code looks)</h3>
+
+  <p>
+    This covers naming, formatting, and patterns. Claude has strong defaults from training data, but your project has its own rules. The most common missed conventions:
+  </p>
+
+  <ul>
+    <li>Naming patterns (camelCase vs snake_case, file naming)</li>
+    <li>Import ordering (built-in, external, internal)</li>
+    <li>Error handling patterns (custom error classes, error boundaries)</li>
+    <li>Component patterns (functional only, no default exports, props interface naming)</li>
+  </ul>
+
+  <pre><code># Conventions
+- TypeScript strict mode. No `any` types.
+- Functions: camelCase. Components: PascalCase. Files: kebab-case.
+- Prefer named exports. Default exports only for pages.
+- Error handling: throw AppError subclasses, never raw Error.
+- No console.log in production code. Use the logger from src/lib/logger.ts.</code></pre>
+
+  <h3>4. Testing setup (what to run and how)</h3>
+
+  <p>
+    This is the category most files skip entirely, and it causes the most wasted time. Without testing instructions, Claude either skips tests, runs the wrong command, or writes tests in the wrong style.
+  </p>
+
+  <pre><code># Testing
+- Framework: Vitest
+- Run all: `npm test`
+- Run single: `npx vitest run tests/routes/users.test.ts`
+- Every new route needs a test file in tests/routes/
+- Use `describe` blocks per endpoint, `it` blocks per scenario
+- Mock external services with msw, never mock internal modules</code></pre>
+
+  <p>
+    The specific command matters more than you think. "npm test" vs "npx jest" vs "pytest" vs "go test ./..." — Claude does not know which one your project uses unless you tell it.
+  </p>
+
+  <h3>5. Guardrails (what to never do)</h3>
+
+  <p>
+    Guardrails prevent the kind of mistakes that waste 30 minutes to undo. They tell Claude what is off-limits, what needs confirmation, and what automated behavior to avoid.
+  </p>
+
+  <pre><code># Guardrails
+- Never delete files with rm. Move to .trash/ instead.
+- Never force-push to main.
+- Never modify database migrations after they have been applied.
+- Do not add dependencies without asking first.
+- Do not change the CI/CD pipeline without confirmation.</code></pre>
+
+  <p>
+    Without guardrails, Claude acts on its best judgment. That judgment is usually fine, but the 5% of cases where it is not can cost you a dropped database table or a force-pushed branch.
+  </p>
+
+  <h2>How scoring works</h2>
+
+  <p>
+    Each category contributes up to 2 points, for a total of 10. The scoring checks for:
+  </p>
+
+  <ul>
+    <li><strong>Structure (0-2):</strong> Does the file tell Claude where key directories and files live?</li>
+    <li><strong>Architecture (0-2):</strong> Are there patterns, layers, or relationships described?</li>
+    <li><strong>Conventions (0-2):</strong> Does it specify naming, formatting, or coding style rules?</li>
+    <li><strong>Testing (0-2):</strong> Is there a test framework, test command, and testing expectations?</li>
+    <li><strong>Guardrails (0-2):</strong> Are there explicit restrictions on what Claude should not do?</li>
+  </ul>
+
+  <p>
+    A file that says "This is a React project using TypeScript and Tailwind" scores about 1. It has some structure context but nothing actionable. A file with all five categories filled in with specific, concrete rules scores 8-10.
+  </p>
+
+  <h2>The most common mistakes</h2>
+
+  <h3>Too much description, not enough instruction</h3>
+
+  <p>
+    "This project is a web application for managing inventory" is a description. Claude reads it, acknowledges it, and still does not know where to put a new component. Replace descriptions with directives: "New components go in src/components/. Use the existing Button.tsx as a template for props interfaces."
+  </p>
+
+  <h3>Missing the test command</h3>
+
+  <p>
+    If Claude does not know how to run tests, it either skips them or guesses. "Run tests with npm test" takes five seconds to write and saves minutes every session.
+  </p>
+
+  <h3>No guardrails at all</h3>
+
+  <p>
+    Guardrails are not about restricting Claude. They are about encoding the lessons you already learned. Every project has things that should not be touched, commands that should not run, and patterns that should not be broken. Write them down.
+  </p>
+
+  <h3>Copy-pasting a README</h3>
+
+  <p>
+    Your README explains the project to new developers. Your CLAUDE.md explains the project to an AI coding agent. The audiences are different. A README has installation steps, feature lists, and screenshots. A CLAUDE.md has file paths, conventions, and working commands.
+  </p>
+
+  <h2>From a 3 to an 8: a practical upgrade path</h2>
+
+  <p>
+    If your CLAUDE.md currently scores low, do not rewrite it from scratch. Add one section at a time:
+  </p>
+
+  <ol>
+    <li><strong>Add a file structure section.</strong> List your top-level directories and what goes in each one. This alone can take you from 1 to 3.</li>
+    <li><strong>Add your test command.</strong> Just the framework name and the command to run tests. Two lines, 2 points.</li>
+    <li><strong>Add 3-5 coding conventions.</strong> Pick the rules you find yourself correcting most often. Those are the ones Claude also gets wrong.</li>
+    <li><strong>Add 3-5 guardrails.</strong> Think about the last time Claude did something you had to undo. Write that down as a "never do this" rule.</li>
+    <li><strong>Add architecture notes.</strong> Describe how your layers connect, what calls what, where business logic lives.</li>
+  </ol>
+
+  <p>
+    Each step takes a few minutes and measurably improves your sessions.
+  </p>
+
+  <h2>Score your own file</h2>
+
+  <p>
+    The <a href="/contextkit/analyze">ContextKit Analyzer</a> scores your CLAUDE.md across all five categories and gives specific suggestions for what to add. Paste your file, get a score, and see exactly which sections are missing.
+  </p>
+
+  <p>
+    It runs entirely in your browser. Nothing is uploaded, nothing is stored. You get a score you can share (it generates a URL with your results) and a concrete list of improvements.
+  </p>
+
+  <p>
+    If you do not have a CLAUDE.md yet, the <a href="/contextkit/generate">ContextKit Generator</a> builds one from scratch. Pick your stack, answer five questions, and export a production-ready config file.
+  </p>
+
+  <p>
+    Between the two tools, there is no reason to start from a blank file or stay at a score of 3. The improvements are specific, the process takes minutes, and the difference in your daily Claude Code sessions is immediate.
+  </p>
+</BlogPost>
