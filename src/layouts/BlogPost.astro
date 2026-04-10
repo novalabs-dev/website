@@ -20,9 +20,10 @@ interface Props {
   keywords?: string[];
   relatedPosts?: RelatedPost[];
   faq?: FAQItem[];
+  jsonLd?: Record<string, any>;
 }
 
-const { title, description, date, readTime, ogImage, keywords = [], relatedPosts = [], faq = [] } = Astro.props;
+const { title, description, date, readTime, ogImage, keywords = [], relatedPosts = [], faq = [], jsonLd: customJsonLd } = Astro.props;
 const slug = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 const articleUrl = `https://nova-labs.dev${Astro.url.pathname}`;
 
@@ -73,6 +74,10 @@ const jsonLd = {
           "text": item.answer
         }
       }))
+    }] : []),
+    ...(customJsonLd?.mainEntity ? [{
+      "@type": "FAQPage",
+      "mainEntity": customJsonLd.mainEntity
     }] : [])
   ]
 };
