@@ -170,6 +170,64 @@ const jsonLd = {
     </div>
   </section>
 
+  <!-- CLI -->
+  <section class="py-20 relative">
+    <div class="section-container max-w-4xl">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 text-sm text-primary-light">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          New: CLI tool
+        </div>
+        <h2 class="text-3xl md:text-4xl font-black mb-4">Score from your terminal</h2>
+        <p class="text-text-muted text-lg max-w-2xl mx-auto">
+          One command. Zero dependencies. Run it in CI to enforce config quality.
+        </p>
+      </div>
+
+      <div class="glass-card overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 bg-[#0d1117] border-b border-surface-lighter/30">
+          <div class="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#28c840]"></div>
+          <span class="text-text-dim text-xs ml-2 font-mono">terminal</span>
+        </div>
+        <pre class="p-6 bg-[#0d1117] text-sm font-mono leading-relaxed overflow-x-auto"><code><span class="text-success">$</span> <span class="text-text">npx contextkit score</span>
+
+<span class="text-text-dim">─────────────────────────────────────────</span>
+  <span class="text-text font-bold">CLAUDE.md Score</span>  <span class="text-success font-bold">8/10</span> <span class="text-text-dim">(Good)</span>
+  <span class="text-text-dim">./CLAUDE.md</span>
+<span class="text-text-dim">─────────────────────────────────────────</span>
+
+  <span class="text-text-muted">Solid config with room for improvement.</span>
+
+  <span class="text-text font-bold">Categories</span>
+
+  <span class="text-text-muted">Structure</span>      <span class="text-success">████████████████</span> <span class="text-success">2/2</span>
+  <span class="text-text-muted">Architecture</span>   <span class="text-success">████████████████</span> <span class="text-success">2/2</span>
+  <span class="text-text-muted">Conventions</span>    <span class="text-success">████████████████</span> <span class="text-success">2/2</span>
+  <span class="text-text-muted">Testing</span>        <span class="text-success">████████████</span><span class="text-text-dim">░░░░</span> <span class="text-success">1.5/2</span>
+  <span class="text-text-muted">Guardrails</span>     <span class="text-warning">████████</span><span class="text-text-dim">░░░░░░░░</span> <span class="text-warning">1/2</span>
+
+  <span class="text-warning">!</span> <span class="text-text-muted">Add security rules (XSS, injection, etc.)</span>
+  <span class="text-success">✓</span> <span class="text-text-muted">Good structure with clear sections</span>
+  <span class="text-success">✓</span> <span class="text-text-muted">Testing framework and commands documented</span></code></pre>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+        <div class="glass-card px-5 py-3 font-mono text-sm text-text-muted">
+          <span class="text-success">$</span> npx contextkit score
+        </div>
+        <div class="glass-card px-5 py-3 font-mono text-sm text-text-muted">
+          <span class="text-success">$</span> npx contextkit score .cursorrules
+        </div>
+      </div>
+
+      <p class="text-center text-text-dim text-sm mt-6">
+        Returns exit code 1 for scores below 5/10. <a href="https://github.com/novalabs-dev/contextkit" class="text-primary-light hover:underline">View on GitHub</a>
+      </p>
+    </div>
+  </section>
+
   <!-- FEATURES COMPARISON -->
   <section class="py-20 relative">
     <div class="section-container max-w-4xl">

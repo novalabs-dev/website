@@ -1,0 +1,194 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How do I score my CLAUDE.md from the terminal?", "acceptedAnswer": { "@type": "Answer", "text": "Run npx contextkit score in your project directory. It auto-detects CLAUDE.md, .cursorrules, AGENTS.md, or GEMINI.md and outputs a score from 0 to 10 with category breakdowns and improvement suggestions. No installation needed." }},
+    { "@type": "Question", "name": "Can I use ContextKit CLI in CI pipelines?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The CLI returns exit code 0 for scores of 5 or higher and exit code 1 for lower scores. Add npx contextkit score to your GitHub Actions workflow to enforce config quality on every pull request." }},
+    { "@type": "Question", "name": "What config files does ContextKit CLI support?", "acceptedAnswer": { "@type": "Answer", "text": "ContextKit auto-detects CLAUDE.md, .claude/CLAUDE.md, .cursorrules, .cursor/rules, AGENTS.md, codex.md, and GEMINI.md. You can also pass any file path directly: npx contextkit score path/to/config.md." }},
+    { "@type": "Question", "name": "Does ContextKit CLI send data to a server?", "acceptedAnswer": { "@type": "Answer", "text": "No. ContextKit CLI runs entirely locally. It reads the file from disk and scores it using the same heuristic engine as the web analyzer. Nothing is uploaded or sent to any server." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to score your CLAUDE.md from the terminal (one command, no install)"
+  description="Run npx contextkit score to get a 0-10 score for your CLAUDE.md with category breakdowns and specific fixes. Works in CI too."
+  date="April 10, 2026"
+  readTime="7 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to score your CLAUDE.md file", slug: "score-your-claudemd" },
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "How to create a CLAUDE.md: 4 approaches compared", slug: "how-to-create-claudemd" },
+  ]}
+>
+  <p>
+    You can score your CLAUDE.md in a browser with the <a href="/contextkit/analyze">web analyzer</a>. But if you live in the terminal (which, if you use Claude Code, you probably do), opening a browser to paste a config file feels like going backwards.
+  </p>
+
+  <p>
+    ContextKit now has a CLI. One command, zero install, instant results.
+  </p>
+
+  <h2>The command</h2>
+
+  <pre><code>npx contextkit score</code></pre>
+
+  <p>
+    That is it. Run it in any project directory and it auto-detects your config file: <code>CLAUDE.md</code>, <code>.cursorrules</code>, <code>AGENTS.md</code>, <code>GEMINI.md</code>, or any of their common locations like <code>.claude/CLAUDE.md</code>.
+  </p>
+
+  <p>
+    The output looks like this:
+  </p>
+
+  <pre><code>─────────────────────────────────────────
+  CLAUDE.md Score  7/10 (Good)
+  ./CLAUDE.md
+─────────────────────────────────────────
+
+  Solid config with room for improvement.
+
+  Categories
+
+  Structure      ████████████████ 2/2
+  Architecture   ████████████████ 2/2
+  Conventions    ████████████     1.5/2
+  Testing        ████████████     1.5/2
+  Guardrails     ████████         1/2
+
+  Improvements
+
+  ! Add security rules (XSS, injection, etc.)
+  ! Add scope constraints like "Keep changes minimal"
+
+  ✓ Good structure with clear sections
+  ✓ Tech stack and file structure documented
+  ✓ Testing framework and commands documented
+─────────────────────────────────────────</code></pre>
+
+  <p>
+    Five categories, each scored out of 2. The total score out of 10 tells you at a glance how much guidance your AI assistant actually has. Below 5, Claude is mostly guessing. Above 7, it has enough context to be genuinely useful.
+  </p>
+
+  <h2>Scoring a specific file</h2>
+
+  <p>
+    If your config file is not in the default location, pass the path directly:
+  </p>
+
+  <pre><code>npx contextkit score path/to/CLAUDE.md
+npx contextkit score .cursorrules
+npx contextkit score configs/team-rules.md</code></pre>
+
+  <p>
+    Or pipe content from stdin:
+  </p>
+
+  <pre><code>cat CLAUDE.md | npx contextkit score --stdin</code></pre>
+
+  <p>
+    The stdin mode is useful if you want to score a file that is not on disk yet, or if you are generating configs dynamically and want to check the output quality.
+  </p>
+
+  <h2>What the five categories measure</h2>
+
+  <p>
+    The scoring engine checks five areas that directly affect how well your AI assistant understands your project:
+  </p>
+
+  <p>
+    <strong>Structure (0-2).</strong> Does the file have markdown headings? Are there enough sections? Is it long enough to be useful? A flat file with no headings means the AI has to guess which section applies to what.
+  </p>
+
+  <p>
+    <strong>Architecture (0-2).</strong> Does the file mention the tech stack? Is there a file structure section? Does it describe what the project is? Without this, Claude writes Python when your project is TypeScript.
+  </p>
+
+  <p>
+    <strong>Conventions (0-2).</strong> Are there coding rules? Do-nots? Naming conventions? Import patterns? This is where you tell Claude "never add docstrings to obvious functions" and "use snake_case for Python variables." Without explicit rules, Claude defaults to its own style.
+  </p>
+
+  <p>
+    <strong>Testing (0-2).</strong> Does the file mention a test framework? Is there a run command? Test strategy? File locations? If Claude does not know you use Vitest, it will write Jest tests. If it does not know the test command, it cannot verify its own work.
+  </p>
+
+  <p>
+    <strong>Guardrails (0-2).</strong> Are there security rules? Scope constraints? A "read existing code first" policy? These prevent Claude from making destructive changes, adding unnecessary features, or ignoring your existing patterns.
+  </p>
+
+  <h2>Using it in CI</h2>
+
+  <p>
+    The CLI returns exit code <code>0</code> for scores of 5 or higher, and exit code <code>1</code> for anything below. This means you can add it to your CI pipeline to enforce config quality:
+  </p>
+
+  <pre><code># .github/workflows/lint-config.yml
+name: Lint AI Config
+on: [pull_request]
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npx contextkit score</code></pre>
+
+  <p>
+    If someone removes the testing section from your CLAUDE.md or strips out the guardrails, CI fails. This is especially useful for teams where multiple people edit the config file and you want to maintain a minimum quality bar.
+  </p>
+
+  <p>
+    You can also score multiple files in a monorepo:
+  </p>
+
+  <pre><code>npx contextkit score CLAUDE.md
+npx contextkit score packages/frontend/.cursorrules
+npx contextkit score packages/api/CLAUDE.md</code></pre>
+
+  <h2>How the scoring works</h2>
+
+  <p>
+    The scoring engine uses the same heuristics as the <a href="/contextkit/analyze">web analyzer</a>. It scans the content for specific signals: are there markdown headings? Does the text mention a framework name? Does it contain "do not" or "never" rules? Does it reference a test runner?
+  </p>
+
+  <p>
+    It is not perfect. A config file that says "do not use TypeScript" would score points for both the tech stack mention and the do-not rule, even though the content is contradictory. But for the vast majority of real config files, the heuristics catch the difference between a thoughtful config and a placeholder.
+  </p>
+
+  <p>
+    Everything runs locally. The CLI reads the file from disk, runs the scoring engine in Node.js, and prints the result. Nothing is uploaded, no network requests are made, no telemetry is collected.
+  </p>
+
+  <h2>From score to fix</h2>
+
+  <p>
+    If your score is below 7, the improvements section tells you exactly what to add. Each suggestion maps to a specific category:
+  </p>
+
+  <ul>
+    <li>"Add markdown headings" = Structure</li>
+    <li>"Mention your tech stack" = Architecture</li>
+    <li>'Add "do not" rules' = Conventions</li>
+    <li>"Specify your test framework" = Testing</li>
+    <li>"Add security rules" = Guardrails</li>
+  </ul>
+
+  <p>
+    If you do not want to write the missing sections by hand, the <a href="/contextkit/generate">ContextKit generator</a> creates a complete config in 30 seconds. Generate one, diff it against your existing file, and merge the sections you are missing.
+  </p>
+
+  <h2>Get started</h2>
+
+  <pre><code>npx contextkit score</code></pre>
+
+  <p>
+    No install, no account, no setup. If you get a score you are proud of, <a href="/contextkit/analyze">grab a README badge</a> for your repo. It links back to the analyzer so your contributors can score their own configs.
+  </p>
+
+  <p>
+    Source code is on <a href="https://github.com/novalabs-dev/contextkit">GitHub</a> (MIT licensed). Issues and PRs welcome.
+  </p>
+</BlogPost>
