@@ -297,7 +297,7 @@ src/
 
         if (!hasHeadings) suggestions.push({ type: 'critical', text: 'Add markdown headings (## Section Name) to organize your config. AI tools parse sections to find relevant instructions.' });
         else if (!hasMultipleSections) suggestions.push({ type: 'fail', text: 'Add more sections. Good configs have 4+ sections covering architecture, conventions, testing, and guardrails.' });
-        if (!hasReasonableLength) suggestions.push({ type: 'fail', text: 'Your config is very short. Aim for at least 100 words — the AI needs enough context to be useful.' });
+        if (!hasReasonableLength) suggestions.push({ type: 'fail', text: 'Your config is very short. Aim for at least 50 words — the AI needs enough context to be useful.' });
         if (hasHeadings && hasMultipleSections && hasReasonableLength) suggestions.push({ type: 'pass', text: 'Good structure with clear sections and enough detail.' });
 
         categories.push({ name: 'Structure', score: structureScore, max: 2, desc: 'Headings, sections, and markdown formatting' });
