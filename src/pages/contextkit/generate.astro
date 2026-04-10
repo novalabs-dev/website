@@ -14,6 +14,7 @@ import Layout from '../../layouts/Layout.astro';
       </a>
       <div class="flex items-center gap-6">
         <a href="/contextkit" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Overview</a>
+        <a href="/contextkit/analyze" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Analyzer</a>
         <a href="/contextkit#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">Get Pro access</a>
       </div>
     </div>
@@ -289,6 +290,19 @@ import Layout from '../../layouts/Layout.astro';
           </div>
           <a href="/contextkit#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm whitespace-nowrap">
             Join Pro waitlist
+          </a>
+        </div>
+      </div>
+
+      <!-- Analyzer CTA -->
+      <div class="glass-card p-6 mt-4">
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <div class="flex-1 text-center sm:text-left">
+            <p class="font-bold text-text mb-1">Already have a CLAUDE.md?</p>
+            <p class="text-text-muted text-sm">Paste it in our analyzer and get a score out of 10 with specific improvement suggestions.</p>
+          </div>
+          <a href="/contextkit/analyze" class="btn-secondary !py-2.5 !px-5 !text-sm whitespace-nowrap">
+            Score your CLAUDE.md
           </a>
         </div>
       </div>

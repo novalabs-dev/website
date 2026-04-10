@@ -1,0 +1,507 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CLAUDE.md Analyzer - Score Your Config",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web (cross-platform)",
+  "description": "Paste your CLAUDE.md and get an instant score with specific improvement suggestions. Free, runs in your browser, nothing uploaded.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "brand": { "@type": "Brand", "name": "Nova Labs" }
+};
+---
+
+<Layout
+  title="CLAUDE.md Analyzer - Score Your Config in Seconds | ContextKit"
+  description="Paste your CLAUDE.md and get a score out of 10 with specific improvement suggestions. Free, client-side, no data uploaded."
+  jsonLd={jsonLd}
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/contextkit" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Context</span><span class="text-text-dim">Kit</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/contextkit/generate" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Generator</a>
+        <a href="/contextkit" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Overview</a>
+        <a href="/contextkit#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">Get Pro access</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative min-h-screen pt-24 pb-16">
+    <div class="section-container max-w-4xl">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6 text-sm text-accent-light">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Free - runs in your browser, nothing uploaded
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-4 tracking-tight">
+          Score your <span class="gradient-text">CLAUDE.md</span>
+        </h1>
+        <p class="text-lg text-text-muted max-w-2xl mx-auto">
+          Paste your config file. Get a score out of 10 with specific fixes.
+        </p>
+      </div>
+
+      <!-- Input -->
+      <div id="input-section" class="glass-card p-8 mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <label for="claude-md-input" class="text-sm font-semibold text-text-muted">Paste your CLAUDE.md contents</label>
+          <span class="text-text-dim text-xs" id="char-count">0 characters</span>
+        </div>
+        <textarea
+          id="claude-md-input"
+          class="w-full h-64 bg-[#0d1117] border border-surface-lighter rounded-xl p-5 text-sm text-text-muted font-mono leading-relaxed resize-y focus:outline-none focus:border-primary/50 transition-colors placeholder:text-text-dim/50"
+          placeholder="# Project Configuration
+
+## Project Overview
+This is a web application built with TypeScript + Next.js.
+
+## Code Style & Conventions
+- Only add comments where the logic is not self-evident
+- No premature abstractions
+..."
+          spellcheck="false"
+        ></textarea>
+        <div class="flex items-center justify-between mt-4">
+          <button id="load-example-btn" class="text-sm text-primary-light/70 hover:text-primary-light transition-colors underline underline-offset-2">
+            Load example CLAUDE.md
+          </button>
+          <button id="analyze-btn" class="btn-primary !py-2.5 !px-6 !text-sm">
+            Analyze
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Results (hidden until analysis) -->
+      <div id="results-section" class="hidden">
+        <!-- Score overview -->
+        <div class="glass-card p-8 mb-6 text-center" id="score-card">
+          <div class="mb-4">
+            <div class="inline-flex items-center justify-center w-28 h-28 rounded-full border-4 mb-3" id="score-circle">
+              <span class="text-4xl font-black" id="score-number">0</span>
+              <span class="text-lg text-text-dim font-semibold">/10</span>
+            </div>
+          </div>
+          <h2 class="text-xl font-bold mb-2" id="score-label">Analyzing...</h2>
+          <p class="text-text-muted text-sm max-w-md mx-auto" id="score-summary"></p>
+          <div class="flex items-center justify-center gap-3 mt-4">
+            <button id="share-score-btn" class="btn-secondary !py-2 !px-4 !text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+              Share score
+            </button>
+            <button id="reanalyze-btn" class="btn-secondary !py-2 !px-4 !text-sm">
+              Analyze again
+            </button>
+          </div>
+        </div>
+
+        <!-- Share toast -->
+        <div id="share-toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-success/90 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
+          Score link copied!
+        </div>
+
+        <!-- Category breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="categories-grid">
+          <!-- Categories injected by JS -->
+        </div>
+
+        <!-- Detailed findings -->
+        <div class="glass-card p-8 mb-6">
+          <h3 class="text-lg font-bold mb-4">Improvement suggestions</h3>
+          <div id="suggestions-list" class="space-y-3">
+            <!-- Suggestions injected by JS -->
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="glass-card p-6 border-primary/20">
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex-1 text-center sm:text-left">
+              <p class="font-bold text-text mb-1" id="cta-headline">Want a higher score?</p>
+              <p class="text-text-muted text-sm" id="cta-text">Generate an optimized CLAUDE.md with our free wizard — covers all the categories above.</p>
+            </div>
+            <a href="/contextkit/generate" class="btn-primary !py-2.5 !px-5 !text-sm whitespace-nowrap">
+              Generate optimized CLAUDE.md
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social proof -->
+      <div class="text-center mt-6">
+        <p class="text-text-dim text-xs">
+          Built by <a href="https://nova-labs.dev" class="text-primary-light/70 hover:text-primary-light">Nova Labs</a> — the AI-run developer tools company
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    #claude-md-input::-webkit-scrollbar { width: 8px; }
+    #claude-md-input::-webkit-scrollbar-track { background: transparent; }
+    #claude-md-input::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.5); border-radius: 4px; }
+
+    .category-card {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      background: rgba(30, 41, 59, 0.4);
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .category-card.score-good { border-color: rgba(16, 185, 129, 0.3); }
+    .category-card.score-ok { border-color: rgba(245, 158, 11, 0.3); }
+    .category-card.score-bad { border-color: rgba(239, 68, 68, 0.3); }
+
+    .score-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(51, 65, 85, 0.5);
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease-out;
+    }
+    .score-bar-fill.good { background: #10b981; }
+    .score-bar-fill.ok { background: #f59e0b; }
+    .score-bar-fill.bad { background: #ef4444; }
+
+    .suggestion-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      background: rgba(30, 41, 59, 0.3);
+      border: 1px solid rgba(51, 65, 85, 0.3);
+    }
+    .suggestion-icon {
+      flex-shrink: 0;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-top: 0.125rem;
+    }
+    .suggestion-icon.pass { color: #10b981; }
+    .suggestion-icon.fail { color: #f59e0b; }
+    .suggestion-icon.critical { color: #ef4444; }
+  </style>
+
+  <script is:inline>
+    (function() {
+      const textarea = document.getElementById('claude-md-input');
+      const charCount = document.getElementById('char-count');
+      const analyzeBtn = document.getElementById('analyze-btn');
+      const resultsSection = document.getElementById('results-section');
+      const loadExampleBtn = document.getElementById('load-example-btn');
+      const reanalyzeBtn = document.getElementById('reanalyze-btn');
+      const shareScoreBtn = document.getElementById('share-score-btn');
+
+      // Char count
+      textarea.addEventListener('input', () => {
+        charCount.textContent = `${textarea.value.length.toLocaleString()} characters`;
+      });
+
+      // Example CLAUDE.md
+      const exampleMd = `# Project Configuration
+
+## Project Overview
+This is a web application built with TypeScript + Next.js.
+
+## Code Style & Conventions
+- Only add comments where the logic is not self-evident
+- No premature abstractions — three similar lines is better than a bad helper
+- Handle errors at system boundaries, not everywhere
+
+## Testing
+- Framework: Vitest
+- Run tests: \`npx vitest\`
+- Write tests for new features before submitting
+
+## File Structure
+\`\`\`
+src/
+  app/          # App Router pages
+  components/   # Reusable UI components
+  lib/          # Shared logic
+\`\`\`
+
+## Important Notes
+- Read existing code before suggesting modifications
+- Prefer editing existing files over creating new ones`;
+
+      loadExampleBtn.addEventListener('click', () => {
+        textarea.value = exampleMd;
+        charCount.textContent = `${exampleMd.length.toLocaleString()} characters`;
+        textarea.focus();
+      });
+
+      reanalyzeBtn.addEventListener('click', () => {
+        resultsSection.classList.add('hidden');
+        textarea.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Scoring engine
+      function analyzeClaudeMd(content) {
+        const lower = content.toLowerCase();
+        const lines = content.split('\n');
+        const headings = lines.filter(l => l.match(/^#{1,3}\s/));
+        const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
+
+        const categories = [];
+        const suggestions = [];
+
+        // 1. STRUCTURE (0-2)
+        let structureScore = 0;
+        const hasHeadings = headings.length >= 2;
+        const hasMultipleSections = headings.length >= 4;
+        const hasReasonableLength = wordCount >= 50;
+        const hasMdFormatting = content.includes('```') || content.includes('- ') || content.includes('* ');
+
+        if (hasHeadings) structureScore += 0.5;
+        if (hasMultipleSections) structureScore += 0.5;
+        if (hasReasonableLength) structureScore += 0.5;
+        if (hasMdFormatting) structureScore += 0.5;
+        structureScore = Math.min(2, structureScore);
+
+        if (!hasHeadings) suggestions.push({ type: 'critical', text: 'Add markdown headings (## Section Name) to organize your config. AI tools parse sections to find relevant instructions.' });
+        else if (!hasMultipleSections) suggestions.push({ type: 'fail', text: 'Add more sections. Good configs have 4+ sections covering architecture, conventions, testing, and guardrails.' });
+        if (!hasReasonableLength) suggestions.push({ type: 'fail', text: 'Your config is very short. Aim for at least 100 words — the AI needs enough context to be useful.' });
+        if (hasHeadings && hasMultipleSections && hasReasonableLength) suggestions.push({ type: 'pass', text: 'Good structure with clear sections and enough detail.' });
+
+        categories.push({ name: 'Structure', score: structureScore, max: 2, desc: 'Headings, sections, and markdown formatting' });
+
+        // 2. ARCHITECTURE (0-2)
+        let archScore = 0;
+        const hasTechStack = /(typescript|javascript|python|go|rust|java|react|next\.?js|vue|svelte|astro|django|fastapi|flask|express|rails|laravel|spring)/i.test(content);
+        const hasProjectType = /(web app|api|cli|library|backend|frontend|mobile|monorepo|service)/i.test(content);
+        const hasFileStructure = /```[\s\S]*?(src\/|app\/|lib\/|pages\/|components\/|routes\/)[\s\S]*?```/i.test(content) || /(file structure|directory|folder)/i.test(content);
+        const hasArchDescription = /(architecture|overview|project|built with|stack)/i.test(content);
+
+        if (hasTechStack) archScore += 0.5;
+        if (hasProjectType) archScore += 0.5;
+        if (hasFileStructure) archScore += 0.5;
+        if (hasArchDescription) archScore += 0.5;
+        archScore = Math.min(2, archScore);
+
+        if (!hasTechStack) suggestions.push({ type: 'fail', text: 'Mention your tech stack (language + framework). This helps the AI write idiomatic code instead of guessing.' });
+        if (!hasFileStructure) suggestions.push({ type: 'fail', text: 'Add a file structure section with a directory tree. This prevents the AI from creating files in wrong locations.' });
+        if (hasTechStack && hasFileStructure) suggestions.push({ type: 'pass', text: 'Tech stack and file structure are documented.' });
+
+        categories.push({ name: 'Architecture', score: archScore, max: 2, desc: 'Tech stack, project type, file structure' });
+
+        // 3. CONVENTIONS (0-2)
+        let convScore = 0;
+        const hasConventions = /(convention|style|rule|prefer|avoid|always|never|do not|don\'t)/i.test(content);
+        const hasSpecificRules = (content.match(/^[-*]\s/gm) || []).length >= 3;
+        const hasNamingConventions = /(naming|camelCase|snake_case|PascalCase|kebab-case)/i.test(content);
+        const hasImportRules = /(import|export|require|module)/i.test(content);
+        const hasDoNots = /(do not|don\'t|never|avoid|no\s)/i.test(content);
+
+        if (hasConventions) convScore += 0.5;
+        if (hasSpecificRules) convScore += 0.5;
+        if (hasDoNots) convScore += 0.5;
+        if (hasNamingConventions || hasImportRules) convScore += 0.5;
+        convScore = Math.min(2, convScore);
+
+        if (!hasConventions) suggestions.push({ type: 'critical', text: 'Add coding conventions. Without rules, the AI uses generic defaults. Tell it what style you expect.' });
+        if (!hasDoNots) suggestions.push({ type: 'fail', text: 'Add "do not" rules. AI tools respond well to explicit prohibitions (e.g., "Do not add docstrings to obvious functions").' });
+        if (hasConventions && hasSpecificRules && hasDoNots) suggestions.push({ type: 'pass', text: 'Clear conventions with specific rules and prohibitions.' });
+
+        categories.push({ name: 'Conventions', score: convScore, max: 2, desc: 'Coding rules, style, do\'s and don\'ts' });
+
+        // 4. TESTING (0-2)
+        let testScore = 0;
+        const hasTestFramework = /(jest|vitest|pytest|go test|rspec|junit|phpunit|playwright|cypress|mocha|testing)/i.test(content);
+        const hasTestCommand = /(npm test|npx |pytest|go test|bundle exec|mvn test|run test)/i.test(content);
+        const hasTestStrategy = /(unit test|integration test|e2e|end.to.end|test coverage|test file)/i.test(content);
+        const hasTestLocation = /(\.test\.|\.spec\.|__tests__|tests\/|test\/)/i.test(content);
+
+        if (hasTestFramework) testScore += 0.5;
+        if (hasTestCommand) testScore += 0.5;
+        if (hasTestStrategy) testScore += 0.5;
+        if (hasTestLocation) testScore += 0.5;
+        testScore = Math.min(2, testScore);
+
+        if (!hasTestFramework && !hasTestCommand) suggestions.push({ type: 'fail', text: 'Add testing instructions. Specify your test framework and how to run tests so the AI writes testable code.' });
+        if (hasTestFramework && !hasTestCommand) suggestions.push({ type: 'fail', text: 'Add the command to run tests (e.g., `npx vitest` or `pytest`). The AI needs to know how to verify its work.' });
+        if (hasTestFramework && hasTestCommand) suggestions.push({ type: 'pass', text: 'Testing framework and commands are documented.' });
+
+        categories.push({ name: 'Testing', score: testScore, max: 2, desc: 'Test framework, commands, strategy' });
+
+        // 5. GUARDRAILS (0-2)
+        let guardScore = 0;
+        const hasSecurity = /(security|xss|injection|sanitize|validate|csrf|auth)/i.test(content);
+        const hasErrorHandling = /(error handling|try.catch|exception|error boundary|fallback)/i.test(content);
+        const hasMinimalism = /(minimal|don\'t add|do not add|keep changes|focused|no extra|no unnecessary)/i.test(content);
+        const hasReadFirst = /(read existing|read.*before|understand.*before|existing code)/i.test(content);
+        const hasDependencies = /(dependencies|package|npm install|pip install|go get|cargo add)/i.test(content);
+
+        if (hasSecurity) guardScore += 0.5;
+        if (hasErrorHandling) guardScore += 0.5;
+        if (hasMinimalism) guardScore += 0.5;
+        if (hasReadFirst || hasDependencies) guardScore += 0.5;
+        guardScore = Math.min(2, guardScore);
+
+        if (!hasSecurity) suggestions.push({ type: 'fail', text: 'Add security rules. Mention common vulnerabilities to avoid (XSS, injection, etc.) — the AI will actively check for them.' });
+        if (!hasMinimalism) suggestions.push({ type: 'fail', text: 'Add scope constraints like "Keep changes minimal and focused" or "Do not add features beyond what was asked."' });
+        if (!hasReadFirst) suggestions.push({ type: 'fail', text: 'Add "Read existing code before suggesting modifications" — this single rule prevents most bad suggestions.' });
+        if (hasSecurity && hasMinimalism && hasReadFirst) suggestions.push({ type: 'pass', text: 'Strong guardrails with security rules, scope constraints, and read-first policy.' });
+
+        categories.push({ name: 'Guardrails', score: guardScore, max: 2, desc: 'Security, scope limits, read-first policy' });
+
+        // Total score
+        const totalScore = categories.reduce((sum, c) => sum + c.score, 0);
+        const roundedScore = Math.round(totalScore * 10) / 10;
+
+        // Score label
+        let label, summary;
+        if (roundedScore >= 9) { label = 'Excellent'; summary = 'Your CLAUDE.md covers all the critical areas. The AI has clear instructions for your project.'; }
+        else if (roundedScore >= 7) { label = 'Good'; summary = 'Solid config with room for improvement. A few additions would make the AI significantly more effective.'; }
+        else if (roundedScore >= 5) { label = 'Decent'; summary = 'Your config covers the basics but is missing important sections. The AI is probably guessing in some areas.'; }
+        else if (roundedScore >= 3) { label = 'Needs work'; summary = 'Several critical areas are missing. The AI is working with limited context about your project.'; }
+        else { label = 'Minimal'; summary = 'Your config needs significant expansion. Right now the AI has almost no project-specific guidance.'; }
+
+        // Sort suggestions: critical first, then fail, then pass
+        const order = { critical: 0, fail: 1, pass: 2 };
+        suggestions.sort((a, b) => order[a.type] - order[b.type]);
+
+        return { score: roundedScore, label, summary, categories, suggestions };
+      }
+
+      // Render results
+      function renderResults(result) {
+        // Score circle
+        const scoreNum = document.getElementById('score-number');
+        const scoreCircle = document.getElementById('score-circle');
+        const scoreLabel = document.getElementById('score-label');
+        const scoreSummary = document.getElementById('score-summary');
+
+        scoreNum.textContent = result.score;
+        scoreLabel.textContent = result.label;
+        scoreSummary.textContent = result.summary;
+
+        // Circle color
+        scoreCircle.className = 'inline-flex items-center justify-center w-28 h-28 rounded-full border-4 mb-3';
+        if (result.score >= 7) scoreCircle.classList.add('border-success', 'text-success');
+        else if (result.score >= 4) scoreCircle.classList.add('border-warning', 'text-warning');
+        else scoreCircle.classList.add('border-error', 'text-error');
+
+        // Categories
+        const grid = document.getElementById('categories-grid');
+        grid.innerHTML = result.categories.map(cat => {
+          const pct = (cat.score / cat.max) * 100;
+          const level = pct >= 75 ? 'good' : pct >= 50 ? 'ok' : 'bad';
+          return `
+            <div class="category-card score-${level}">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-sm text-text">${cat.name}</span>
+                <span class="text-sm font-bold ${level === 'good' ? 'text-success' : level === 'ok' ? 'text-warning' : 'text-error'}">${cat.score}/${cat.max}</span>
+              </div>
+              <p class="text-text-dim text-xs mb-1">${cat.desc}</p>
+              <div class="score-bar">
+                <div class="score-bar-fill ${level}" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Suggestions
+        const list = document.getElementById('suggestions-list');
+        list.innerHTML = result.suggestions.map(s => {
+          const iconClass = s.type === 'pass' ? 'pass' : s.type === 'critical' ? 'critical' : 'fail';
+          const icon = s.type === 'pass'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />'
+            : s.type === 'critical'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+          return `
+            <div class="suggestion-item">
+              <svg class="suggestion-icon ${iconClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
+              <p class="text-sm text-text-muted">${s.text}</p>
+            </div>
+          `;
+        }).join('');
+
+        // CTA text based on score
+        const ctaHeadline = document.getElementById('cta-headline');
+        const ctaText = document.getElementById('cta-text');
+        if (result.score >= 8) {
+          ctaHeadline.textContent = 'Already strong. Want to compare?';
+          ctaText.textContent = 'Generate a fresh config with our wizard and compare it against yours for ideas you might have missed.';
+        } else if (result.score >= 5) {
+          ctaHeadline.textContent = 'Fill the gaps in 30 seconds';
+          ctaText.textContent = 'Our free generator covers all 5 scoring categories. Generate one and merge the sections you\'re missing.';
+        } else {
+          ctaHeadline.textContent = 'Start with a solid foundation';
+          ctaText.textContent = 'Generate a complete CLAUDE.md with our free wizard. Answer 5 questions, get a production-ready config.';
+        }
+
+        resultsSection.classList.remove('hidden');
+        document.getElementById('score-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Analyze button
+      analyzeBtn.addEventListener('click', () => {
+        const content = textarea.value.trim();
+        if (!content) {
+          textarea.focus();
+          textarea.classList.add('ring-2', 'ring-warning');
+          setTimeout(() => textarea.classList.remove('ring-2', 'ring-warning'), 2000);
+          return;
+        }
+        if (content.length < 10) {
+          textarea.focus();
+          return;
+        }
+
+        const result = analyzeClaudeMd(content);
+        renderResults(result);
+
+        // GA4 tracking
+        if (typeof gtag === 'function') {
+          gtag('event', 'contextkit_analyze', {
+            score: result.score,
+            label: result.label,
+            content_length: content.length
+          });
+        }
+      });
+
+      // Share score
+      shareScoreBtn.addEventListener('click', () => {
+        const score = document.getElementById('score-number').textContent;
+        const label = document.getElementById('score-label').textContent;
+        const text = `My CLAUDE.md scored ${score}/10 (${label}). Check yours: ${window.location.origin}/contextkit/analyze`;
+        navigator.clipboard.writeText(text).then(() => {
+          const toast = document.getElementById('share-toast');
+          toast.classList.remove('hidden');
+          setTimeout(() => toast.classList.add('hidden'), 3000);
+          shareScoreBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!';
+          setTimeout(() => {
+            shareScoreBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg> Share score';
+          }, 2000);
+          if (typeof gtag === 'function') gtag('event', 'contextkit_share_score', { score: score });
+        }).catch(() => {
+          window.prompt('Copy this to share:', text);
+        });
+      });
+
+      // Keyboard shortcut: Ctrl/Cmd + Enter to analyze
+      textarea.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          analyzeBtn.click();
+        }
+      });
+    })();
+  </script>
+</Layout>
