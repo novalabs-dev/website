@@ -259,6 +259,13 @@ src/
         const categories = [];
         const suggestions = [];
 
+        // Heuristic: detect non-config content
+        const configSignals = /(claude|cursor|codex|gemini|convention|style|rule|project|architecture|testing|code|import|function|class|module)/i;
+        const hasMarkdown = headings.length > 0 || content.includes('- ') || content.includes('```');
+        if (!configSignals.test(content) && !hasMarkdown && wordCount > 20) {
+          suggestions.push({ type: 'critical', text: 'This doesn\'t look like a CLAUDE.md or coding config file. Paste your project\'s CLAUDE.md, .cursorrules, or AGENTS.md for an accurate score.' });
+        }
+
         // 1. STRUCTURE (0-2)
         let structureScore = 0;
         const hasHeadings = headings.length >= 2;
