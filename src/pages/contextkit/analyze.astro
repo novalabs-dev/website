@@ -96,9 +96,24 @@ This is a web application built with TypeScript + Next.js.
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
               Share score
             </button>
+            <button id="badge-btn" class="btn-secondary !py-2 !px-4 !text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+              Get README badge
+            </button>
             <button id="reanalyze-btn" class="btn-secondary !py-2 !px-4 !text-sm">
               Analyze again
             </button>
+          </div>
+
+          <!-- Badge panel (hidden until toggled) -->
+          <div id="badge-panel" class="hidden mt-5 p-5 rounded-xl bg-[#0d1117] border border-surface-lighter text-left">
+            <p class="text-sm font-semibold text-text mb-3">Add this badge to your README:</p>
+            <div class="mb-3" id="badge-preview"></div>
+            <div class="relative">
+              <textarea id="badge-snippet" readonly class="w-full h-16 bg-surface border border-surface-lighter rounded-lg p-3 text-xs text-text-muted font-mono resize-none focus:outline-none"></textarea>
+              <button id="copy-badge-btn" class="absolute top-2 right-2 text-xs text-primary-light hover:text-primary bg-surface-lighter/50 px-2 py-1 rounded">Copy</button>
+            </div>
+            <p class="text-xs text-text-dim mt-2">Badge links back to the analyzer so others can score their config too.</p>
           </div>
         </div>
 
@@ -245,6 +260,7 @@ src/
 
       reanalyzeBtn.addEventListener('click', () => {
         resultsSection.classList.add('hidden');
+        badgePanel.classList.add('hidden');
         textarea.focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
@@ -499,6 +515,43 @@ src/
           if (typeof gtag === 'function') gtag('event', 'contextkit_share_score', { score: score });
         }).catch(() => {
           window.prompt('Copy this to share:', text);
+        });
+      });
+
+      // Badge panel toggle
+      const badgeBtn = document.getElementById('badge-btn');
+      const badgePanel = document.getElementById('badge-panel');
+      const badgePreview = document.getElementById('badge-preview');
+      const badgeSnippet = document.getElementById('badge-snippet');
+      const copyBadgeBtn = document.getElementById('copy-badge-btn');
+
+      badgeBtn.addEventListener('click', () => {
+        const score = document.getElementById('score-number').textContent;
+        const label = document.getElementById('score-label').textContent;
+        const badgeUrl = `${window.location.origin}/api/badge?score=${encodeURIComponent(score)}&label=${encodeURIComponent(label)}`;
+        const analyzeUrl = `${window.location.origin}/contextkit/analyze`;
+        const markdown = `[![CLAUDE.md Score](${badgeUrl})](${analyzeUrl})`;
+
+        badgePreview.innerHTML = `<a href="${analyzeUrl}"><img src="${badgeUrl}" alt="CLAUDE.md Score" /></a>`;
+        badgeSnippet.value = markdown;
+
+        badgePanel.classList.toggle('hidden');
+        if (!badgePanel.classList.contains('hidden')) {
+          badgePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (typeof gtag === 'function') gtag('event', 'contextkit_badge_view', { score: score });
+        }
+      });
+
+      copyBadgeBtn.addEventListener('click', () => {
+        badgeSnippet.select();
+        navigator.clipboard.writeText(badgeSnippet.value).then(() => {
+          copyBadgeBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBadgeBtn.textContent = 'Copy'; }, 2000);
+          if (typeof gtag === 'function') gtag('event', 'contextkit_badge_copy', { score: document.getElementById('score-number').textContent });
+        }).catch(() => {
+          document.execCommand('copy');
+          copyBadgeBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBadgeBtn.textContent = 'Copy'; }, 2000);
         });
       });
 

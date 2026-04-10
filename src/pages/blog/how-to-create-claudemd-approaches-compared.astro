@@ -1,0 +1,348 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the fastest way to create a CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "The fastest option is Claude Code's built-in /init command. Run it inside your project directory and it generates a basic CLAUDE.md by reading your codebase. It takes under a minute and requires no external tools. For more structured output with export to multiple AI tools, ContextKit's 5-step wizard at nova-labs.dev/contextkit/generate takes about 3-4 minutes." }},
+    { "@type": "Question", "name": "Is there a CLAUDE.md generator that works without Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. ContextKit (nova-labs.dev/contextkit/generate) is a web-based wizard that works in any browser without installing anything. It asks you about your stack, conventions, and workflow, then generates a ready-to-use CLAUDE.md. It also exports to Cursor (.cursorrules), Codex (AGENTS.md), and Gemini CLI (GEMINI.md) formats." }},
+    { "@type": "Question", "name": "Can I use the same config file for Claude Code and Cursor?", "acceptedAnswer": { "@type": "Answer", "text": "Not directly — they use different filenames and formats. Claude Code uses CLAUDE.md, Cursor uses .cursorrules, GitHub Copilot/Codex uses AGENTS.md, and Gemini CLI uses GEMINI.md. ContextKit can export your config in all four formats from a single wizard session." }},
+    { "@type": "Question", "name": "How do I know if my CLAUDE.md file is any good?", "acceptedAnswer": { "@type": "Answer", "text": "ContextKit's analyzer (nova-labs.dev/contextkit/analyze) scores your CLAUDE.md from 0-10 and gives specific improvement suggestions. It checks for missing sections, vague instructions, and common mistakes. You can also paste your file into Claude and ask it to critique the config — but that gives less structured feedback." }},
+    { "@type": "Question", "name": "Should I write my CLAUDE.md manually or use a generator?", "acceptedAnswer": { "@type": "Answer", "text": "It depends on how much time you have and how complex your project is. Manual writing gives the most accurate result for unusual setups, but takes 30+ minutes and requires knowing what to include. Generators are faster and cover all the standard sections — they're a good starting point that you can then customize." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to create a CLAUDE.md file: 4 approaches compared (manual, CLI, generators, and ContextKit)"
+  description="Four ways to create a CLAUDE.md config file compared side by side — manual writing, Claude Code's built-in /init, web-based generators, and ContextKit. Which one fits your workflow?"
+  date="April 10, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "How to score your CLAUDE.md file", slug: "score-your-claudemd" },
+    { title: "CLAUDE.md starter templates for every stack", slug: "claudemd-starter-templates" },
+  ]}
+>
+  <p>
+    A good CLAUDE.md file can transform how useful Claude Code is on a project. A bad one — or none at all — leaves you fighting generic output that doesn't match your codebase conventions.
+  </p>
+
+  <p>
+    The problem is that there's more than one way to create one, and the options have different trade-offs depending on your situation. This guide compares four approaches honestly: writing by hand, using Claude Code's built-in <code>/init</code> command, using a web form generator, and using ContextKit.
+  </p>
+
+  <p>
+    No approach is universally best. The right one depends on whether you already have Claude Code running, how complex your stack is, and whether you need to export configs for multiple AI tools.
+  </p>
+
+  <h2>What makes a CLAUDE.md actually useful</h2>
+
+  <p>
+    Before comparing approaches, it's worth being clear about what a CLAUDE.md needs to do. It's a context file that Claude Code reads at the start of every session. A useful one typically covers:
+  </p>
+
+  <ul>
+    <li>Tech stack and key dependencies</li>
+    <li>Project structure and how the codebase is organized</li>
+    <li>Coding conventions (naming, file organization, patterns to follow or avoid)</li>
+    <li>How to run tests and linting</li>
+    <li>Anything Claude should never do in this project</li>
+  </ul>
+
+  <p>
+    The goal is to make Claude's default behavior match your project's actual conventions without you having to re-explain things in every prompt.
+  </p>
+
+  <h2>Approach 1: Write it manually</h2>
+
+  <p>
+    Writing your CLAUDE.md from scratch is the most straightforward option. You open a text editor and write markdown. No tools required.
+  </p>
+
+  <h3>How it works</h3>
+
+  <p>
+    You start with a blank file, usually at your project root, and write sections covering your stack, file structure, coding style, test setup, and any rules you want Claude to follow. Most developers end up with something between 50 and 200 lines.
+  </p>
+
+  <h3>Pros</h3>
+
+  <ul>
+    <li>Full control — you include exactly what matters and nothing else</li>
+    <li>Forces you to think clearly about your own conventions, which often improves consistency</li>
+    <li>Works for unusual or highly custom setups that generators can't anticipate</li>
+    <li>No dependency on any external tool</li>
+  </ul>
+
+  <h3>Cons</h3>
+
+  <ul>
+    <li>Time-consuming — a thorough file takes 30-60 minutes to write well</li>
+    <li>Easy to miss important sections if you don't know what Claude looks for</li>
+    <li>No validation — you won't know if your instructions are clear until Claude starts making mistakes</li>
+    <li>No export to other AI tool formats</li>
+  </ul>
+
+  <h3>Best for</h3>
+
+  <p>
+    Teams with highly specific setups, monorepos with unusual structures, or anyone who wants to deeply understand what they're putting in the file. Also worth considering if you're already an experienced Claude Code user who knows which sections matter most for your workflow.
+  </p>
+
+  <h2>Approach 2: Claude Code's built-in /init command</h2>
+
+  <p>
+    Claude Code ships with a <code>/init</code> command that reads your codebase and generates a CLAUDE.md automatically. This is often the most overlooked option because many developers don't know it exists.
+  </p>
+
+  <h3>How it works</h3>
+
+  <p>
+    Open Claude Code in your project directory and run:
+  </p>
+
+  <pre><code>/init</code></pre>
+
+  <p>
+    Claude scans your project files — package.json, directory structure, existing config files, test setup — and generates a CLAUDE.md based on what it finds. The whole process takes under a minute.
+  </p>
+
+  <h3>Pros</h3>
+
+  <ul>
+    <li>Free and built-in — no extra accounts or tools needed</li>
+    <li>Reads your actual codebase, so the output reflects reality rather than what you describe</li>
+    <li>Fast — useful when you want something working immediately</li>
+    <li>Good starting point that you can then edit</li>
+  </ul>
+
+  <h3>Cons</h3>
+
+  <ul>
+    <li>Output quality is basic — it captures structure but often misses conventions and style preferences</li>
+    <li>No scoring or validation of the output</li>
+    <li>Can't export to Cursor, Codex, or Gemini CLI formats</li>
+    <li>Requires Claude Code to already be installed and running</li>
+    <li>May infer incorrect conventions if your codebase is inconsistent</li>
+  </ul>
+
+  <h3>Best for</h3>
+
+  <p>
+    Quick starts. If you're setting up Claude Code on an existing project and want something working in under two minutes, <code>/init</code> is the right move. Treat the output as a rough draft you refine over time.
+  </p>
+
+  <h2>Approach 3: Web form generators (codewithclaude.net and similar)</h2>
+
+  <p>
+    Several websites have built form-based CLAUDE.md generators. You fill in fields about your stack and preferences, and they produce a file you can copy.
+  </p>
+
+  <h3>How it works</h3>
+
+  <p>
+    You visit the site, answer questions about your tech stack, language preferences, and project type, then download or copy the generated CLAUDE.md. No installation required.
+  </p>
+
+  <h3>Pros</h3>
+
+  <ul>
+    <li>Free and requires no login</li>
+    <li>Works without Claude Code installed</li>
+    <li>Guided — the form prompts you to think about sections you might skip manually</li>
+  </ul>
+
+  <h3>Cons</h3>
+
+  <ul>
+    <li>Static forms — they can't read your actual codebase, so output is based entirely on what you describe</li>
+    <li>No scoring or quality analysis of the generated output</li>
+    <li>Output quality is limited by how generic the form questions are</li>
+    <li>No versioning, shareable configs, or multi-tool export</li>
+    <li>The file you get is a template with your answers filled in, not a config derived from your project</li>
+  </ul>
+
+  <h3>Best for</h3>
+
+  <p>
+    Starting from zero when you have no Claude Code installation yet and want something quick to paste into a new project. It's a step up from a blank file, but you'll likely need to do significant editing afterward.
+  </p>
+
+  <h2>Approach 4: ContextKit</h2>
+
+  <p>
+    <a href="/contextkit/generate">ContextKit</a> is a 5-step wizard that generates a CLAUDE.md (and config files for other AI tools) and includes a separate analyzer that scores your existing file.
+  </p>
+
+  <h3>How it works</h3>
+
+  <p>
+    The wizard walks you through five structured sections: project overview, tech stack, code style and conventions, workflow and testing setup, and custom rules. At the end you can export in four formats:
+  </p>
+
+  <ul>
+    <li><strong>CLAUDE.md</strong> — for Claude Code</li>
+    <li><strong>.cursorrules</strong> — for Cursor</li>
+    <li><strong>AGENTS.md</strong> — for GitHub Copilot and Codex</li>
+    <li><strong>GEMINI.md</strong> — for Gemini CLI</li>
+  </ul>
+
+  <p>
+    The <a href="/contextkit/analyze">analyzer</a> takes an existing CLAUDE.md (paste or upload) and returns a 0-10 score with specific feedback on what's missing or vague.
+  </p>
+
+  <h3>Pros</h3>
+
+  <ul>
+    <li>Structured wizard covers all the sections that actually affect Claude's behavior</li>
+    <li>Four export formats from a single session — useful if your team uses multiple AI tools</li>
+    <li>Analyzer gives concrete improvement suggestions, not just a generic score</li>
+    <li>Shareable configs with README badges so teammates can find and use the same config</li>
+    <li>Works in any browser, no installation needed</li>
+  </ul>
+
+  <h3>Cons</h3>
+
+  <ul>
+    <li>Web-based — it can't read your local repository directly, so you describe your setup rather than having it inferred</li>
+    <li>Direct codebase scanning (like <code>/init</code> does) is not available yet</li>
+    <li>Takes slightly longer than <code>/init</code> (around 3-5 minutes for the full wizard)</li>
+  </ul>
+
+  <h3>Best for</h3>
+
+  <p>
+    Projects where you need configs for more than one AI tool, teams where multiple people need to use the same config, anyone who wants to score and improve an existing file, or situations where you want a more thorough config than <code>/init</code> produces without writing everything from scratch.
+  </p>
+
+  <h2>Side-by-side comparison</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Manual</th>
+        <th>Claude Code /init</th>
+        <th>Web form generators</th>
+        <th>ContextKit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Reads your actual codebase</td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>No (wizard-based)</td>
+      </tr>
+      <tr>
+        <td>No installation required</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Scores or validates output</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Yes (0-10 analyzer)</td>
+      </tr>
+      <tr>
+        <td>Multi-tool export</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Yes (4 formats)</td>
+      </tr>
+      <tr>
+        <td>Shareable configs</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Covers all standard sections</td>
+        <td>If you know them</td>
+        <td>Partially</td>
+        <td>Partially</td>
+        <td>Yes (structured wizard)</td>
+      </tr>
+      <tr>
+        <td>Cost</td>
+        <td>Free</td>
+        <td>Free (included)</td>
+        <td>Free</td>
+        <td>Free</td>
+      </tr>
+      <tr>
+        <td>Time to working file</td>
+        <td>30-60 min</td>
+        <td>Under 1 min</td>
+        <td>5-10 min</td>
+        <td>3-5 min</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Which approach should you use</h2>
+
+  <p>
+    Here's a practical guide based on common situations:
+  </p>
+
+  <h3>You just installed Claude Code and want something working now</h3>
+
+  <p>
+    Run <code>/init</code>. It takes under a minute, reads your actual project, and gives you something Claude Code can work with immediately. You can improve it later with the analyzer.
+  </p>
+
+  <h3>You're starting a new project from scratch</h3>
+
+  <p>
+    Use ContextKit's wizard. You don't have a codebase to scan yet, so <code>/init</code> won't help much. The wizard guides you through all the sections worth covering and produces a file you can commit alongside your first code.
+  </p>
+
+  <h3>You use Cursor, Codex, or Gemini CLI alongside Claude Code</h3>
+
+  <p>
+    Use ContextKit. It's the only option that generates all four config formats in one session, so you don't have to maintain separate files manually.
+  </p>
+
+  <h3>You already have a CLAUDE.md but it doesn't seem to help</h3>
+
+  <p>
+    Run it through the <a href="/contextkit/analyze">ContextKit analyzer</a>. It'll tell you what's missing or too vague, which is faster than diagnosing the problem yourself.
+  </p>
+
+  <h3>Your project has an unusual or highly custom setup</h3>
+
+  <p>
+    Write manually, or use ContextKit as a starting point and heavily customize it. Generators work well for standard setups but can't account for everything.
+  </p>
+
+  <h3>Your whole team needs to use the same config</h3>
+
+  <p>
+    Use ContextKit's shareable config feature so everyone is working from the same file with a stable link. This is useful for onboarding new developers.
+  </p>
+
+  <h2>A note on output quality</h2>
+
+  <p>
+    Whichever approach you use, the first version of your CLAUDE.md is rarely the best version. The most effective files are ones that get updated as you learn what Claude actually needs to work well in your project.
+  </p>
+
+  <p>
+    Pay attention to recurring mistakes Claude makes — those usually point to missing or unclear sections in your config. Add them when you notice them, not all at once upfront. A CLAUDE.md that grows organically alongside your project tends to be more accurate than one written in a single session.
+  </p>
+
+  <p>
+    If you want a baseline to start from, <a href="/contextkit/generate">generate one with ContextKit</a> and run it through the <a href="/contextkit/analyze">analyzer</a> before committing it to your repo.
+  </p>
+</BlogPost>

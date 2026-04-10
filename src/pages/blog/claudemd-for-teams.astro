@@ -1,0 +1,406 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do teams share CLAUDE.md configurations across developers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The simplest approach is committing a shared CLAUDE.md to the repository root. Every developer who clones the repo gets the same baseline configuration automatically. For team-wide conventions that apply across multiple projects, the .claude/rules/ directory lets you split rules into separate files that are easier to manage and review."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can individual developers have personal CLAUDE.md settings without overriding team rules?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Claude Code supports a layered config system. Your team rules live in the project CLAUDE.md (committed to git). Individual developers can add personal preferences in a home-directory CLAUDE.md at ~/.claude/CLAUDE.md. Personal settings layer on top of project settings without overwriting them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What team conventions are most effective to put in CLAUDE.md?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Focus on rules that Claude gets wrong without guidance: code review requirements (no unapproved dependencies, test coverage thresholds), deployment guards (never modify migration files directly, always run linter before suggesting a PR), testing conventions (framework choice, file location, naming patterns), and project-specific patterns that differ from Claude's defaults."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you onboard new developers to a team's CLAUDE.md setup?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Since CLAUDE.md lives in the repository, new developers get it automatically on first clone. The key is to keep the rules self-documenting: each rule should explain why it exists, not just what it is. New developers should also know about the .claude/rules/ directory structure so they understand where project-specific vs. personal rules belong."
+      }
+    }
+  ]
+};
+---
+
+<BlogPost
+  title="How to standardize CLAUDE.md across your development team (without slowing anyone down)"
+  description="Inconsistent Claude Code configs mean every developer gets different AI behavior. Here's how to build a shared CLAUDE.md setup your whole team actually uses."
+  date="April 10, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Claude Code project rules directory explained", slug: "claude-code-project-rules-directory" },
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "How to manage CLAUDE.md files across multiple projects", slug: "manage-claudemd-multiple-projects" },
+  ]}
+>
+  <p>
+    Your team adopted Claude Code six months ago. Half the developers have a CLAUDE.md in their local project directory. The other half don't. The ones who do have four different versions, each reflecting whoever set it up first on that machine.
+  </p>
+
+  <p>
+    What happens: Alice's Claude refuses to add <code>console.log</code> statements because her config bans them. Bob's Claude happily adds them because his config says nothing about logging. The PR review catches it, but the back-and-forth costs time. Multiply this across a dozen conventions and a team of eight developers, and you have a real problem.
+  </p>
+
+  <p>
+    The fix is a shared, version-controlled CLAUDE.md setup with clear layers for team rules vs. personal preferences. This guide shows you exactly how to build it.
+  </p>
+
+  <h2>Why inconsistent configs cause real problems</h2>
+
+  <p>
+    Claude Code's behavior is heavily shaped by the configuration it reads at session start. Without a shared baseline, each developer effectively has a different AI assistant, even if they're all using Claude Code on the same codebase.
+  </p>
+
+  <p>
+    This shows up in predictable ways:
+  </p>
+
+  <ul>
+    <li><strong>Code review friction</strong> - Claude generates code that doesn't match your team's style, which gets flagged in reviews. The review comment is correct but the developer didn't write that code consciously, Claude did.</li>
+    <li><strong>Testing inconsistency</strong> - One developer's Claude uses Jest, another's uses Vitest. Both are reasonable choices, but now your test suite has mixed patterns.</li>
+    <li><strong>Security guardrails missing</strong> - If your team has rules about never committing secrets or always using parameterized queries, those rules only protect the developers who put them in their config.</li>
+    <li><strong>Onboarding friction</strong> - New team members have to figure out your Claude setup from scratch, usually by asking a senior dev who explains it verbally once and hopes it sticks.</li>
+  </ul>
+
+  <p>
+    None of these are catastrophic on their own. Together, they add up to a slow, constant tax on the team's productivity.
+  </p>
+
+  <h2>The two-layer config model</h2>
+
+  <p>
+    Before building your team setup, it helps to understand how Claude Code handles multiple config sources. There are two distinct layers:
+  </p>
+
+  <h3>Layer 1: Project config (shared, committed to git)</h3>
+
+  <p>
+    This is your <code>CLAUDE.md</code> in the repository root, plus the <code>.claude/rules/</code> directory. Every developer who clones the repo gets this automatically. Changes are reviewed like any other code change. This is where team conventions, project architecture, and shared guardrails belong.
+  </p>
+
+  <h3>Layer 2: Personal config (individual, never committed)</h3>
+
+  <p>
+    Claude Code also reads a home-directory config at <code>~/.claude/CLAUDE.md</code>. This applies globally across all projects on that machine. It's the right place for personal preferences: whether you like verbose explanations, your preferred comment style, your timezone for log entries. These don't need team review and they don't override project rules.
+  </p>
+
+  <p>
+    The mental model: project config defines what's consistent across the team. Personal config defines what's consistent for you as an individual.
+  </p>
+
+  <h2>Setting up the shared team config</h2>
+
+  <h3>Step 1: Create the project CLAUDE.md</h3>
+
+  <p>
+    Start with the rules that currently cause inconsistency. Pull up your last 20 PR review comments. What corrections come up repeatedly? Those are your first rules.
+  </p>
+
+  <p>
+    A practical starting structure for a team config:
+  </p>
+
+  <pre><code># Team Configuration
+
+## Project Overview
+[2-3 lines: what this codebase is, what stack it uses]
+
+## Code Conventions
+[Rules that override Claude's defaults for your project]
+
+## Testing Requirements
+[Framework, run command, file structure, coverage requirements]
+
+## File Structure
+[Directory map so Claude places new files correctly]
+
+## Team Guardrails
+[Rules specific to your team's risk areas]
+
+## What Not To Do
+[Explicit prohibitions based on past mistakes]</code></pre>
+
+  <p>
+    The "What Not To Do" section is underused. It directly prevents the mistakes that keep showing up in reviews. Be explicit: "Do not add dependencies without a comment explaining why this library was chosen over alternatives" is more useful than "prefer minimal dependencies."
+  </p>
+
+  <h3>Step 2: Use .claude/rules/ for modular team conventions</h3>
+
+  <p>
+    For larger teams, a single CLAUDE.md file becomes hard to maintain. The <code>.claude/rules/</code> directory lets you split conventions into separate files. Each file covers a specific domain and gets loaded automatically.
+  </p>
+
+  <p>
+    A typical structure looks like this:
+  </p>
+
+  <pre><code>.claude/
+  rules/
+    code-review.md    # Review requirements and PR conventions
+    testing.md        # Test framework, coverage, patterns
+    security.md       # Security guardrails and prohibited patterns
+    deployment.md     # Deployment guards and migration rules
+    style.md          # Code style and naming conventions</code></pre>
+
+  <p>
+    This layout has a practical advantage beyond organization: when a developer wants to understand why Claude behaves a certain way, they can find the relevant rule file directly. It's also easier to review changes when a PR only touches <code>security.md</code> instead of modifying a 200-line CLAUDE.md.
+  </p>
+
+  <p>
+    If you want to generate a solid baseline for your team's rules directory, <a href="/contextkit/generate">ContextKit's generator</a> produces modular output structured for <code>.claude/rules/</code> out of the box. Answer questions about your stack and team constraints once, then export the files ready to commit.
+  </p>
+
+  <h3>Step 3: Define the team guardrails</h3>
+
+  <p>
+    Guardrails are rules that exist to prevent specific types of costly mistakes. They're different from style conventions because the reason to follow them isn't aesthetic, it's risk management.
+  </p>
+
+  <p>
+    Common team guardrails worth putting in your config:
+  </p>
+
+  <h4>Code review requirements</h4>
+
+  <pre><code>## Code Review Requirements
+
+- Never approve a dependency addition without checking its license
+- All database queries must use parameterized inputs, never string interpolation
+- New API endpoints require an entry in the OpenAPI spec
+- Avoid importing from src/ across module boundaries (use the public exports)
+- Flag any use of eval(), Function(), or dynamic require() for security review</code></pre>
+
+  <h4>Testing requirements</h4>
+
+  <pre><code>## Testing Requirements
+
+- Framework: Vitest (never Jest - the two have incompatible expect() behavior)
+- Run: `npx vitest run`
+- Coverage threshold: 80% for new code in src/lib/ and src/services/
+- Test files: co-located next to source files as [name].test.ts
+- Integration tests for all new API routes
+- Never mock the database in integration tests - use the test database</code></pre>
+
+  <h4>Deployment guards</h4>
+
+  <pre><code>## Deployment Guards
+
+- Do not modify files in db/migrations/ directly - create new migration files
+- Environment variables go in .env.example with placeholder values, never actual values
+- Never commit .env or .env.local files
+- Build must pass before suggesting a PR is ready: `npm run build`
+- Linter must pass: `npx eslint src/ --max-warnings 0`</code></pre>
+
+  <p>
+    These rules are most effective when they match your actual deployment process. If you use a different linter command, update the example above. Claude will follow whatever you specify.
+  </p>
+
+  <h2>Handling personal preferences without conflict</h2>
+
+  <p>
+    One common concern when rolling out a shared team config: developers who already have personal setups they like. The layered config model handles this without requiring anyone to give up their preferences.
+  </p>
+
+  <p>
+    The personal config at <code>~/.claude/CLAUDE.md</code> applies globally, but project-level settings take precedence for project-specific rules. A developer can keep their personal preferences for explanation verbosity, comment style, and workflow habits, while the project rules enforce team conventions.
+  </p>
+
+  <p>
+    Document this for your team clearly. Something like:
+  </p>
+
+  <blockquote>
+    <p>Project config lives in <code>CLAUDE.md</code> and <code>.claude/rules/</code>. This is committed to git and applies to everyone. Personal Claude preferences go in <code>~/.claude/CLAUDE.md</code> on your own machine. Don't put personal preferences in the project config, and don't put project rules in your personal config.</p>
+  </blockquote>
+
+  <p>
+    This clear separation prevents the most common source of confusion: developers editing the project config to match their personal preferences, inadvertently breaking rules that other team members rely on.
+  </p>
+
+  <h2>Onboarding new team members</h2>
+
+  <p>
+    With a properly committed team config, onboarding Claude Code for a new developer is mostly automatic. They clone the repo, the config is there. But a few extra steps make the experience much smoother.
+  </p>
+
+  <h3>Add a Claude setup note to your onboarding docs</h3>
+
+  <p>
+    New developers often don't know about the personal config layer. Add a short note to your onboarding documentation:
+  </p>
+
+  <pre><code>## Claude Code Setup
+
+The project CLAUDE.md and .claude/rules/ files configure Claude Code for this
+project automatically. You don't need to do anything to get team conventions.
+
+For personal preferences (explanation verbosity, comment style, etc.), create
+~/.claude/CLAUDE.md on your machine. This applies globally across all projects
+without affecting the team config.
+
+To audit your full active configuration at any time, run:
+  cat CLAUDE.md
+  ls .claude/rules/</code></pre>
+
+  <h3>Make the rules self-documenting</h3>
+
+  <p>
+    Each rule in your team config should explain why it exists. Rules without context get ignored or worked around. Rules with context get followed because developers understand the reasoning.
+  </p>
+
+  <p>
+    Compare these two versions of the same rule:
+  </p>
+
+  <p>
+    Without context:
+  </p>
+
+  <pre><code>- Never use string interpolation in database queries</code></pre>
+
+  <p>
+    With context:
+  </p>
+
+  <pre><code>- Never use string interpolation in database queries. Always use
+  parameterized inputs. We had a SQL injection incident in 2024 from
+  this exact pattern - it's the one rule we never break.</code></pre>
+
+  <p>
+    The second version takes two extra lines. It also makes every developer understand why this rule is non-negotiable, and they're more likely to flag AI-generated code that violates it.
+  </p>
+
+  <h2>Auditing your current team setup</h2>
+
+  <p>
+    If your team already uses Claude Code but without a standardized config, auditing what everyone currently has is a good first step before rolling out something shared.
+  </p>
+
+  <p>
+    Ask each developer to share their current CLAUDE.md (or confirm they don't have one). Look for:
+  </p>
+
+  <ul>
+    <li>Rules that appear in multiple configs - these belong in the shared config</li>
+    <li>Rules that contradict each other - these need a team decision</li>
+    <li>Gaps where no one has rules - these are where the inconsistency lives</li>
+    <li>Rules tied to personal workflow - these stay in personal configs</li>
+  </ul>
+
+  <p>
+    <a href="/contextkit/analyze">ContextKit's config analyzer</a> can take an existing CLAUDE.md and identify gaps, redundant rules, and rules that don't follow best practices for Claude Code. It's useful both for auditing individual team member configs and for reviewing your new shared config before committing it.
+  </p>
+
+  <h2>Version controlling your config changes</h2>
+
+  <p>
+    Treat CLAUDE.md and <code>.claude/rules/</code> changes like any other code change. This means:
+  </p>
+
+  <ul>
+    <li>Config changes go through pull requests, not direct commits to main</li>
+    <li>Use descriptive commit messages: "Add security rule for parameterized queries" not "update CLAUDE.md"</li>
+    <li>Consider a CHANGELOG comment at the top of the file for major rule changes</li>
+    <li>When removing a rule, add a brief comment explaining why it was removed</li>
+  </ul>
+
+  <p>
+    The version history of your CLAUDE.md becomes a useful record of your team's evolving conventions. Six months from now, when a new developer asks why you never use default exports, the git history has the answer.
+  </p>
+
+  <h2>Common team patterns that work well</h2>
+
+  <p>
+    Based on configs we've seen work across different team types, a few patterns consistently improve team AI output quality:
+  </p>
+
+  <h3>The explicit prohibition list</h3>
+
+  <p>
+    A dedicated section for things Claude should never do. This is different from style rules because these are non-negotiable:
+  </p>
+
+  <pre><code>## Never Do This
+
+- Never use `any` type in TypeScript
+- Never add console.log statements in production code paths
+- Never generate placeholder comments like "// TODO: implement this"
+- Never suggest disabling ESLint rules with eslint-disable comments
+- Never write functions longer than 40 lines without breaking them up</code></pre>
+
+  <h3>Architecture decision records in the config</h3>
+
+  <p>
+    For significant architectural choices, add a brief note explaining the decision. This prevents Claude from suggesting "better" alternatives that your team already considered and rejected:
+  </p>
+
+  <pre><code>## Architecture Decisions
+
+- We use Zustand for state management, not Redux. Redux was evaluated in
+  2024 and rejected due to boilerplate cost. Don't suggest migrating.
+- API routes are in src/app/api/ using Next.js Route Handlers.
+  We do not use tRPC (evaluated but rejected for complexity reasons).
+- Authentication is handled by Supabase Auth. Do not suggest implementing
+  custom JWT handling.</code></pre>
+
+  <h3>Environment-specific rules</h3>
+
+  <pre><code>## Environment Rules
+
+- Development: console.log is acceptable for debugging
+- Production code: use the structured logger at src/lib/logger.ts
+- Test code: use vi.fn() for mocks, never jest.fn()
+- CI runs on Node 20 - don't use APIs that aren't available in Node 20</code></pre>
+
+  <h2>Sharing configs beyond your team</h2>
+
+  <p>
+    If your team works across multiple repositories, maintaining separate CLAUDE.md files for each project adds overhead. A few approaches worth considering:
+  </p>
+
+  <p>
+    Keep a canonical team config in a shared repo or internal documentation. When starting a new project, copy it as the baseline and customize for that project's specific conventions. This is lower friction than trying to sync configs across repos automatically.
+  </p>
+
+  <p>
+    ContextKit supports shareable config URLs, so you can share a baseline config with your team by URL. One person configures it, shares the link, and everyone else can pull it into their project with one click. Useful for organizations where multiple teams have overlapping conventions but different projects.
+  </p>
+
+  <h2>Start with the problems you already have</h2>
+
+  <p>
+    Don't try to write a comprehensive team config from scratch. You'll spend hours on rules that don't actually cause problems and miss the ones that do.
+  </p>
+
+  <p>
+    A better approach: look at your last month of code reviews. Find the correction patterns that come up repeatedly. Write rules for those. Ship the config. Iterate.
+  </p>
+
+  <p>
+    A team config with six specific, well-reasoned rules outperforms a 200-line config that covers everything generically. Claude follows specific instructions. Vague principles get interpreted differently by every developer who reads them.
+  </p>
+
+  <p>
+    If you want to skip the blank-page problem, <a href="/contextkit/generate">use ContextKit to generate a team baseline</a>. Answer questions about your stack, team size, and main risk areas, and it generates a structured config ready to commit. You can also <a href="/contextkit/analyze">paste in your current config</a> to find gaps before rolling it out to the whole team.
+  </p>
+</BlogPost>

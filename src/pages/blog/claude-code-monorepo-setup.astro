@@ -1,0 +1,374 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does Claude Code support multiple CLAUDE.md files in a monorepo?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code loads CLAUDE.md files from the project root and from subdirectories when you work in those directories. This means each package in a monorepo can have its own CLAUDE.md with package-specific instructions, while the root CLAUDE.md sets shared conventions." }},
+    { "@type": "Question", "name": "Where should shared conventions go in a monorepo CLAUDE.md setup?", "acceptedAnswer": { "@type": "Answer", "text": "Shared conventions belong in two places: the root CLAUDE.md for high-level rules that apply everywhere, and .claude/rules/ files for domain-specific rules (testing conventions, deployment rules, guardrails). Package-level CLAUDE.md files should only contain what is specific to that package." }},
+    { "@type": "Question", "name": "How do I configure Claude Code for Turborepo or Nx workspaces?", "acceptedAnswer": { "@type": "Answer", "text": "For Turborepo and Nx, put a CLAUDE.md in the repo root with workspace-level commands and conventions. Add CLAUDE.md files to individual packages or apps for stack-specific rules. Include the workspace tool name, task commands (turbo run build, nx build), and the location of shared configs like tsconfig.base.json." }},
+    { "@type": "Question", "name": "Can I override root CLAUDE.md rules at the package level in a monorepo?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code loads all CLAUDE.md files in scope and combines them. There is no explicit override mechanism, but you can be more specific in package-level files to win out over general root instructions. Keep root rules intentionally general so package-level rules can add detail without contradicting them." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to set up Claude Code for monorepos (workspace configs that actually work)"
+  description="Monorepos break single-file CLAUDE.md setups. This guide covers workspace-level configs, package-level overrides, shared rules directories, and practical examples for Turborepo, Nx, and pnpm workspaces."
+  date="April 10, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to manage CLAUDE.md files across multiple projects", slug: "manage-claudemd-multiple-projects" },
+    { title: "Claude Code project rules directory explained", slug: "claude-code-project-rules-directory" },
+    { title: "CLAUDE.md starter templates for every stack", slug: "claudemd-starter-templates" },
+  ]}
+>
+  <p>
+    A single CLAUDE.md works fine for a standalone project. Put it in the root, list your stack, add some conventions, done. But drop that approach into a monorepo and it falls apart fast.
+  </p>
+
+  <p>
+    Your backend package uses Python and FastAPI. Your frontend uses TypeScript and React. Your shared libraries have their own test setup. One root CLAUDE.md trying to describe all of this becomes noise, and Claude ends up applying backend conventions to frontend code or vice versa.
+  </p>
+
+  <p>
+    Claude Code actually handles monorepos well, but you have to set it up intentionally. This guide covers what works.
+  </p>
+
+  <h2>How Claude Code loads configs in a monorepo</h2>
+
+  <p>
+    Claude Code uses a layered loading system. When you work in a directory, it loads:
+  </p>
+
+  <ol>
+    <li><code>~/.claude/CLAUDE.md</code> — your global config</li>
+    <li>The nearest <code>CLAUDE.md</code> in or above the current directory</li>
+    <li>Any <code>.claude/rules/*.md</code> files in the project root</li>
+  </ol>
+
+  <p>
+    For monorepos, this means: if you are working in <code>packages/api/</code> and there is a <code>CLAUDE.md</code> in that directory, Claude loads it. If there is also one in the repo root, Claude loads that too. Both apply.
+  </p>
+
+  <p>
+    This layered behavior is what makes monorepo configs work. Root config handles workspace-wide rules. Package configs handle package-specific rules. Neither has to know about the other.
+  </p>
+
+  <h2>The workspace structure to aim for</h2>
+
+  <p>
+    Here is a monorepo layout that works well in practice:
+  </p>
+
+  <pre><code>my-monorepo/
+  CLAUDE.md                      # Workspace conventions, shared commands
+  .claude/
+    rules/
+      guardrails.md              # Destructive action rules
+      git-workflow.md            # Branch strategy, commit conventions
+      testing.md                 # Shared test standards
+  packages/
+    api/
+      CLAUDE.md                  # FastAPI/Python-specific rules
+    web/
+      CLAUDE.md                  # React/TypeScript-specific rules
+    shared/
+      CLAUDE.md                  # Shared lib conventions
+  apps/
+    dashboard/
+      CLAUDE.md                  # Dashboard-specific rules</code></pre>
+
+  <p>
+    The root CLAUDE.md stays intentionally lean. Package-level files add specifics. Shared rules go in <code>.claude/rules/</code> so they are not mixed into the root CLAUDE.md, which would make it hard to read.
+  </p>
+
+  <h2>What goes in the root CLAUDE.md</h2>
+
+  <p>
+    The root config answers workspace-level questions: what is this codebase, how do you run things, what are the conventions that apply everywhere?
+  </p>
+
+  <pre><code># Workspace: My Monorepo
+
+## Structure
+- packages/ — shared libraries and services
+- apps/ — deployable applications
+- .github/ — CI/CD workflows
+
+## Tech Stack
+- Package manager: pnpm workspaces
+- Build tool: Turborepo
+- TypeScript: strict mode, tsconfig.base.json in root
+- Testing: Vitest across all packages
+
+## Common Commands
+- Install all: pnpm install
+- Build all: turbo run build
+- Test all: turbo run test
+- Test single package: pnpm --filter @company/api test
+- Lint: turbo run lint
+
+## Conventions (workspace-wide)
+- All packages use ESM. No CommonJS.
+- Named exports only. No default exports except page components.
+- Internal imports use @company/* package names. No relative imports across packages.
+- Every package must have a test script in package.json.
+- Do not modify node_modules or .turbo directories.</code></pre>
+
+  <p>
+    Notice what is not in here: framework specifics, component patterns, database rules, API conventions. Those belong in package-level configs.
+  </p>
+
+  <h2>Package-level CLAUDE.md files</h2>
+
+  <p>
+    Each package config describes only what is specific to that package. Because the workspace root config already covers shared conventions, you do not repeat them.
+  </p>
+
+  <h3>packages/api/CLAUDE.md (Python FastAPI)</h3>
+
+  <pre><code># Package: API
+
+## Stack
+- Python 3.12, FastAPI, SQLAlchemy 2.0, Alembic
+- Tests: pytest, httpx for async client
+
+## Commands
+- Run dev: uvicorn app.main:app --reload
+- Run tests: pytest
+- Run single test: pytest tests/path/to/test.py::test_name
+- Generate migration: alembic revision --autogenerate -m "description"
+- Apply migrations: alembic upgrade head
+
+## Structure
+- app/routers/ — route handlers, one file per resource
+- app/models/ — SQLAlchemy models
+- app/schemas/ — Pydantic request/response schemas
+- app/services/ — business logic, no database calls here
+- app/deps.py — FastAPI dependencies (auth, db session)
+
+## Conventions
+- Route handlers are thin. Business logic goes in services/.
+- Every router uses dependency injection for auth and db.
+- Schema names: ResourceRequest for input, ResourceResponse for output.
+- Use async functions throughout. No sync database calls.
+- Never put business logic in models.</code></pre>
+
+  <h3>apps/web/CLAUDE.md (React TypeScript)</h3>
+
+  <pre><code># Package: Web App
+
+## Stack
+- React 18, TypeScript (strict), Tailwind CSS, React Query, Zustand
+- Routing: React Router v6
+- Tests: Vitest, React Testing Library
+
+## Commands
+- Run dev: pnpm dev
+- Run tests: pnpm test
+- Build: pnpm build
+- Type check: pnpm typecheck
+
+## Structure
+- src/pages/ — route-level components (thin, mostly composition)
+- src/components/ — reusable UI components
+- src/features/ — feature modules (components + hooks + types scoped to a feature)
+- src/hooks/ — shared custom hooks
+- src/store/ — Zustand stores
+- src/api/ — React Query hooks and API client
+
+## Conventions
+- Functional components with explicit return types.
+- Props interface: ComponentNameProps, defined in the same file.
+- Server state: React Query only. No manual fetch calls.
+- Client state: Zustand for global, useState for local.
+- Styles: Tailwind utility classes. No inline styles, no CSS modules.
+- Every component that handles user interaction needs a test.</code></pre>
+
+  <h2>Shared rules in .claude/rules/</h2>
+
+  <p>
+    Some rules apply workspace-wide but do not belong in the root CLAUDE.md because they are long or specialized. The <code>.claude/rules/</code> directory is the right place for these.
+  </p>
+
+  <h3>.claude/rules/guardrails.md</h3>
+
+  <pre><code># Guardrails
+
+- Never delete files. Move to .trash/ with: mv path/to/file .trash/
+- Never force push. Always use feature branches.
+- Never modify migration files after they have been committed.
+- Never change workspace root package.json dependencies without asking first.
+- Do not edit files in node_modules, .turbo, or dist directories.
+- Never commit .env files. All secrets go in .env.local (gitignored).</code></pre>
+
+  <h3>.claude/rules/git-workflow.md</h3>
+
+  <pre><code># Git Workflow
+
+- Branch naming: feature/short-description, fix/short-description, chore/short-description
+- Commit message format: type(scope): description
+  - Types: feat, fix, chore, docs, test, refactor
+  - Scope: package name (api, web, shared) or workspace for root changes
+  - Example: feat(api): add user authentication endpoints
+- One logical change per commit. Do not combine unrelated changes.
+- Always run tests before committing: turbo run test
+- Tag releases: vMAJOR.MINOR.PATCH</code></pre>
+
+  <h3>.claude/rules/testing.md</h3>
+
+  <pre><code># Testing Standards (Workspace-Wide)
+
+- Every new function with logic needs a unit test.
+- Every API endpoint needs an integration test.
+- Test files live next to source files: foo.ts and foo.test.ts in the same directory.
+- Test naming: describe("ComponentName/functionName") with it("should do X when Y").
+- No skipped tests in main branch. Remove or fix, never skip.
+- Mocks: mock at the module boundary, not deep inside implementations.
+- Do not test implementation details. Test behavior and outputs.</code></pre>
+
+  <h2>Turborepo-specific setup</h2>
+
+  <p>
+    Turborepo projects need a few extra lines in the root CLAUDE.md so Claude understands the build pipeline.
+  </p>
+
+  <pre><code># Workspace: Turborepo Project
+
+## Build Tool: Turborepo
+- Pipeline defined in turbo.json
+- Task order: lint -> build -> test (build depends on ^build for deps)
+- Cache: .turbo directory, do not modify manually
+- Remote cache: Vercel (configured in turbo.json)
+
+## Key Commands
+- Build all: turbo run build
+- Build specific: turbo run build --filter=@company/api
+- Build with deps: turbo run build --filter=@company/web...
+- Watch mode: turbo run dev
+- Affected only (CI): turbo run test --filter=[HEAD^1]
+
+## Adding a New Package
+1. Create directory in packages/ or apps/
+2. Add package.json with @company/name naming
+3. Add to pnpm-workspace.yaml if not already covered by glob
+4. Add CLAUDE.md with package-specific conventions
+5. Run pnpm install from root</code></pre>
+
+  <h2>Nx workspace setup</h2>
+
+  <p>
+    Nx has different conventions. The root CLAUDE.md needs to reflect how Nx organizes things.
+  </p>
+
+  <pre><code># Workspace: Nx Monorepo
+
+## Build Tool: Nx
+- nx.json defines project configuration
+- Project graph: run nx graph to visualize
+- Affected commands use git history for change detection
+
+## Key Commands
+- Build: nx build project-name
+- Test: nx test project-name
+- Affected build: nx affected:build
+- Affected test: nx affected:test
+- Lint: nx lint project-name
+- Generate component: nx g @nx/react:component ComponentName --project=web
+
+## Structure
+- apps/ — application projects
+- libs/ — library projects (feature, ui, data-access, util)
+- tools/ — workspace tooling
+
+## Library Types (Nx convention)
+- feature/: smart components with business logic
+- ui/: dumb presentational components
+- data-access/: state, API calls, data fetching
+- util/: pure functions, pipes, helpers
+- Do not cross library type boundaries. feature imports data-access and ui, never the reverse.</code></pre>
+
+  <h2>pnpm workspaces without a build tool</h2>
+
+  <p>
+    Not every monorepo uses Turborepo or Nx. Plain pnpm workspaces are common for simpler setups.
+  </p>
+
+  <pre><code># Workspace: pnpm Monorepo
+
+## Package Manager: pnpm workspaces
+- Workspace config: pnpm-workspace.yaml
+- All packages share a root node_modules via hoisting
+- Package naming: @company/package-name
+
+## Key Commands
+- Install: pnpm install (from root)
+- Run in package: pnpm --filter @company/api dev
+- Run in all packages: pnpm -r run build
+- Add dep to package: pnpm --filter @company/web add react
+- Add shared dep to root: pnpm add -w typescript
+
+## Internal Dependencies
+- Reference internal packages with workspace:* in package.json
+- Example: "@company/shared": "workspace:*"
+- Never use relative paths to reference code in another package. Use package imports.</code></pre>
+
+  <h2>Common mistakes to avoid</h2>
+
+  <p>
+    After setting up monorepo configs, these are the issues that come up most often:
+  </p>
+
+  <ul>
+    <li><strong>Root CLAUDE.md is too long.</strong> If it is over 150 lines, split it. Move testing standards to <code>.claude/rules/testing.md</code> and guardrails to <code>.claude/rules/guardrails.md</code>. The root file should be quick to scan.</li>
+    <li><strong>Package configs repeat workspace rules.</strong> Do not copy workspace conventions into package files. If it applies everywhere, it belongs in the root. Package files add specifics, they do not restate shared ones.</li>
+    <li><strong>No commands listed.</strong> Developers waste tokens asking Claude how to run things. Always include the most-used commands in the relevant CLAUDE.md. Claude can run them directly when needed.</li>
+    <li><strong>Vague conventions.</strong> "Follow best practices" tells Claude nothing. Be specific: "Functional components only. No class components." or "Use async/await. No .then() chains."</li>
+    <li><strong>Forgetting to add CLAUDE.md to new packages.</strong> As the monorepo grows, new packages get added without configs. Add a checklist item to your "new package" process.</li>
+  </ul>
+
+  <h2>Checking what Claude actually sees</h2>
+
+  <p>
+    One thing that trips people up: you write a package-level CLAUDE.md but Claude keeps applying the wrong rules. Before debugging the content, verify the config is being loaded.
+  </p>
+
+  <p>
+    Start a Claude Code session from within the package directory, not the repo root. Run a simple check: ask Claude "what conventions apply for this package?" and see if it reflects the package-level config. If it only reflects the root config, confirm the CLAUDE.md file exists in the correct directory with no typos in the path.
+  </p>
+
+  <p>
+    If you want to audit your full config setup across all packages, the <a href="/contextkit/analyze">ContextKit Analyzer</a> can score each CLAUDE.md individually and flag gaps across your workspace. Useful for larger repos where packages have accumulated inconsistently.
+  </p>
+
+  <h2>Starting a new monorepo from scratch</h2>
+
+  <p>
+    If you are setting up configs for a new monorepo, the fastest approach:
+  </p>
+
+  <ol>
+    <li>Write the root CLAUDE.md first. Focus on workspace commands and cross-cutting conventions.</li>
+    <li>Create <code>.claude/rules/guardrails.md</code> with destructive action rules and safety boundaries.</li>
+    <li>Create <code>.claude/rules/git-workflow.md</code> with your branching and commit conventions.</li>
+    <li>Add a CLAUDE.md to each package as you start working in it. Do not front-load this.</li>
+    <li>Review and trim after a week. Remove anything that turned out to be wrong or unused.</li>
+  </ol>
+
+  <p>
+    For the initial root file, the <a href="/contextkit/generate">ContextKit Generator</a> builds a solid starting point. Select your workspace tool and stack, and it produces a config covering structure, commands, and conventions. From there, split into package files as you go.
+  </p>
+
+  <h2>One more thing: keep configs in version control</h2>
+
+  <p>
+    All CLAUDE.md files and the <code>.claude/rules/</code> directory should be committed to the repo. These are project conventions; they should live alongside the code they govern. This also means new contributors get the correct setup immediately when they clone the repo.
+  </p>
+
+  <p>
+    Add a note to your contributing guide that CLAUDE.md files exist and explain the structure. Developers who do not use Claude Code can ignore them. Developers who do will get consistent behavior from day one.
+  </p>
+</BlogPost>
