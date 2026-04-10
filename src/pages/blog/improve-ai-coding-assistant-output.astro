@@ -1,0 +1,233 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How do I get better output from AI coding assistants?", "acceptedAnswer": { "@type": "Answer", "text": "The biggest lever is your project configuration file. A well-structured CLAUDE.md (or equivalent) that includes file structure, coding conventions, testing commands, and guardrails will dramatically improve output quality. Most developers skip this step and rely on in-chat prompting alone, which forces you to repeat the same corrections every session." }},
+    { "@type": "Question", "name": "Why does my AI coding assistant keep making the same mistakes?", "acceptedAnswer": { "@type": "Answer", "text": "AI coding assistants have no memory between sessions. If you corrected a mistake in a previous session, the assistant does not know about it in the next one. The fix is to encode those corrections into your project config file so the assistant reads them at the start of every session. Turn repeated corrections into permanent rules." }},
+    { "@type": "Question", "name": "What is the difference between prompting and configuration for AI coding tools?", "acceptedAnswer": { "@type": "Answer", "text": "Prompting is what you type during a session. Configuration is what the assistant reads before you type anything. Prompting is good for one-off instructions. Configuration is good for rules that should apply to every session, like coding conventions, file structure, and testing commands. The best results come from strong configuration plus minimal prompting." }},
+    { "@type": "Question", "name": "Do AI coding assistants work better with certain project structures?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Projects with clear separation of concerns, consistent naming conventions, and well-organized directories produce significantly better AI output. The assistant can pattern-match against existing code more effectively when the codebase follows predictable patterns. Messy codebases with mixed conventions confuse AI tools the same way they confuse human developers." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to improve your AI coding assistant's output quality"
+  description="Practical techniques for getting better code from Claude Code, Cursor, Copilot, and other AI coding tools. Covers project configs, structured prompting, conventions, and guardrails."
+  date="April 10, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Claude Code custom instructions guide", slug: "claude-code-custom-instructions-guide" },
+    { title: "Why Claude Code ignores your instructions", slug: "why-claude-code-ignores-instructions" },
+    { title: "AI pair programming with Claude Code", slug: "ai-pair-programming-claude-code" },
+  ]}
+>
+  <p>
+    You start a new session. You ask your AI coding assistant to add a feature. It writes code that works but uses the wrong patterns, puts files in the wrong directory, and ignores the conventions the rest of your codebase follows. You spend 20 minutes correcting it. Next session, the same thing happens.
+  </p>
+
+  <p>
+    This is not an AI problem. It is a configuration problem.
+  </p>
+
+  <p>
+    The difference between developers who get great output from AI coding tools and those who constantly fight them comes down to preparation. Not smarter prompts during the session, but better setup before the session starts.
+  </p>
+
+  <p>
+    These techniques work across AI coding assistants, though the examples lean toward Claude Code because that is what I use daily.
+  </p>
+
+  <h2>1. Write a project config file that actually configures</h2>
+
+  <p>
+    Every serious AI coding tool supports some form of project configuration. Claude Code reads <code>CLAUDE.md</code>. Cursor reads <code>.cursorrules</code>. GitHub Copilot reads <code>.github/copilot-instructions.md</code>. The file name varies but the purpose is identical: give the assistant context it can use on every interaction.
+  </p>
+
+  <p>
+    Most developers write these files like README files. They describe what the project does, list the tech stack, maybe add a paragraph about the architecture. This is better than nothing, but it misses the point.
+  </p>
+
+  <p>
+    A config file should contain <strong>rules</strong>, not descriptions. The assistant does not need to understand your business domain. It needs to know where files go, what patterns to follow, which commands to run, and what to never do.
+  </p>
+
+  <p>
+    Compare these two approaches:
+  </p>
+
+  <pre><code># Weak config (describes)
+This is a Next.js application that handles user authentication
+and dashboard features. We use TypeScript and Tailwind for styling.
+
+# Strong config (configures)
+- Components in src/components/ are reusable UI. Feature components go in src/features/[name]/
+- All API calls go through src/lib/api.ts. Never use fetch() directly.
+- Authentication state is in src/stores/auth.ts (Zustand). No other auth state.
+- Run tests: pnpm vitest. Run E2E: pnpm playwright test.
+- Never add default exports. Named exports only.</code></pre>
+
+  <p>
+    The first tells Claude what the project is. The second tells Claude how to work in it. The second produces better code every single time.
+  </p>
+
+  <div class="cta-box" style="margin: 2rem 0; padding: 1.5rem; border: 1px solid #333; border-radius: 8px; background-color: #111;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>Not sure if your config is doing its job?</strong></p>
+    <p style="margin: 0;"><a href="https://nova-labs.dev/contextkit/analyze" style="color: #a78bfa;">Score your CLAUDE.md with the free ContextKit Analyzer &#8594;</a></p>
+  </div>
+
+  <h2>2. Structure your config like a checklist, not an essay</h2>
+
+  <p>
+    AI models process bullet points and short rules more reliably than paragraphs. Every sentence in your config should pass this test: can Claude turn this into a yes/no decision while writing code?
+  </p>
+
+  <p>
+    "We prefer functional components" is hard to act on. When does "prefer" become "require"? What about the three class components already in the codebase?
+  </p>
+
+  <p>
+    "All new components must be functional. Do not create class components. Existing class components will be migrated separately." is unambiguous. Claude knows exactly what to do.
+  </p>
+
+  <p>
+    The same applies to structure. Group your rules by category:
+  </p>
+
+  <ul>
+    <li><strong>File structure</strong> - where files go and why</li>
+    <li><strong>Architecture</strong> - how components/modules relate</li>
+    <li><strong>Conventions</strong> - naming, formatting, patterns</li>
+    <li><strong>Testing</strong> - commands, frameworks, expectations</li>
+    <li><strong>Guardrails</strong> - actions that should never happen</li>
+  </ul>
+
+  <p>
+    These five categories are what the <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyzer</a> scores against, and they cover the areas where AI coding assistants diverge from your expectations most often.
+  </p>
+
+  <h2>3. Define your conventions explicitly</h2>
+
+  <p>
+    Your codebase has conventions that you follow instinctively. Semicolons or no semicolons. Single quotes or double quotes. Tabs or spaces. Named exports or default exports. These feel obvious to you because you have been working in this codebase for months.
+  </p>
+
+  <p>
+    The AI assistant is seeing your project for the first time, every time. Without explicit conventions, it makes educated guesses based on the files it happens to read. If it reads a file with semicolons first, it uses semicolons. If it reads one without them, it skips them.
+  </p>
+
+  <p>
+    The conventions that matter most are the ones you would correct in a code review:
+  </p>
+
+  <pre><code># Conventions that actually prevent corrections
+- Single quotes for strings, double quotes only in JSX attributes
+- Named exports only. No default exports.
+- Error variables: name them 'err', not 'error' or 'e'
+- Component files: PascalCase. Utility files: kebab-case.
+- Imports: group by external, internal, relative. Blank line between groups.
+- No barrel files (index.ts re-exports). Import from source directly.</code></pre>
+
+  <p>
+    Every rule you add here is a correction you stop making manually. Over a week of coding, this saves hours.
+  </p>
+
+  <h2>4. Use test-first workflows</h2>
+
+  <p>
+    This is the technique with the highest impact-to-effort ratio. Instead of asking Claude to "add a search feature," ask it to "write tests for a search feature that filters by name and date range, then implement the feature to pass those tests."
+  </p>
+
+  <p>
+    Why this works so much better:
+  </p>
+
+  <p>
+    Tests force the assistant to think about interfaces before implementation. It has to decide what the function signature looks like, what inputs it accepts, and what outputs it returns before writing any logic. This produces cleaner APIs.
+  </p>
+
+  <p>
+    Tests are also a built-in validation mechanism. You can run them immediately to verify the implementation actually works, instead of manually testing in the browser or sending curl requests.
+  </p>
+
+  <p>
+    For this to work, your config file must include the test command and framework. If Claude does not know how to run tests in your project, the test-first workflow falls apart.
+  </p>
+
+  <pre><code># Testing
+- Framework: Vitest + React Testing Library
+- Run all: pnpm test
+- Run specific: pnpm test src/features/search/
+- Watch mode: pnpm test --watch
+- Coverage: pnpm test --coverage (maintain > 80%)
+- Every new feature needs: unit tests for logic, integration test for the flow</code></pre>
+
+  <h2>5. Add guardrails that prevent actual damage</h2>
+
+  <p>
+    Guardrails are the most overlooked section in AI coding configs, but they might be the most valuable. Every developer who has used AI coding tools has a horror story: a force-pushed branch, a deleted migration file, a <code>rm -rf</code> that went wrong.
+  </p>
+
+  <p>
+    Guardrails do not make Claude smarter. They make it safer. And because AI assistants operate faster than humans, the damage from an unguarded mistake happens before you can intervene.
+  </p>
+
+  <pre><code># Guardrails
+- Never use git push --force or git reset --hard
+- Never delete files with rm. Move to .trash/ instead.
+- Never modify migration files after they have been committed
+- Never add dependencies without listing them in your response
+- Never use console.log for debugging in committed code (use the logger)
+- Never store secrets in code files. Use environment variables only.</code></pre>
+
+  <p>
+    Good guardrails share a pattern: they are all things that have gone wrong before. Review your git history for force pushes, accidental deletions, and dependency bloat. Each incident is a guardrail waiting to be written.
+  </p>
+
+  <div class="cta-box" style="margin: 2rem 0; padding: 1.5rem; border: 1px solid #333; border-radius: 8px; background-color: #111;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>Generate a complete config for your project in 30 seconds.</strong></p>
+    <p style="margin: 0;"><a href="https://nova-labs.dev/contextkit/generate" style="color: #a78bfa;">Create your CLAUDE.md with the ContextKit Generator &#8594;</a></p>
+  </div>
+
+  <h2>6. Treat your config as a living document</h2>
+
+  <p>
+    The best CLAUDE.md files are not written once. They grow with the project. Every time you correct the AI assistant during a session, ask yourself: should this correction be in the config?
+  </p>
+
+  <p>
+    If you catch Claude putting a utility function in the wrong directory, add a rule about where utilities go. If it creates a component with the wrong naming pattern, add the naming convention. If it uses <code>any</code> types in TypeScript, add a rule against it.
+  </p>
+
+  <p>
+    Some teams add a "lessons learned" section at the bottom of their config:
+  </p>
+
+  <pre><code># Known pitfalls
+- The payments module uses Stripe SDK v2, not v3. Do not upgrade.
+- Tests in /e2e/ require the dev server running. Start with pnpm dev first.
+- The user model has a soft-delete. Always filter by deleted_at IS NULL.
+- DatePicker component is from @internal/ui, not from any npm package.</code></pre>
+
+  <p>
+    These project-specific notes are where the real value accumulates. No generic template can capture them. They come from working in the codebase and noticing where AI tools stumble.
+  </p>
+
+  <h2>The compound effect</h2>
+
+  <p>
+    None of these techniques is revolutionary on its own. A config file saves you a few corrections. Explicit conventions save a few more. Test-first workflows catch bugs earlier. Guardrails prevent disasters.
+  </p>
+
+  <p>
+    But they compound. A developer with all five in place gets fundamentally different output from the same AI tool that frustrates a developer with none of them. The AI did not get smarter. The developer gave it better context.
+  </p>
+
+  <p>
+    Start with your config file. If you do not have one, the <a href="https://nova-labs.dev/contextkit/generate">ContextKit Generator</a> builds one in 30 seconds. If you already have one, run it through the <a href="https://nova-labs.dev/contextkit/analyze">Analyzer</a> to find the gaps. Then spend one session fixing those gaps and see the difference.
+  </p>
+
+</BlogPost>

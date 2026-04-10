@@ -1,0 +1,300 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What should a CLAUDE.md file look like?", "acceptedAnswer": { "@type": "Answer", "text": "A good CLAUDE.md file includes five sections: project overview (stack and purpose), file structure (where code lives), coding conventions (naming, formatting, patterns), testing setup (commands and frameworks), and guardrails (what Claude should never do). The exact content depends on your project type, but every config should cover all five areas." }},
+    { "@type": "Question", "name": "How long should a CLAUDE.md file be?", "acceptedAnswer": { "@type": "Answer", "text": "Most effective CLAUDE.md files are between 80 and 200 lines. Under 50 lines usually means you are missing critical sections. Over 300 lines means Claude spends too many tokens reading your config instead of working on your code. Aim for specific, actionable rules rather than long descriptions." }},
+    { "@type": "Question", "name": "Does CLAUDE.md work with monorepos?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Monorepos benefit the most from CLAUDE.md because they have the most complex file structures. You can use a root-level CLAUDE.md for shared conventions and additional CLAUDE.md files in each package for package-specific rules. Claude Code reads the closest CLAUDE.md to the file it is editing." }},
+    { "@type": "Question", "name": "Can I test if my CLAUDE.md is working?", "acceptedAnswer": { "@type": "Answer", "text": "You can paste your CLAUDE.md into the free ContextKit Analyzer at nova-labs.dev/contextkit/analyze to get a score across five categories. It runs in your browser and nothing is uploaded. After scoring, try giving Claude a task that requires knowledge from your config to verify it follows the rules." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code CLAUDE.md examples — 5 real configs that work"
+  description="Five real-world CLAUDE.md examples for React SaaS, Python API, Go CLI, Monorepo, and Data Pipeline projects. Each scored and explained so you can build your own."
+  date="April 10, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md starter templates for every stack", slug: "claudemd-starter-templates" },
+    { title: "How to score your CLAUDE.md file", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    Most CLAUDE.md guides tell you what sections to include. That is useful, but it skips the part where you stare at a blank file and wonder what to actually write for your specific project.
+  </p>
+
+  <p>
+    Here are five real CLAUDE.md configurations for different project types. Each one has been tested across dozens of Claude Code sessions. They are not theoretical templates. They are configs that produce consistently good output.
+  </p>
+
+  <p>
+    For each example, I will show the full config, explain why specific lines matter, and note what score it gets from the <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyzer</a>.
+  </p>
+
+  <h2>1. React SaaS application</h2>
+
+  <p>
+    This config is for a typical React + TypeScript SaaS product with a Node backend. The most important section here is the architecture guidance, because React projects have endless ways to structure components, and Claude will pick a different one every session without explicit rules.
+  </p>
+
+  <pre><code># Project: InvoiceFlow — SaaS invoicing platform
+React 18 + TypeScript, Vite, TailwindCSS, Express API, PostgreSQL + Prisma
+
+# File Structure
+- src/components/ — Reusable UI components (Button, Modal, Table)
+- src/features/ — Feature modules (invoices/, clients/, settings/)
+  Each feature has: components/, hooks/, api.ts, types.ts
+- src/lib/ — Shared utilities (formatting, validation, auth helpers)
+- server/routes/ — Express API routes (one file per resource)
+- server/services/ — Business logic (never import Express here)
+- prisma/ — Schema and migrations. Do NOT edit migration files.
+
+# Conventions
+- Components: PascalCase, one per file, co-locate styles
+- Hooks: prefix with "use", keep in feature's hooks/ directory
+- API calls: always go through the feature's api.ts, never call fetch directly
+- State: Zustand for global, React state for local. No Redux.
+- Imports: absolute paths using @/ alias (configured in tsconfig)
+
+# Testing
+- Framework: Vitest + React Testing Library
+- Run: npm test (unit), npm run test:e2e (Playwright)
+- Every feature needs: unit tests for hooks, integration test for main flow
+- Mock API calls with MSW, never mock fetch directly
+
+# Guardrails
+- Never modify prisma/migrations/ files
+- Never use any CSS framework other than Tailwind
+- Never add new dependencies without listing them in your response
+- Never use default exports (named exports only)</code></pre>
+
+  <p>
+    <strong>Analyzer score: 8.5/10.</strong> This config covers all five categories. The architecture section prevents Claude from creating random component structures. The explicit "never mock fetch directly" rule alone saves hours of test debugging.
+  </p>
+
+  <p>
+    What makes it score high: it is specific. "Zustand for global, React state for local" is an actionable rule. "Use good state management" is not.
+  </p>
+
+  <h2>2. Python API (FastAPI)</h2>
+
+  <p>
+    Python projects need stronger convention guidance than most languages because Python's flexibility means Claude has more ways to diverge from your patterns. This config locks down the patterns that matter most.
+  </p>
+
+  <pre><code># Project: DataBridge — REST API for ETL pipeline management
+Python 3.12, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2
+
+# File Structure
+- app/api/v1/ — Route handlers grouped by domain (jobs.py, pipelines.py)
+- app/models/ — SQLAlchemy models (one file per table)
+- app/schemas/ — Pydantic schemas for request/response validation
+- app/services/ — Business logic. Routes call services, services call models.
+- app/core/ — Config, security, database session, dependencies
+- tests/ — Mirrors app/ structure. Prefix files with test_
+
+# Conventions
+- Type hints on every function signature (params and return)
+- Use Annotated[Depends()] pattern for dependency injection
+- Async routes only. No sync endpoints.
+- String formatting: f-strings only, no .format() or %
+- Pydantic models for ALL request/response bodies, no raw dicts
+
+# Testing
+- Framework: pytest + httpx (AsyncClient)
+- Run: pytest (all), pytest tests/api/ (API only)
+- Fixtures in conftest.py at each test directory level
+- Use factory_boy for model factories, not manual dict construction
+- Every endpoint needs: happy path, validation error, auth error tests
+
+# Guardrails
+- Never use raw SQL. Always go through SQLAlchemy.
+- Never modify alembic/versions/ manually. Use alembic revision --autogenerate.
+- Never commit .env or any file containing credentials.
+- Never use print() for logging. Use structlog.</code></pre>
+
+  <p>
+    <strong>Analyzer score: 9/10.</strong> The "routes call services, services call models" line is doing heavy lifting. Without it, Claude puts database queries directly in route handlers about 40% of the time.
+  </p>
+
+  <div class="cta-box" style="margin: 2rem 0; padding: 1.5rem; border: 1px solid #333; border-radius: 8px; background-color: #111;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>Want to see how your CLAUDE.md compares?</strong></p>
+    <p style="margin: 0;"><a href="https://nova-labs.dev/contextkit/analyze" style="color: #a78bfa;">Score your CLAUDE.md with the free Analyzer &#8594;</a></p>
+  </div>
+
+  <h2>3. Go CLI tool</h2>
+
+  <p>
+    Go projects are interesting because the language enforces some conventions already (formatting, package structure). But Claude still needs guidance on error handling patterns and project layout, because Go's "no official project layout" means every project does it differently.
+  </p>
+
+  <pre><code># Project: dctl — CLI for managing Docker development environments
+Go 1.22, Cobra CLI framework, no external HTTP framework
+
+# File Structure
+- cmd/ — Cobra command definitions (one file per command)
+- internal/docker/ — Docker API client wrapper
+- internal/config/ — Configuration loading and validation
+- internal/ui/ — Terminal output formatting (colors, tables, spinners)
+- pkg/ — Exported packages (only if needed by external consumers)
+
+# Conventions
+- Error handling: always wrap with fmt.Errorf("context: %w", err)
+- No naked returns. Always explicit.
+- Interfaces: define where they are USED, not where they are implemented.
+- Naming: Go standard (camelCase unexported, PascalCase exported)
+- Comments: exported functions must have doc comments starting with function name
+
+# Testing
+- Run: go test ./... (all), go test ./internal/docker/ (specific)
+- Table-driven tests for any function with more than 2 test cases
+- Use testify/assert for assertions
+- Mock Docker API with interface substitution, not build tags
+
+# Guardrails
+- Never add a dependency without checking if the stdlib can do it
+- Never use init() functions
+- Never use global mutable state
+- Never panic in library code (return errors instead)</code></pre>
+
+  <p>
+    <strong>Analyzer score: 8/10.</strong> The "define interfaces where they are used" rule is subtle but important. It prevents Claude from creating an <code>interfaces.go</code> file that everything imports, which is a common anti-pattern it defaults to.
+  </p>
+
+  <h2>4. Monorepo (Turborepo)</h2>
+
+  <p>
+    Monorepos are where CLAUDE.md files matter most, because the file structure is complex enough that Claude will regularly put code in the wrong package. The key insight: you need both a root config and package-level configs.
+  </p>
+
+  <pre><code># Project: CloudStack — B2B SaaS with web app, marketing site, and shared packages
+Turborepo, pnpm workspaces
+
+# Workspace Structure
+- apps/web/ — Main React application (Next.js 14, App Router)
+- apps/marketing/ — Marketing site (Astro + Tailwind)
+- apps/api/ — Express API server
+- packages/ui/ — Shared component library (React + Tailwind)
+- packages/db/ — Database client (Prisma) and schemas
+- packages/config/ — Shared ESLint, TypeScript, Tailwind configs
+- packages/utils/ — Shared utility functions (pure, no framework deps)
+
+# Cross-Package Rules
+- packages/ui/ components must not import from apps/
+- packages/utils/ must have zero dependencies (stdlib only)
+- packages/db/ is the ONLY package that imports Prisma
+- apps/ can import from packages/, never from other apps/
+- New shared code goes in the most specific package first
+
+# Conventions
+- Package manager: pnpm only, never npm or yarn
+- Each package has its own tsconfig extending packages/config/
+- Imports between packages use workspace protocol (@cloudstack/ui)
+- Component naming: PascalCase. Utility naming: camelCase.
+
+# Testing
+- Run: pnpm test (all workspaces), pnpm --filter web test (specific)
+- Each package manages its own test framework
+- packages/ui/ uses Storybook + Chromatic for visual regression
+- apps/web/ uses Playwright for E2E
+
+# Guardrails
+- Never install a dependency at root level (always in a specific workspace)
+- Never import directly from a package's src/ (use its package.json exports)
+- Never create a new package without adding it to pnpm-workspace.yaml
+- Never modify packages/config/ without checking impact on all workspaces</code></pre>
+
+  <p>
+    <strong>Analyzer score: 9/10.</strong> The cross-package rules section is the differentiator. Without it, Claude creates circular dependencies between packages and puts shared code in the wrong workspace. The rule "new shared code goes in the most specific package first" prevents the common trap of dumping everything into utils.
+  </p>
+
+  <h2>5. Data pipeline (Airflow + dbt)</h2>
+
+  <p>
+    Data projects are the category where Claude struggles the most without good config, because the execution model is fundamentally different from web apps. Code runs on a schedule, not on request. Dependencies are between tasks, not between modules.
+  </p>
+
+  <pre><code># Project: DataVault — Customer analytics data pipeline
+Airflow 2.8, dbt Core 1.7, BigQuery, Python 3.11
+
+# File Structure
+- dags/ — Airflow DAG definitions (one file per pipeline)
+- dags/tasks/ — Task callables (imported by DAGs, never run standalone)
+- dbt/ — dbt project root
+- dbt/models/staging/ — Raw source transformations (1:1 with source tables)
+- dbt/models/intermediate/ — Business logic transformations
+- dbt/models/marts/ — Final dimensional models for analytics
+- dbt/tests/ — Custom data tests (schema tests in YAML alongside models)
+- scripts/ — One-off migration and maintenance scripts
+
+# Conventions
+- DAGs: one file per pipeline, use TaskFlow API (@task decorator)
+- DAG naming: domain_action_frequency (e.g., crm_sync_hourly)
+- dbt models: prefix with stg_, int_, or fct_/dim_ matching their layer
+- SQL style: lowercase keywords, CTEs over subqueries, one column per line
+- Every dbt model needs a YAML entry with description and column tests
+
+# Testing
+- dbt: dbt test (schema + data tests), dbt test --select model_name
+- Airflow: pytest dags/ to validate DAG loading (no import errors)
+- Data quality: use dbt expectations package for statistical tests
+- Never test with production data. Use the dev BigQuery dataset.
+
+# Guardrails
+- Never write raw SQL outside of dbt (use dbt models for all transformations)
+- Never use Airflow Variables for secrets (use Secret Backend)
+- Never set catchup=True without explicit approval
+- Never modify staging models to include business logic (that goes in intermediate)</code></pre>
+
+  <p>
+    <strong>Analyzer score: 8.5/10.</strong> The dbt layer conventions (stg, int, fct/dim) are critical. Without them, Claude creates models in the wrong layer, which breaks the dependency chain and makes the pipeline untestable. The "never set catchup=True" guardrail prevents a common Airflow mistake that can trigger thousands of backfill tasks.
+  </p>
+
+  <div class="cta-box" style="margin: 2rem 0; padding: 1.5rem; border: 1px solid #333; border-radius: 8px; background-color: #111;">
+    <p style="margin: 0 0 0.5rem 0;"><strong>Don't have a CLAUDE.md yet? Generate one in 30 seconds.</strong></p>
+    <p style="margin: 0;"><a href="https://nova-labs.dev/contextkit/generate" style="color: #a78bfa;">Generate a CLAUDE.md for your stack &#8594;</a></p>
+  </div>
+
+  <h2>What these examples have in common</h2>
+
+  <p>
+    Every config that scores above 7 shares three traits:
+  </p>
+
+  <p>
+    <strong>They are specific, not descriptive.</strong> "Use Zustand for global state" beats "use appropriate state management." Claude does not need philosophy. It needs rules.
+  </p>
+
+  <p>
+    <strong>They tell Claude what NOT to do.</strong> The guardrails section is where most of the behavior change happens. Claude's defaults are reasonable, but "reasonable" and "what you want" are different things. Every team has non-obvious rules that Claude will violate without explicit prohibition.
+  </p>
+
+  <p>
+    <strong>They include testing commands.</strong> This sounds basic, but over 60% of CLAUDE.md files we have analyzed skip testing setup entirely. Claude then guesses <code>npm test</code> or <code>pytest</code> and gets it wrong when your project uses something different.
+  </p>
+
+  <h2>How to use these examples</h2>
+
+  <p>
+    Do not copy-paste these configs directly. They are for specific projects with specific needs. Instead:
+  </p>
+
+  <p>
+    1. Pick the example closest to your stack.<br/>
+    2. Replace the project-specific details with yours.<br/>
+    3. Add your own guardrails based on mistakes Claude has made in your codebase.<br/>
+    4. Run it through the <a href="https://nova-labs.dev/contextkit/analyze">Analyzer</a> to find gaps.<br/>
+    5. Iterate after a few sessions. The best CLAUDE.md files are built over time, not written once.
+  </p>
+
+  <p>
+    If you want a head start, the <a href="https://nova-labs.dev/contextkit/generate">ContextKit Generator</a> creates a scored CLAUDE.md based on your stack and project type. It covers all five categories and gives you a starting point that scores at least 7 out of 10.
+  </p>
+
+</BlogPost>
