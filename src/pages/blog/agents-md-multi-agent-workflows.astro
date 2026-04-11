@@ -1,0 +1,293 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is AGENTS.md and how is it different from CLAUDE.md?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AGENTS.md is a configuration file for multi-agent development environments like OpenAI Codex. It defines how AI agents should behave, what tools they can use, and what constraints they should follow. CLAUDE.md serves the same purpose but specifically for Claude Code. The key difference is naming convention — AGENTS.md is tool-agnostic and increasingly supported by multiple AI coding tools, while CLAUDE.md is Claude Code specific. Many developers now maintain both files for cross-tool compatibility."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need both AGENTS.md and CLAUDE.md in my project?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on your team. If everyone uses Claude Code, a CLAUDE.md file is sufficient — Claude Code reads it automatically. If your team uses multiple AI coding tools (Claude Code, Codex, Copilot), maintaining an AGENTS.md alongside CLAUDE.md ensures consistent AI behavior regardless of which tool a developer prefers. Some teams use AGENTS.md as the canonical config and symlink or import it from tool-specific files."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I include in an AGENTS.md file?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An effective AGENTS.md includes: project overview and architecture, directory structure explanation, coding conventions and style rules, testing requirements and commands, deployment procedures, security constraints and guardrails, and any domain-specific knowledge the agent needs. The goal is to give any AI agent enough context to produce code that matches your existing codebase without constant correction."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I manage AGENTS.md in a monorepo with multiple services?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use a layered approach. Place a root AGENTS.md with shared conventions (language standards, git workflow, CI requirements). Then add service-specific AGENTS.md files in each package or service directory with local overrides (framework-specific rules, service-specific testing commands, local dependencies). Most AI tools merge these layers automatically, applying the most specific rules where they exist and falling back to root-level rules elsewhere."
+      }
+    }
+  ]
+};
+---
+
+<BlogPost
+  title="How to set up AGENTS.md for multi-agent development workflows"
+  description="AGENTS.md is becoming the standard way to configure AI coding agents across tools. Here is how to write one that works, with practical examples for different project types."
+  date="April 11, 2026"
+  readTime="10 min read"
+  keywords={["agents.md", "agents md guide", "agents.md vs claude.md", "multi-agent development", "ai agent configuration", "openai codex agents.md", "claude code agents md", "ai coding agent setup"]}
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "Manage CLAUDE.md across multiple projects", slug: "manage-claudemd-multiple-projects" },
+  ]}
+>
+  <p>
+    Every AI coding tool reads some kind of project configuration file. Claude Code reads <code>CLAUDE.md</code>. Cursor reads <code>.cursorrules</code>. Windsurf reads <code>.windsurfrules</code>. And now, with OpenAI's Codex and the broader move toward multi-agent development, <code>AGENTS.md</code> is emerging as the tool-agnostic standard.
+  </p>
+
+  <p>
+    The idea behind all these files is the same: give the AI enough context about your project that it produces code matching your actual patterns, conventions, and constraints from the first attempt. The difference is that AGENTS.md is not tied to any single tool, which makes it increasingly relevant as teams use multiple AI coding assistants simultaneously.
+  </p>
+
+  <h2>Why AGENTS.md exists</h2>
+
+  <p>
+    The problem is simple. AI coding tools are good at writing code, but they have no way to know your specific conventions unless you tell them. Without configuration, they default to generic patterns that may not match your codebase at all.
+  </p>
+
+  <p>
+    Consider what happens when you ask an AI agent to add a new API endpoint to your project. Without context, it guesses your framework, your error handling approach, your naming conventions, your test structure, and your authentication pattern. It might guess correctly on some of these. It will almost certainly get others wrong.
+  </p>
+
+  <p>
+    With a well-written configuration file, the agent knows all of these details before it starts. The code it produces matches your existing patterns on the first try.
+  </p>
+
+  <p>
+    AGENTS.md is the tool-agnostic version of this configuration. It works with any AI tool that supports reading markdown-based project context, and more tools are adding support as multi-agent workflows become standard practice.
+  </p>
+
+  <h2>What goes in an AGENTS.md</h2>
+
+  <p>
+    An effective AGENTS.md covers five categories. You do not need to fill every section for every project, but addressing each one prevents common failure modes.
+  </p>
+
+  <h3>1. Project overview</h3>
+
+  <p>
+    Start with what the project is, what it does, and how it is structured at a high level. This gives the agent the mental model it needs to make good decisions about where code belongs and how components interact.
+  </p>
+
+  <pre><code># Project Overview
+
+This is a SaaS application for inventory management.
+Backend: FastAPI (Python 3.12), PostgreSQL, Redis for caching.
+Frontend: Next.js 15 with TypeScript, Tailwind CSS.
+Monorepo managed with Turborepo.
+
+## Directory Structure
+- /apps/api — FastAPI backend
+- /apps/web — Next.js frontend
+- /packages/shared — Shared TypeScript types and utilities
+- /packages/db — Drizzle ORM schema and migrations</code></pre>
+
+  <h3>2. Coding conventions</h3>
+
+  <p>
+    This is where you prevent the agent from writing code that technically works but does not match your style. Be specific about patterns you use and patterns you avoid.
+  </p>
+
+  <pre><code>## Coding Conventions
+
+### Python (Backend)
+- Use Pydantic v2 models for all request/response schemas
+- Dependency injection via FastAPI's Depends()
+- No raw SQL — use SQLAlchemy ORM exclusively
+- Type hints on all function signatures
+- Docstrings only on public API endpoints
+
+### TypeScript (Frontend)
+- Functional components only, no class components
+- Use server components by default, client components only when interactivity is needed
+- Zustand for client state, React Query for server state
+- No barrel exports (index.ts re-exports)
+- Prefer named exports over default exports</code></pre>
+
+  <h3>3. Testing requirements</h3>
+
+  <p>
+    Tell the agent what tests look like in your project, what commands to run, and what standards to follow. This prevents agents from generating tests that use the wrong framework or follow patterns that conflict with your existing test suite.
+  </p>
+
+  <pre><code>## Testing
+
+### Backend tests
+- Framework: pytest with pytest-asyncio
+- Run: `cd apps/api && pytest`
+- Test files mirror source structure: src/routes/users.py → tests/routes/test_users.py
+- Use factory_boy for test data, not raw fixtures
+- Database tests use a dedicated test database (TEST_DATABASE_URL in .env.test)
+
+### Frontend tests
+- Framework: Vitest + Testing Library
+- Run: `cd apps/web && npm test`
+- Test user behavior, not implementation details
+- Mock API calls with MSW, never mock fetch directly</code></pre>
+
+  <h3>4. Guardrails and constraints</h3>
+
+  <p>
+    This section prevents the agent from making changes that are technically valid but operationally dangerous. Think of it as the "do not" list.
+  </p>
+
+  <pre><code>## Guardrails
+
+- Never modify migration files after they have been applied
+- Never delete database columns — add a deprecated flag instead
+- Do not add new npm dependencies without checking the bundle size impact
+- Never bypass TypeScript strict mode with @ts-ignore
+- Do not modify the auth middleware without explicit approval
+- Always use parameterized queries — no string concatenation in SQL
+- Rate limiting is required on all public API endpoints</code></pre>
+
+  <h3>5. Architecture decisions</h3>
+
+  <p>
+    Document the non-obvious decisions that shaped your codebase. Without this context, agents will suggest alternative approaches that conflict with intentional design choices.
+  </p>
+
+  <pre><code>## Architecture Decisions
+
+- We use a CQRS-lite pattern: separate read and write models for performance-critical paths
+- Background jobs run via a task queue (Celery + Redis), not cron jobs
+- File uploads go to S3 via presigned URLs — the backend never handles file bytes
+- WebSocket connections are managed by a separate service (/apps/ws), not the main API
+- We chose Drizzle over Prisma because we need raw SQL escape hatches for complex reporting queries</code></pre>
+
+  <h2>AGENTS.md vs CLAUDE.md: what to use when</h2>
+
+  <p>
+    If your entire team uses Claude Code, a <code>CLAUDE.md</code> file is all you need. Claude Code reads it automatically at session start, and you get the full benefit of project-specific configuration.
+  </p>
+
+  <p>
+    If your team uses different tools — some on Claude Code, others on Cursor or Codex — maintaining tool-specific files becomes tedious and error-prone. AGENTS.md solves this by providing a single source of truth that multiple tools can read.
+  </p>
+
+  <p>
+    The practical approach many teams use:
+  </p>
+
+  <ol>
+    <li>Write your primary configuration in <code>AGENTS.md</code></li>
+    <li>Create a minimal <code>CLAUDE.md</code> that imports or references it: <code>Read and follow the conventions in AGENTS.md.</code></li>
+    <li>Do the same for <code>.cursorrules</code> or other tool-specific files</li>
+  </ol>
+
+  <p>
+    This way you maintain one canonical document and each tool picks it up through its own mechanism.
+  </p>
+
+  <h2>Layered configuration for monorepos</h2>
+
+  <p>
+    Monorepos need a layered approach. A single root-level file cannot cover the conventions of a Python backend, a TypeScript frontend, and a Go microservice simultaneously without becoming unwieldy.
+  </p>
+
+  <p>
+    The pattern that works:
+  </p>
+
+  <pre><code>my-project/
+  AGENTS.md              # Shared: git workflow, CI, code review standards
+  apps/
+    api/
+      AGENTS.md          # Python-specific: FastAPI patterns, pytest config
+    web/
+      AGENTS.md          # TypeScript-specific: React patterns, Vitest config
+    mobile/
+      AGENTS.md          # React Native-specific patterns
+  packages/
+    shared/
+      AGENTS.md          # Shared package conventions</code></pre>
+
+  <p>
+    Root-level configuration covers what applies everywhere: git commit conventions, PR review requirements, CI pipeline details, security baseline. Service-level files cover framework-specific conventions, local testing commands, and service-specific architecture decisions.
+  </p>
+
+  <p>
+    Most AI coding tools merge these layers automatically. When an agent works in <code>apps/api/</code>, it reads both the root AGENTS.md and the local one, with local rules taking precedence where they conflict.
+  </p>
+
+  <h2>Common mistakes in AGENTS.md files</h2>
+
+  <h3>Too vague</h3>
+
+  <p>
+    Statements like "write clean code" or "follow best practices" add no value. The agent already tries to write clean code. What it needs is specific guidance about your definition of clean: your naming conventions, your error handling approach, your file organization rules.
+  </p>
+
+  <h3>Too long</h3>
+
+  <p>
+    A 5,000-word configuration file costs tokens on every interaction and buries important rules in noise. Focus on conventions that the agent would get wrong without guidance. If a rule matches what any competent developer would do by default, skip it.
+  </p>
+
+  <h3>Outdated</h3>
+
+  <p>
+    Configuration files that reference deprecated libraries, old directory structures, or abandoned patterns cause more harm than having no configuration at all. The agent follows the instructions faithfully, producing code that matches an old version of your project.
+  </p>
+
+  <p>
+    Treat AGENTS.md like code. Review it when you make architectural changes. Update it when conventions evolve. Delete rules that no longer apply.
+  </p>
+
+  <h3>Missing the hard-won knowledge</h3>
+
+  <p>
+    The most valuable content in a configuration file is the stuff that is not obvious from reading the code. Why you chose this ORM over that one. Why authentication works this unusual way. Why you never use library X even though it seems like the obvious choice. This context prevents agents from "improving" things back to generic patterns that you intentionally moved away from.
+  </p>
+
+  <h2>Scoring your configuration</h2>
+
+  <p>
+    Whether you use AGENTS.md, CLAUDE.md, or both, the effectiveness of your configuration depends on coverage. Missing categories mean the agent guesses in those areas, and guesses are inconsistent.
+  </p>
+
+  <p>
+    <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyze</a> scores your configuration file across five categories: structure, architecture, conventions, testing, and guardrails. It identifies specific gaps and suggests concrete improvements. The analysis runs entirely in your browser — your configuration never leaves your machine.
+  </p>
+
+  <p>
+    If you are starting a new project and want a solid baseline, <a href="https://nova-labs.dev/contextkit/generate">ContextKit Generate</a> creates a complete configuration from your project description in about a minute. It produces output in CLAUDE.md format, but the content works equally well as an AGENTS.md since the structure and purpose are identical.
+  </p>
+
+  <h2>What comes next</h2>
+
+  <p>
+    The trend is clear: AI coding agents are becoming a standard part of development workflows, and teams increasingly use more than one. A shared configuration format eliminates the overhead of maintaining separate files for each tool.
+  </p>
+
+  <p>
+    AGENTS.md is not yet an official standard, but it is the closest thing to one. OpenAI's Codex reads it. Claude Code can be instructed to read it. The content structure (project overview, conventions, testing, guardrails, architecture decisions) is universal regardless of which file name you use.
+  </p>
+
+  <p>
+    The practical advice: start with whichever file your primary tool reads, write it well, and extend to a shared format when your team needs cross-tool consistency. The content matters more than the filename. A thorough CLAUDE.md will serve you better than a superficial AGENTS.md every time.
+  </p>
+</BlogPost>

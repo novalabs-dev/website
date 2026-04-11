@@ -1,0 +1,278 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the most important Claude Code tip for beginners?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Write a CLAUDE.md file before you start your first session. This single file tells Claude about your project structure, coding conventions, and constraints. Without it, Claude makes generic assumptions that usually require correction. A good CLAUDE.md reduces back-and-forth by 50% or more and dramatically improves output quality from the first interaction."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I reduce Claude Code costs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Three techniques have the biggest impact: (1) Write a thorough CLAUDE.md to reduce retry loops caused by incorrect assumptions, (2) Use the /compact command to compress conversation history when sessions get long, (3) Break large tasks into smaller, focused sessions rather than running one massive session that burns through your context window. Configuration quality alone can cut token usage by 30-40%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can Claude Code run tests automatically?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Claude Code can execute any shell command, including your test suite. Tell Claude to run tests after making changes and it will execute the command, read the output, fix any failures, and re-run until tests pass. You can also set this up in your CLAUDE.md as a standard instruction: 'After any code change, run npm test and fix failures before reporting completion.'"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are Claude Code hooks and when should I use them?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hooks are shell commands that run automatically before or after Claude Code tool calls. For example, a pre-commit hook can run your linter before every git commit Claude makes. A notification hook can alert you when Claude finishes a long task. Use hooks for automated quality gates (linting, type checking) and workflow integration (notifications, logging). Configure them in .claude/settings.json."
+      }
+    }
+  ]
+};
+---
+
+<BlogPost
+  title="25 Claude Code tips and tricks most developers miss"
+  description="Practical tips for getting more out of Claude Code. From project configuration to advanced workflows, these are the features and techniques that make the biggest difference."
+  date="April 11, 2026"
+  readTime="14 min read"
+  keywords={["claude code tips", "claude code tricks", "claude code tips and tricks", "claude code productivity", "claude code best practices", "how to use claude code effectively", "claude code advanced features", "claude code workflow tips"]}
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "Claude Code subagents: parallel tasks", slug: "claude-code-subagents-parallel-tasks" },
+    { title: "Score your CLAUDE.md out of 10", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    Claude Code has a lot of features that are not immediately obvious. The documentation covers the basics, but many of the most useful capabilities are discovered through experimentation or word of mouth. Here are 25 techniques that consistently make a difference in daily use.
+  </p>
+
+  <h2>Project setup</h2>
+
+  <h3>1. Write your CLAUDE.md before your first session</h3>
+
+  <p>
+    This is the single highest-impact thing you can do. A <code>CLAUDE.md</code> file at your project root tells Claude about your architecture, conventions, testing approach, and constraints. Without it, Claude starts every session with zero context about your project and makes generic assumptions.
+  </p>
+
+  <p>
+    Spend 20 minutes on this before you write your first prompt. The investment pays back within the first hour of use. If you want a fast start, <a href="https://nova-labs.dev/contextkit/generate">ContextKit Generate</a> can produce a solid baseline from a project description.
+  </p>
+
+  <h3>2. Use .claude/rules/ for team-wide conventions</h3>
+
+  <p>
+    Beyond the root CLAUDE.md, you can create individual rule files in <code>.claude/rules/</code>. Each file addresses a specific concern: testing standards, security constraints, deployment procedures. This modular approach makes rules easier to maintain and review than one massive file.
+  </p>
+
+  <pre><code>.claude/
+  rules/
+    testing.md        # Test conventions and commands
+    security.md       # Security requirements
+    api-conventions.md # API design rules
+    git-workflow.md   # Commit and PR standards</code></pre>
+
+  <h3>3. Add a "do not" section to your CLAUDE.md</h3>
+
+  <p>
+    Tell Claude what to avoid. This prevents common mistakes that waste time. Examples: "Do not use default exports," "Do not add comments to code you did not change," "Do not create new utility files for one-time operations." Negative constraints are often more valuable than positive instructions because they prevent specific failure modes you have already encountered.
+  </p>
+
+  <h3>4. Include your test and build commands</h3>
+
+  <p>
+    Claude cannot run your tests if it does not know the command. Add the exact commands to your CLAUDE.md:
+  </p>
+
+  <pre><code>## Commands
+- Test: `npm test`
+- Lint: `npm run lint`
+- Type check: `npx tsc --noEmit`
+- Build: `npm run build`
+- Dev server: `npm run dev` (port 3000)</code></pre>
+
+  <p>
+    Now Claude can verify its own work before reporting completion.
+  </p>
+
+  <h2>Daily workflow</h2>
+
+  <h3>5. Start sessions with a specific task, not a vague goal</h3>
+
+  <p>
+    "Improve the authentication system" gives Claude too much latitude and usually produces changes you did not want. "Add rate limiting to the /api/login endpoint — max 5 attempts per IP per minute, return 429 after that" gives Claude a clear target. Specific prompts produce specific, reviewable results.
+  </p>
+
+  <h3>6. Use /compact to manage long sessions</h3>
+
+  <p>
+    Long conversations eat context window space. When your session gets long and Claude starts forgetting earlier context, type <code>/compact</code>. This compresses the conversation history while preserving the key decisions and state. Your session continues with a fresh context budget.
+  </p>
+
+  <h3>7. Let Claude read before it writes</h3>
+
+  <p>
+    Before asking Claude to modify code, ask it to read and explain the relevant files first. "Read src/auth/middleware.ts and explain how the token validation works." This forces Claude to build an accurate mental model before making changes, which produces better edits and fewer bugs.
+  </p>
+
+  <h3>8. Ask Claude to run tests after changes</h3>
+
+  <p>
+    After Claude makes code changes, tell it to run your test suite. If tests fail, Claude can read the error output and fix the issues iteratively. This catches problems immediately instead of discovering them later. You can make this automatic by adding "After any code change, run the test suite and fix failures" to your CLAUDE.md.
+  </p>
+
+  <h3>9. Use git commits as checkpoints</h3>
+
+  <p>
+    After Claude completes a task successfully, ask it to commit the changes. This creates a rollback point before the next task. If the next change goes wrong, you can reset to the last good state without losing progress. Claude handles git operations natively — it can stage, commit, and even create branches.
+  </p>
+
+  <h2>Advanced features</h2>
+
+  <h3>10. Spawn subagents for independent tasks</h3>
+
+  <p>
+    Claude Code can launch subagents that work on independent tasks in parallel. If you need to update three unrelated modules, Claude can spawn a subagent for each one. They work simultaneously and return results. This is particularly useful for large refactors where changes in different areas of the codebase are independent.
+  </p>
+
+  <h3>11. Use hooks for automated quality gates</h3>
+
+  <p>
+    Hooks run shell commands before or after Claude's tool calls. Set up a pre-commit hook that runs your linter, a post-edit hook that runs type checking, or a notification hook that pings you when a long task finishes. Configure them in <code>.claude/settings.json</code>.
+  </p>
+
+  <pre><code set:text={`// .claude/settings.json
+{
+  "hooks": {
+    "PreCommit": ["npm run lint -- --fix"],
+    "Stop": ["terminal-notifier -message 'Claude Code finished'"]
+  }
+}`}></code></pre>
+
+  <h3>12. Use /init to bootstrap your CLAUDE.md</h3>
+
+  <p>
+    If you do not have a CLAUDE.md yet, run <code>/init</code> in your project directory. Claude will analyze your codebase and generate a starter configuration file. It is not perfect — you should review and customize it — but it is a much faster starting point than writing from scratch.
+  </p>
+
+  <h3>13. Reference specific files in your prompts</h3>
+
+  <p>
+    Instead of "fix the auth bug," say "fix the token expiry check in src/auth/jwt.ts around line 45." The more specific your reference, the less time Claude spends searching and the more accurate the fix. File paths and line numbers dramatically reduce ambiguity.
+  </p>
+
+  <h3>14. Use Claude for code review</h3>
+
+  <p>
+    Ask Claude to review code before you commit it. "Review the changes in this session for bugs, security issues, and style violations." Claude reads the diff and provides feedback. This is especially valuable for solo developers who do not have a team reviewer.
+  </p>
+
+  <h2>Cost optimization</h2>
+
+  <h3>15. Break large tasks into focused sessions</h3>
+
+  <p>
+    A single massive session that rewrites an entire module costs far more in tokens than three focused sessions that each handle a specific aspect. Each new session starts with a fresh context, which means Claude is not paying to carry irrelevant conversation history from earlier tasks.
+  </p>
+
+  <h3>16. A good CLAUDE.md reduces token waste</h3>
+
+  <p>
+    Every time Claude asks a clarifying question, you both spend tokens on the question and the answer. Every time Claude makes a change that does not match your conventions, you spend tokens explaining the correction and Claude spends tokens redoing the work. A thorough CLAUDE.md eliminates most of these retry loops.
+  </p>
+
+  <p>
+    Check how well your configuration covers the key areas with <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyze</a>. Projects that score below 5/10 typically have 30-40% more token waste than well-configured ones.
+  </p>
+
+  <h3>17. Use model routing for simple tasks</h3>
+
+  <p>
+    Not every task needs Opus. Simple file reads, boilerplate generation, and routine edits can use Sonnet or Haiku at a fraction of the cost. If you are on API billing, consider routing simpler tasks to cheaper models. The quality difference for routine work is minimal.
+  </p>
+
+  <h3>18. Avoid rebuilding context unnecessarily</h3>
+
+  <p>
+    If you are working on the same area of code across multiple prompts, stay in the same session. Each new session requires Claude to re-read files and rebuild context. Continuing a session is free — the context is already loaded.
+  </p>
+
+  <h2>Debugging</h2>
+
+  <h3>19. Give Claude the error output, not your interpretation</h3>
+
+  <p>
+    Instead of "the API returns an error," paste the actual error message, stack trace, or log output. Claude is better at diagnosing issues from raw error data than from summarized descriptions. The details you think are irrelevant often contain the actual clue.
+  </p>
+
+  <h3>20. Ask Claude to trace the execution path</h3>
+
+  <p>
+    For complex bugs, ask Claude to trace the flow: "Read the code path from when a POST request hits /api/orders to where the database insert happens. Identify where the validation might be failing." This systematic approach catches issues that ad-hoc debugging misses.
+  </p>
+
+  <h3>21. Use Claude to write reproduction cases</h3>
+
+  <p>
+    When you find a bug, ask Claude to write a test that reproduces it before fixing it. This gives you confidence that the fix actually addresses the problem and prevents regression. "Write a test that demonstrates the bug where duplicate orders are created when two requests arrive within 100ms, then fix the underlying issue."
+  </p>
+
+  <h2>Team workflows</h2>
+
+  <h3>22. Commit your CLAUDE.md to the repo</h3>
+
+  <p>
+    Your CLAUDE.md should be in version control. When team members clone the repo, they get the same AI configuration. When conventions change, the CLAUDE.md changes in the same commit. This ensures consistency across the team without requiring manual synchronization.
+  </p>
+
+  <h3>23. Use Claude for PR descriptions</h3>
+
+  <p>
+    After completing a feature, ask Claude to draft a PR description based on the changes made in the session. Claude has full context on what changed and why, so the descriptions are detailed and accurate. Less time writing PR descriptions, better documentation of what the change does.
+  </p>
+
+  <h3>24. Create team-specific rules files</h3>
+
+  <p>
+    Different team members may have different roles. A frontend developer and a backend developer working in the same monorepo need different conventions emphasized. Use <code>.claude/rules/</code> files for shared rules and personal CLAUDE.md overrides for role-specific preferences.
+  </p>
+
+  <h3>25. Review Claude's changes like you review a junior developer's PR</h3>
+
+  <p>
+    Claude produces correct code most of the time, but it occasionally makes subtle mistakes: incorrect assumptions about business logic, inefficient approaches that technically work, or changes that are correct in isolation but conflict with broader project goals. Review every change before committing. The mental model of "I am reviewing a junior developer's work" sets the right expectations: usually good, occasionally needs correction, always worth checking.
+  </p>
+
+  <h2>Getting started</h2>
+
+  <p>
+    You do not need to adopt all 25 tips at once. Start with the highest-impact ones:
+  </p>
+
+  <ol>
+    <li><strong>Write a CLAUDE.md</strong> (<a href="https://nova-labs.dev/contextkit/generate">generate one here</a>)</li>
+    <li><strong>Include your test commands</strong> so Claude can verify its own work</li>
+    <li><strong>Be specific in prompts</strong> with file paths and line numbers</li>
+    <li><strong>Ask Claude to run tests</strong> after every change</li>
+    <li><strong>Use /compact</strong> when sessions get long</li>
+  </ol>
+
+  <p>
+    These five habits cover 80% of the productivity gain. Add the rest as your workflow matures and you discover which advanced features match your specific needs.
+  </p>
+
+  <p>
+    To see where your current setup stands, run your CLAUDE.md through <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyze</a>. It takes 30 seconds and gives you a concrete score with specific improvements. Most developers find at least two or three gaps that are easy to fix and immediately improve their Claude Code experience.
+  </p>
+</BlogPost>
