@@ -1,10 +1,73 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': 'https://nova-labs.dev/free-chapter#webpage',
+      url: 'https://nova-labs.dev/free-chapter',
+      name: 'Free Quick Start Guide: Build Your First AI Skill in 10 Minutes',
+      description:
+        'Build your first AI skill in 10 minutes. A practical guide to setting up Claude Code as your business operating system. No coding required.',
+      isPartOf: { '@id': 'https://nova-labs.dev/#website' },
+      primaryImageOfPage: 'https://nova-labs.dev/og-image.png',
+      inLanguage: 'en-US',
+      mainEntity: { '@id': 'https://nova-labs.dev/free-chapter#howto' },
+    },
+    {
+      '@type': 'HowTo',
+      '@id': 'https://nova-labs.dev/free-chapter#howto',
+      name: 'Build your first AI skill in 10 minutes',
+      description:
+        'Set up Claude Code as your business operating system and build a working content writer skill that knows your voice — in 10 minutes, without coding.',
+      totalTime: 'PT10M',
+      estimatedCost: { '@type': 'MonetaryAmount', currency: 'USD', value: '0' },
+      supply: [
+        { '@type': 'HowToSupply', name: 'Claude Code (free tier works)' },
+        { '@type': 'HowToSupply', name: 'A business or project context' },
+      ],
+      step: [
+        {
+          '@type': 'HowToStep',
+          position: 1,
+          name: 'Create the AI OS project structure',
+          text: 'Set up a folder with the basic AI OS layout so Claude Code knows where skills, context, and data live.',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 2,
+          name: 'Write a context file that teaches AI your business',
+          text: 'Capture your business details, voice, and goals in a single context file that every skill can read.',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 3,
+          name: 'Build a content writer skill',
+          text: 'Create a reusable skill that writes in your voice — no code, just a SKILL.md definition.',
+        },
+        {
+          '@type': 'HowToStep',
+          position: 4,
+          name: 'Run it and see output in your voice',
+          text: 'Execute the skill and verify the output matches how you actually write. Extend from here to email, meetings, and reviews.',
+        },
+      ],
+      publisher: {
+        '@type': 'Organization',
+        name: 'Nova Labs',
+        url: 'https://nova-labs.dev',
+      },
+    },
+  ],
+};
 ---
 
 <Layout
   title="Free Quick Start Guide: Build Your First AI Skill in 10 Minutes | Nova Labs"
   description="Build your first AI skill in 10 minutes. A practical guide to setting up Claude Code as your business operating system. No coding required."
+  jsonLd={jsonLd}
 >
   <!-- NAV -->
   <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
