@@ -1,0 +1,257 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is the minimum viable CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "A minimum viable CLAUDE.md needs four things: your tech stack in one line, the directory where new code goes, your test command, and one guardrail. That takes about two minutes to write and immediately improves Claude Code's output. You can expand from there as you notice gaps." }},
+    { "@type": "Question", "name": "How many sections should a CLAUDE.md have?", "acceptedAnswer": { "@type": "Answer", "text": "An effective CLAUDE.md covers five areas: project structure, architecture patterns, coding conventions, testing setup, and guardrails. Most files that score 8 or above have between 30 and 80 lines. Longer is not better. Concise, specific rules work better than detailed documentation." }},
+    { "@type": "Question", "name": "How often should I update my CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Update your CLAUDE.md when Claude makes a mistake that a rule would have prevented. If Claude puts files in the wrong directory, add a structure rule. If it uses the wrong test command, add a testing rule. Most projects need updates every few weeks as patterns stabilize." }},
+    { "@type": "Question", "name": "Should every developer on the team have their own CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "No. CLAUDE.md should be committed to the repository and shared across the team. Individual preferences go in personal config files. The project CLAUDE.md contains project-wide rules that everyone follows. This prevents inconsistencies where each developer's Claude sessions produce different code styles." }}
+  ]
+};
+---
+
+<BlogPost
+  title="The CLAUDE.md configuration checklist: 15 items every project needs"
+  description="A practical checklist for building a complete CLAUDE.md file. Check off each item, score your config, and stop correcting Claude Code on the same issues every session."
+  date="April 11, 2026"
+  readTime="9 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md starter templates", slug: "claudemd-starter-templates" },
+    { title: "Score your CLAUDE.md", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    Every time Claude Code does something you have to correct, a CLAUDE.md rule would have prevented it. The file in the wrong directory, the test command that does not exist, the import style that does not match your codebase. Each correction is a signal that your config is missing something.
+  </p>
+
+  <p>
+    This checklist covers the 15 items that matter most. Some take 30 seconds to add. None are optional if you want Claude to work the way you expect.
+  </p>
+
+  <h2>Category 1: Project structure (items 1-3)</h2>
+
+  <h3>1. Tech stack declaration</h3>
+
+  <p>
+    One line that tells Claude what it is working with.
+  </p>
+
+  <pre><code>React 19 + TypeScript 5.4, Vite, Tailwind CSS 4, PostgreSQL via Prisma.</code></pre>
+
+  <p>
+    This seems obvious, but without it Claude infers your stack from file extensions and package.json. That works most of the time, but fails when you have multiple languages or frameworks in the same repo.
+  </p>
+
+  <h3>2. Directory map</h3>
+
+  <p>
+    Where key directories live and what goes in them.
+  </p>
+
+  <pre><code>- src/components/  — React components (one per file, PascalCase)
+- src/hooks/       — Custom hooks (use* prefix)
+- src/lib/         — Utility functions (pure, no React imports)
+- src/routes/      — Page components (maps to URL path)
+- prisma/          — Database schema and migrations</code></pre>
+
+  <p>
+    Without this, Claude reads your directory listing and makes educated guesses. The guesses are right 80% of the time. The other 20% creates files you have to move.
+  </p>
+
+  <h3>3. Important files</h3>
+
+  <p>
+    Files that Claude should know about but might not find on its own.
+  </p>
+
+  <pre><code>- src/lib/db.ts          — Database client singleton
+- src/middleware/auth.ts  — Auth middleware (used by all protected routes)
+- .env.example            — Template for environment variables</code></pre>
+
+  <p>
+    Listing key files prevents Claude from creating duplicates. If Claude does not know about your database singleton, it might create a new one.
+  </p>
+
+  <h2>Category 2: Architecture (items 4-6)</h2>
+
+  <h3>4. Layer separation</h3>
+
+  <p>
+    How your code is organized into layers and what each layer does.
+  </p>
+
+  <pre><code>- Routes handle HTTP (request parsing, response formatting)
+- Services handle business logic (no HTTP concepts)
+- Models handle data access (Prisma queries only here)</code></pre>
+
+  <p>
+    Without layer rules, Claude puts business logic in route handlers. It works, but it violates your architecture and makes future changes harder.
+  </p>
+
+  <h3>5. Data flow patterns</h3>
+
+  <p>
+    How data moves through your application.
+  </p>
+
+  <pre><code>Route → Service → Model → Database
+Routes never import Models directly.
+Services return plain objects, never Prisma types.</code></pre>
+
+  <p>
+    This prevents the most common architecture violation: Claude bypassing a layer because the direct path is shorter.
+  </p>
+
+  <h3>6. State management approach</h3>
+
+  <p>
+    For frontend projects, how state is handled.
+  </p>
+
+  <pre><code>- Global state: Zustand store in src/stores/
+- Server state: TanStack Query (never fetch in useEffect)
+- Form state: React Hook Form
+- No prop drilling beyond 2 levels — use context or store</code></pre>
+
+  <p>
+    State management is where Claude's training data creates the most inconsistency. It knows five different approaches and will pick whichever feels most natural for the current component, regardless of what the rest of your app uses.
+  </p>
+
+  <h2>Category 3: Coding conventions (items 7-10)</h2>
+
+  <h3>7. Naming rules</h3>
+
+  <pre><code>- Files: kebab-case (user-profile.tsx, not UserProfile.tsx)
+- Components: PascalCase
+- Functions: camelCase
+- Constants: UPPER_SNAKE_CASE
+- Database columns: snake_case</code></pre>
+
+  <p>
+    Naming conventions are the rules Claude breaks most often without explicit instructions. It defaults to its training data patterns, which are a mix of every convention.
+  </p>
+
+  <h3>8. Import ordering</h3>
+
+  <pre><code>- Built-in modules first (node:fs, node:path)
+- External packages second (react, prisma)
+- Internal modules third (@/lib, @/components)
+- Relative imports last (./utils, ../hooks)
+- Blank line between each group</code></pre>
+
+  <p>
+    This is a small detail that shows up in every code review if Claude does not follow it.
+  </p>
+
+  <h3>9. Error handling pattern</h3>
+
+  <pre><code>- Use custom AppError class (extends Error, has statusCode)
+- Services throw AppError, routes catch and format response
+- Never swallow errors silently (no empty catch blocks)
+- Log errors with structured logger, not console.error</code></pre>
+
+  <p>
+    Without a defined error handling pattern, Claude uses try/catch inconsistently and sometimes creates bare <code>catch (e) {}</code> blocks that hide bugs.
+  </p>
+
+  <h3>10. Component pattern (frontend)</h3>
+
+  <pre><code>- Functional components only (no class components)
+- Props interface named ComponentNameProps (exported)
+- No default exports. Use named exports everywhere.
+- Colocate styles: component.tsx + component.module.css</code></pre>
+
+  <p>
+    If you use React, this is one of the highest-impact convention rules. Claude alternates between default and named exports, between inline styles and CSS modules, and between props types and props interfaces unless you tell it which one to use.
+  </p>
+
+  <h2>Category 4: Testing (items 11-13)</h2>
+
+  <h3>11. Test framework and run command</h3>
+
+  <pre><code>- Framework: Vitest
+- Run all: npm test
+- Run single: npx vitest run src/routes/users.test.ts
+- Watch mode: npx vitest</code></pre>
+
+  <p>
+    The run command is the single most impactful testing rule. Without it, Claude either skips tests or tries <code>npm test</code> and hopes it works.
+  </p>
+
+  <h3>12. Test file location and naming</h3>
+
+  <pre><code>- Test files: same directory as source, named *.test.ts
+- Test fixtures: tests/fixtures/ (shared test data)
+- Test helpers: tests/helpers/ (factory functions, mock setup)</code></pre>
+
+  <p>
+    Co-located tests vs. a separate test directory is a project-level decision that Claude cannot infer. Tell it which one you use.
+  </p>
+
+  <h3>13. What to test and how</h3>
+
+  <pre><code>- Test behavior, not implementation
+- Mock external services (HTTP, database). Never mock internal modules.
+- Every route needs at least: success case, validation error, not found
+- Use describe blocks per function/route, it blocks per scenario</code></pre>
+
+  <p>
+    Without testing conventions, Claude writes tests that test implementation details (checking that a specific function was called) rather than behavior (checking that the response is correct). These tests break every time you refactor.
+  </p>
+
+  <h2>Category 5: Guardrails (items 14-15)</h2>
+
+  <h3>14. Destructive action prevention</h3>
+
+  <pre><code>- Never force-push to main/master
+- Never delete files with rm (use mv to .trash/)
+- Never run git reset --hard without confirmation
+- Never skip pre-commit hooks (--no-verify)
+- Never drop database tables without confirmation</code></pre>
+
+  <p>
+    These five rules prevent the most common irreversible mistakes. They take 30 seconds to write and save hours of recovery time.
+  </p>
+
+  <h3>15. Scope boundaries</h3>
+
+  <pre><code>- Do not add dependencies without asking
+- Do not modify CI/CD configuration
+- Do not change the database schema without creating a migration
+- Do not refactor code outside the scope of the current task</code></pre>
+
+  <p>
+    Scope boundaries prevent Claude from "helpfully" fixing things you did not ask about. Refactoring a function while fixing a bug is how regressions happen.
+  </p>
+
+  <h2>How to use this checklist</h2>
+
+  <p>
+    Go through the 15 items above. For each one, write 1-3 lines in your CLAUDE.md. The whole process takes about 15 minutes for a new project.
+  </p>
+
+  <p>
+    For existing projects, check which items you already cover. Most CLAUDE.md files cover 4-6 of the 15 items. The gaps are where Claude makes the mistakes you keep correcting.
+  </p>
+
+  <p>
+    You do not need to write these from scratch. The <a href="/contextkit/generate">ContextKit Generator</a> produces a CLAUDE.md that covers all 15 items. Pick your stack, answer five questions, and export the result.
+  </p>
+
+  <p>
+    To measure your coverage, paste your existing CLAUDE.md into the <a href="/contextkit/analyze">ContextKit Analyzer</a>. It scores you across the five categories (structure, architecture, conventions, testing, guardrails) and highlights exactly which items are missing.
+  </p>
+
+  <p>
+    Most files score between 3 and 5 out of 10 before using the checklist. After adding the missing items, scores typically jump to 7-9. The difference is measurable in fewer corrections per coding session.
+  </p>
+
+  <p>
+    For teams, run <code>npx contextkit score</code> in your CI pipeline. It exits with code 1 when the score drops below 5, catching regressions when someone removes rules during refactoring. The checklist is not a one-time exercise. It is a living baseline that grows as your project does.
+  </p>
+</BlogPost>

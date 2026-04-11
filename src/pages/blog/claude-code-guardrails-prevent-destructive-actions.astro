@@ -1,0 +1,202 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What are Claude Code guardrails?", "acceptedAnswer": { "@type": "Answer", "text": "Guardrails are explicit rules in your CLAUDE.md file that tell Claude Code what actions it must never take. They prevent destructive operations like force-pushing to main, deleting production files, or dropping database tables. Without guardrails, Claude uses its best judgment, which is usually fine but occasionally catastrophic." }},
+    { "@type": "Question", "name": "How do I add guardrails to CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Add a Guardrails section to your CLAUDE.md with specific 'never do' rules. Each rule should name the exact action to avoid and optionally suggest the safe alternative. For example: 'Never delete files with rm. Move to .trash/ instead.' Keep rules concrete and actionable, not vague." }},
+    { "@type": "Question", "name": "Do guardrails slow down Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "No. Guardrails do not reduce Claude's speed or capabilities. They redirect behavior, not restrict it. A guardrail that says 'never force-push, use regular push' does not prevent Claude from pushing code. It prevents a specific dangerous variation of pushing. Well-written guardrails make sessions faster because you spend less time undoing mistakes." }},
+    { "@type": "Question", "name": "What are the most important guardrails to set?", "acceptedAnswer": { "@type": "Answer", "text": "The five most critical guardrails for any project are: never force-push to main/master, never delete files permanently (use trash), never modify applied database migrations, never commit secrets or .env files, and never skip pre-commit hooks. These cover the most common destructive actions that waste significant time to recover from." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code guardrails: how to prevent destructive actions and protect your codebase"
+  description="Claude Code is powerful, but without guardrails it can force-push, delete files, or break your database. Here are the specific CLAUDE.md rules that prevent the mistakes you cannot easily undo."
+  date="April 11, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "Score your CLAUDE.md", slug: "score-your-claudemd" },
+    { title: "Why Claude Code ignores half your instructions", slug: "why-claude-code-ignores-instructions" },
+  ]}
+>
+  <p>
+    Claude Code is an autonomous coding agent. It reads your project, writes code, runs commands, and makes git commits. Most of the time, it does exactly what you want. But the times it does not can cost you an afternoon.
+  </p>
+
+  <p>
+    A force-push to main overwrites your team's work. A dropped database table means restoring from backup. A deleted file that was not in git is gone. These are not theoretical scenarios. They are the kind of things that happen when a powerful tool operates without explicit boundaries.
+  </p>
+
+  <p>
+    Guardrails solve this. They are specific rules in your CLAUDE.md that tell Claude what actions to never take, and what to do instead.
+  </p>
+
+  <h2>Why guardrails matter more than you think</h2>
+
+  <p>
+    Claude Code has access to your terminal. It can run any command your user account can run. It uses this access responsibly, but "responsibly" is based on general training, not your specific project's requirements.
+  </p>
+
+  <p>
+    In a typical project, Claude might:
+  </p>
+
+  <ul>
+    <li>Run <code>git push --force</code> to resolve a diverged branch</li>
+    <li>Delete a config file it thinks is unused</li>
+    <li>Run <code>git reset --hard</code> to clean up a messy working directory</li>
+    <li>Drop and recreate a database table to fix a schema issue</li>
+    <li>Skip pre-commit hooks with <code>--no-verify</code> because a linter is complaining</li>
+  </ul>
+
+  <p>
+    Each of these makes sense in some context. None of them are what you want as default behavior. Guardrails turn these from "Claude's judgment call" into "explicitly prohibited."
+  </p>
+
+  <h2>The essential guardrails every project needs</h2>
+
+  <h3>1. Git safety</h3>
+
+  <pre><code># Git Guardrails
+- Never force-push (git push --force or --force-with-lease) to main or master
+- Never run git reset --hard without explicit confirmation
+- Never skip hooks with --no-verify. If a hook fails, fix the issue.
+- Never amend commits that have been pushed to remote
+- Always create new commits instead of amending when unsure
+- Do not push to remote unless explicitly asked to</code></pre>
+
+  <p>
+    The force-push rule is the most important single guardrail you can set. A force-push to a shared branch can overwrite days of work from multiple team members. Claude might reach for it when a rebase creates conflicts or when local and remote branches diverge.
+  </p>
+
+  <p>
+    The <code>--no-verify</code> rule matters because Claude sometimes tries to bypass failing pre-commit hooks instead of fixing the underlying issue. The hook exists for a reason. Skipping it hides the problem.
+  </p>
+
+  <h3>2. File safety</h3>
+
+  <pre><code># File Safety
+- Never delete files with rm. Move to .trash/ instead: mv file .trash/
+- Never overwrite files without reading them first
+- Do not delete files that are not tracked by git without confirmation
+- Preserve intermediate outputs before retrying failed operations</code></pre>
+
+  <p>
+    The <code>.trash/</code> pattern is more useful than it sounds. Claude occasionally decides a file is unused and removes it. If the file was in git, you can recover it. If it was not (a local config, an untracked data file), it is gone. Moving to <code>.trash/</code> instead of deleting gives you a safety net.
+  </p>
+
+  <h3>3. Database safety</h3>
+
+  <pre><code># Database Guardrails
+- Never drop tables or databases without explicit confirmation
+- Never modify migration files after they have been applied
+- Never run destructive queries (DELETE, TRUNCATE, DROP) on production data
+- Always create a new migration for schema changes, never edit existing ones
+- Back up data before running migrations on non-empty tables</code></pre>
+
+  <p>
+    Database guardrails are critical for any project with persistent data. Claude will sometimes propose dropping and recreating a table as the simplest fix for a schema mismatch. That "fix" destroys your data.
+  </p>
+
+  <h3>4. Security guardrails</h3>
+
+  <pre><code># Security
+- Never commit .env files, API keys, tokens, or credentials
+- Never hardcode secrets in source code
+- Never log sensitive data (passwords, tokens, PII)
+- Never use subprocess with shell=True
+- Never disable SSL verification
+- Do not add third-party dependencies without checking their maintenance status</code></pre>
+
+  <p>
+    Security guardrails prevent the kind of mistakes that create vulnerabilities. Claude generally avoids these patterns, but in complex debugging sessions it might temporarily hardcode a value or disable a security check "just to test." The guardrail prevents the temporary fix from becoming permanent.
+  </p>
+
+  <h3>5. Dependency and infrastructure guardrails</h3>
+
+  <pre><code># Dependencies & Infrastructure
+- Do not add new dependencies without asking first
+- Do not upgrade major versions of existing dependencies without confirmation
+- Do not modify CI/CD pipeline configuration without confirmation
+- Do not change build tool configuration (webpack, vite, etc.) without confirmation
+- Do not modify Docker or container configuration without confirmation</code></pre>
+
+  <p>
+    These guardrails prevent scope creep. Claude might add a utility library to save three lines of code, or upgrade a dependency to fix a deprecation warning. Both are reasonable actions that can break your build in unexpected ways.
+  </p>
+
+  <h2>Writing effective guardrails</h2>
+
+  <h3>Be specific, not vague</h3>
+
+  <p>
+    Bad: "Be careful with the database." Claude does not know what "careful" means in your context.
+  </p>
+
+  <p>
+    Good: "Never run DELETE without a WHERE clause. Never drop tables without confirmation." Claude knows exactly what to avoid.
+  </p>
+
+  <h3>Include the safe alternative</h3>
+
+  <p>
+    Bad: "Never delete files." This prevents Claude from doing something it sometimes needs to do.
+  </p>
+
+  <p>
+    Good: "Never delete files with rm. Move to .trash/ instead." Claude can still remove files from the working directory, just safely.
+  </p>
+
+  <h3>Focus on irreversible actions</h3>
+
+  <p>
+    Guardrails are most valuable for actions that are hard to undo. Reformatting code is easy to revert. Force-pushing a branch is not. Focus your guardrails on the high-consequence actions.
+  </p>
+
+  <h3>Do not over-restrict</h3>
+
+  <p>
+    Twenty guardrails is a lot. If you list every possible bad action, Claude spends more time checking restrictions than writing code. Focus on the 5-10 rules that prevent the biggest disasters. Everything else is handled by good architecture guidance and conventions.
+  </p>
+
+  <h2>Project-specific guardrails</h2>
+
+  <p>
+    Beyond the universal rules, every project has its own danger zones. Think about:
+  </p>
+
+  <ul>
+    <li><strong>What directory must never be modified?</strong> Production configs, deployed manifests, vendor directories.</li>
+    <li><strong>What commands must never run in production?</strong> Seed scripts, test data generators, migration rollbacks.</li>
+    <li><strong>What patterns must never be introduced?</strong> Global state, circular imports, God classes.</li>
+    <li><strong>What third-party systems must not be called?</strong> Payment processors, email services, external APIs in test environments.</li>
+  </ul>
+
+  <p>
+    These are the guardrails that prevent the mistakes unique to your project. The ones you learned about the hard way. Write them down so Claude never has to learn the same lesson.
+  </p>
+
+  <h2>Testing your guardrails</h2>
+
+  <p>
+    Guardrails only work if Claude reads them. The <a href="/contextkit/analyze">ContextKit Analyzer</a> checks whether your CLAUDE.md has a guardrails section and evaluates its quality. It scores you on specificity (concrete rules vs vague advice) and coverage (the major risk categories).
+  </p>
+
+  <p>
+    If your guardrails score is below 2 out of 2, the analyzer tells you exactly what is missing: "No git safety rules detected" or "No mention of file deletion policy." These are the gaps where mistakes happen.
+  </p>
+
+  <p>
+    To add guardrails to an existing CLAUDE.md, you can use the <a href="/contextkit/generate">ContextKit Generator</a> to create a section template. Pick your stack, and it generates guardrails appropriate for your framework and tools.
+  </p>
+
+  <p>
+    For team projects, run <code>npx contextkit score</code> in CI. If someone removes a guardrail in a pull request, the score drops and the pipeline flags it. Guardrails are too important to remove by accident.
+  </p>
+</BlogPost>

@@ -1,0 +1,361 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can Claude Code run inside a CI/CD pipeline?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code itself is an interactive tool for local development. What you can do in CI is run quality checks on the configuration that Claude Code uses, specifically your CLAUDE.md file, using tools like npx contextkit score. You can also run pre-commit hooks that validate AI-generated code before it ever reaches your pipeline." }},
+    { "@type": "Question", "name": "How do I enforce CLAUDE.md quality in GitHub Actions?", "acceptedAnswer": { "@type": "Answer", "text": "Add a step that runs npx contextkit score --min 5 to your workflow. ContextKit CLI returns exit code 1 when the score falls below your threshold, which fails the workflow. This catches config drift early, before a degraded CLAUDE.md causes subtle problems in your AI-generated code." }},
+    { "@type": "Question", "name": "What is config drift in AI-assisted development?", "acceptedAnswer": { "@type": "Answer", "text": "Config drift happens when your CLAUDE.md stops reflecting how your codebase actually works. Someone adds a new directory, changes the test framework, or updates naming conventions, but the CLAUDE.md stays the same. Claude Code then generates code based on outdated rules. Automated scoring in CI catches this by failing the build when the config falls below a usable quality threshold." }},
+    { "@type": "Question", "name": "What pre-commit hooks work well with Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "The most effective pre-commit hooks for AI-assisted codebases are: running your linter with zero-tolerance settings (AI-generated code often has style inconsistencies), checking that test files exist alongside new source files, and scoring your CLAUDE.md with npx contextkit score. These catch the patterns that AI code generation gets wrong most often." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to integrate Claude Code into your CI/CD pipeline"
+  description="AI-generated code needs the same quality gates as hand-written code, sometimes stricter ones. Here is how to use GitHub Actions, pre-commit hooks, and config drift detection to keep AI-assisted codebases reliable."
+  date="April 11, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to score your CLAUDE.md from the terminal", slug: "score-claudemd-from-terminal" },
+    { title: "CLAUDE.md for teams: keeping configs consistent across developers", slug: "claudemd-for-teams" },
+    { title: "Claude Code guardrails: how to prevent destructive actions", slug: "claude-code-guardrails-prevent-destructive-actions" },
+  ]}
+>
+  <p>
+    When you write code by hand, you know what you wrote. You can defend every line in a review. You know which decisions were deliberate and which were shortcuts. AI-generated code does not come with that context. It looks confident, compiles cleanly, and passes basic tests. Then three weeks later someone discovers it was quietly ignoring error cases, using a deprecated API, or solving the wrong problem.
+  </p>
+
+  <p>
+    The fix is not to distrust AI-generated code. The fix is to treat it the same way you treat any code that arrives without full context: run it through quality gates before it merges.
+  </p>
+
+  <p>
+    This post covers four things: why AI code needs CI gates, how to score your CLAUDE.md as part of every pull request, how to set up a GitHub Actions workflow that catches common AI code issues, and how to monitor config drift before it degrades your whole team's output.
+  </p>
+
+  <h2>Why AI-generated code needs quality gates</h2>
+
+  <p>
+    AI coding assistants make a specific kind of mistake. They are very good at producing plausible code and not great at knowing when a pattern does not fit your specific context. If your CLAUDE.md says "use the repository pattern" but does not explain how your repositories are structured, Claude will implement a repository that looks right but does not integrate with the rest of your system.
+  </p>
+
+  <p>
+    These mistakes are harder to catch in review than obvious bugs. The code is idiomatic. It uses correct syntax. It even has tests. But it bypasses your error handling layer, imports the wrong logger, or skips the validation middleware that every other route goes through.
+  </p>
+
+  <p>
+    Three things go wrong most often with AI-generated code in team codebases:
+  </p>
+
+  <ul>
+    <li><strong>Convention drift:</strong> AI picks its own style when yours is underspecified. Over time, a codebase developed with AI assistance develops subtle inconsistencies that are invisible until you try to refactor.</li>
+    <li><strong>Missing test coverage:</strong> AI writes tests when asked, but may not know which scenarios matter most for your domain. Without a gate, important edge cases stay untested.</li>
+    <li><strong>Config staleness:</strong> Your CLAUDE.md was accurate six months ago. Since then, you changed frameworks, restructured directories, or updated your patterns. Claude is still following the old rules.</li>
+  </ul>
+
+  <p>
+    Automated gates catch all three. They do not require code reviewers to memorize every convention. They run the same checks on every commit, every time.
+  </p>
+
+  <h2>Scoring your CLAUDE.md in CI with ContextKit</h2>
+
+  <p>
+    The most overlooked CI check for AI-assisted codebases is scoring the config file that drives your AI assistant. If your CLAUDE.md has a score below 5 out of 10, Claude Code is guessing at conventions, file structure, and testing patterns. Every AI-generated PR is working from an incomplete map.
+  </p>
+
+  <p>
+    The <a href="https://github.com/novalabs-dev/contextkit">ContextKit CLI</a> scores your CLAUDE.md from the terminal. It returns exit code 1 when the score falls below your threshold, which integrates cleanly into any CI system.
+  </p>
+
+  <pre><code>npx contextkit score --min 5</code></pre>
+
+  <p>
+    A score below 5 means your CLAUDE.md is missing at least two of the five core categories: structure, architecture, conventions, testing setup, or guardrails. Any of those gaps leads to AI-generated code that drifts from your standards.
+  </p>
+
+  <p>
+    You can also check what the score is without failing the build, useful for informational reporting:
+  </p>
+
+  <pre><code>npx contextkit score</code></pre>
+
+  <p>
+    This outputs a full breakdown by category, specific suggestions for what to add, and a numeric score. Add the <code>--min</code> flag when you want to enforce a floor.
+  </p>
+
+  <p>
+    You can also analyze your config in the browser at <a href="https://nova-labs.dev/contextkit/analyze">nova-labs.dev/contextkit/analyze</a> - paste the file, get the score and suggestions instantly.
+  </p>
+
+  <h2>GitHub Actions workflow</h2>
+
+  <p>
+    Here is a complete workflow that runs CLAUDE.md scoring, linting, and tests on every pull request. Add this file to your repo at <code>.github/workflows/ai-quality.yml</code>:
+  </p>
+
+  <pre><code>name: AI Code Quality
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  config-quality:
+    name: Check CLAUDE.md quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Score CLAUDE.md
+        run: npx contextkit score --min 5
+        # Fails if score is below 5 (exit code 1)
+        # Remove --min 5 to report score without blocking
+
+  code-quality:
+    name: Lint and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        # Use --max-warnings 0 for AI-assisted codebases
+        # AI code often passes lint with warnings; treat warnings as errors
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run tests
+        run: npm test -- --coverage</code></pre>
+
+  <p>
+    A few things worth explaining in this workflow:
+  </p>
+
+  <p>
+    The <code>config-quality</code> job runs independently from the code quality job. If your CLAUDE.md score drops below 5, the PR is blocked regardless of whether the code itself passes tests. This creates the right pressure: fixing a degraded config file is a prerequisite for merging, not an optional cleanup item.
+  </p>
+
+  <p>
+    The linter step uses <code>--max-warnings 0</code> (or equivalent for your linter). AI-generated code often passes lint with minor warnings because the AI knows the rules but applies them inconsistently. Treating warnings as errors forces those inconsistencies to be resolved.
+  </p>
+
+  <p>
+    The test coverage threshold is a judgment call. 80% line coverage is a reasonable starting point for AI-assisted codebases. The AI writes tests when it writes code, so coverage tends to be higher than in purely hand-written codebases, but the tests often miss the edge cases that actually matter. A coverage gate ensures that at minimum, the happy path is tested.
+  </p>
+
+  <h2>Pre-commit hooks with Claude Code</h2>
+
+  <p>
+    CI catches problems after the fact. Pre-commit hooks catch them before a commit ever happens. For AI-assisted development, where a single session can produce dozens of files, catching issues locally is faster and less disruptive.
+  </p>
+
+  <p>
+    Install <a href="https://pre-commit.com">pre-commit</a> and create a <code>.pre-commit-config.yaml</code> file in your repo root:
+  </p>
+
+  <pre><code>repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-yaml
+
+  - repo: local
+    hooks:
+      - id: contextkit-score
+        name: Score CLAUDE.md
+        language: system
+        entry: npx contextkit score --min 5
+        files: CLAUDE\.md$
+        pass_filenames: false
+        # Only runs when CLAUDE.md is modified
+
+      - id: eslint
+        name: ESLint
+        language: system
+        entry: npx eslint --max-warnings 0
+        files: \.(js|ts|jsx|tsx)$
+        types: [file]
+
+      - id: test-coverage-check
+        name: Check test files exist
+        language: system
+        entry: python3 scripts/check_test_coverage.py
+        files: src/.*\.(js|ts)$
+        pass_filenames: true</code></pre>
+
+  <p>
+    The <code>contextkit-score</code> hook only runs when CLAUDE.md is modified. This means it does not slow down every commit, only the ones that change the config file. When someone edits CLAUDE.md and the score drops below 5, the commit is blocked until they fix it.
+  </p>
+
+  <p>
+    The test coverage check hook is a custom script that verifies test files exist alongside new source files. Here is a minimal version of that script:
+  </p>
+
+  <pre><code set:html={`#!/usr/bin/env python3
+# scripts/check_test_coverage.py
+import sys
+import os
+
+missing = []
+for filepath in sys.argv[1:]:
+    # Skip test files themselves
+    if '.test.' in filepath or '.spec.' in filepath:
+        continue
+    # Only check source files in src/
+    if not filepath.startswith('src/'):
+        continue
+
+    # Derive expected test file path
+    base = filepath.replace('src/', 'tests/', 1)
+    name, ext = os.path.splitext(base)
+    test_path = f"{name}.test{ext}"
+
+    if not os.path.exists(test_path):
+        missing.append(f"  Missing: {test_path} (for {filepath})")
+
+if missing:
+    print("New source files are missing test files:")
+    for m in missing:
+        print(m)
+    sys.exit(1)`}></code></pre>
+
+  <p>
+    This is blunt but effective. AI-generated code often comes with tests for the obvious paths. The script just makes sure a test file exists at all. You can extend it with actual coverage checks once you have the baseline in place.
+  </p>
+
+  <h2>Automated testing strategies for AI-written code</h2>
+
+  <p>
+    The testing challenge with AI-generated code is that it comes with tests already. The AI wrote them. The issue is not missing tests, it is tests that validate the wrong things.
+  </p>
+
+  <p>
+    AI tends to test the happy path thoroughly and the edge cases inconsistently. It writes tests based on what it knows about the function, not based on what could actually go wrong in your system. This produces high coverage numbers that give false confidence.
+  </p>
+
+  <p>
+    A few strategies that work better than relying on AI-generated tests alone:
+  </p>
+
+  <h3>Review tests before reviewing code</h3>
+
+  <p>
+    In code review, look at the test file first. What scenarios does it cover? What scenarios are missing? This is faster than reading the implementation and tells you just as much about whether the AI understood the requirements.
+  </p>
+
+  <h3>Add a required test categories checklist to your CLAUDE.md</h3>
+
+  <p>
+    Tell Claude explicitly what to test. A generic instruction like "write tests" produces generic tests. Specific instructions produce better coverage:
+  </p>
+
+  <pre><code># Testing Requirements
+- Every function that handles user input must test the invalid input case
+- Every async function must test the rejection/error path
+- Every function that calls an external service must test the failure case
+- Never mock internal modules; use real implementations with test data
+- Happy path + at least 2 edge cases minimum per function</code></pre>
+
+  <h3>Use mutation testing on AI-generated code specifically</h3>
+
+  <p>
+    Mutation testing tools (Stryker for JS/TS, mutmut for Python) introduce small changes to your code and check whether tests catch them. AI-generated tests often fail mutation testing spectacularly: they test that a function runs without errors, not that it produces the right output. A 10-minute mutation test run on a new AI-generated module will tell you more than a coverage report.
+  </p>
+
+  <h2>Monitoring config drift in team repos</h2>
+
+  <p>
+    In a solo project, CLAUDE.md drift is annoying. In a team repo, it becomes a consistency problem. Developer A updates a directory structure, developer B adds a new test framework for a specific module, developer C changes the deployment process. Nobody updates CLAUDE.md. Within a month, the config file describes a project that no longer exists.
+  </p>
+
+  <p>
+    The result: every team member using Claude Code is working from a different mental model of the codebase, and all of them are wrong.
+  </p>
+
+  <p>
+    Three practices that prevent this:
+  </p>
+
+  <h3>Add CLAUDE.md review to your PR template</h3>
+
+  <p>
+    Add a checkbox to your pull request template: "Does this change require updating CLAUDE.md?" This is not automated, but it creates a moment of deliberate consideration. Add it to <code>.github/pull_request_template.md</code>:
+  </p>
+
+  <pre><code>## Changes
+[Describe what this PR does]
+
+## Checklist
+- [ ] Tests added or updated
+- [ ] Documentation updated if needed
+- [ ] CLAUDE.md updated if this changes file structure, conventions, or tooling</code></pre>
+
+  <h3>Run a weekly config score check</h3>
+
+  <p>
+    Add a scheduled workflow that runs <code>npx contextkit score</code> weekly and posts results to your team Slack or creates a GitHub issue when the score drops. This catches drift that individual PRs miss because the overall config degrades gradually.
+  </p>
+
+  <pre><code>name: Weekly Config Audit
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Score CLAUDE.md
+        run: npx contextkit score --min 5</code></pre>
+
+  <h3>Pin CLAUDE.md reviews to architecture decisions</h3>
+
+  <p>
+    When you make a significant architectural decision, update CLAUDE.md in the same commit. This keeps the config file aligned with actual decisions rather than lagging behind them. Treat CLAUDE.md as living documentation that changes when the system changes, not after.
+  </p>
+
+  <h2>What this looks like in practice</h2>
+
+  <p>
+    A team that has implemented these gates sees a different kind of failure mode. Before: AI-generated code passes review, gets merged, causes subtle bugs in production three weeks later, no one can trace why. After: AI-generated code fails the pre-commit hook because the test file is missing, or the PR is blocked because a recent refactor dropped the CLAUDE.md score to 4, or the weekly audit flags that the config no longer mentions the new authentication module.
+  </p>
+
+  <p>
+    The failures are earlier, more obvious, and cheaper to fix. That is the actual value of these gates: not preventing AI from writing code, but catching the mismatch between what the AI was told and what the codebase actually needs.
+  </p>
+
+  <p>
+    None of this requires a complex setup. The GitHub Actions workflow above takes about 30 minutes to add to an existing project. The pre-commit hooks take another 15 minutes. The CLAUDE.md scoring check is one line.
+  </p>
+
+  <p>
+    Start with the CLAUDE.md score gate. If your config is already solid, the check will pass and add zero friction. If it surfaces a score below 5, fixing it will immediately improve every Claude Code session on your team.
+  </p>
+
+  <p>
+    Score your config now at <a href="https://nova-labs.dev/contextkit/analyze">nova-labs.dev/contextkit/analyze</a>, or run it directly in your repo with the <a href="https://github.com/novalabs-dev/contextkit">ContextKit CLI</a>: <code>npx contextkit score</code>.
+  </p>
+</BlogPost>

@@ -1,0 +1,311 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Why does Claude Code keep writing wrong code even though I have a CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "A CLAUDE.md that exists but has vague or incomplete rules behaves the same as no file at all. Claude falls back to training defaults for anything your file does not explicitly address. The most common culprits are missing test commands, no file structure section, and positive-only instructions with no 'never do this' rules. Run your file through the ContextKit Analyzer to find exactly which sections are missing." }},
+    { "@type": "Question", "name": "What is context window overflow in Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code has a fixed context window. In long sessions, older parts of the conversation, including the rules from your CLAUDE.md, get pushed out to make room for new content. When this happens, Claude stops following rules it was following earlier in the session. The fix is to start a fresh session, which reloads your CLAUDE.md from the top. Sessions longer than 30-40 substantial exchanges are the most likely to hit this." }},
+    { "@type": "Question", "name": "How do I stop Claude Code from creating files in the wrong directory?", "acceptedAnswer": { "@type": "Answer", "text": "Add an explicit file structure section to your CLAUDE.md that maps every major directory and what goes in it. Without this, Claude reads the directory listing and guesses. With it, Claude goes directly to the path you specified. Include both where files should go and where they should not go (for example: 'Do not create utility files in src/components/')." }},
+    { "@type": "Question", "name": "When should I restart a Claude Code session vs fix my config?", "acceptedAnswer": { "@type": "Answer", "text": "Restart the session when: Claude was following a rule earlier in the session but stopped, the session is long and Claude seems to be 'forgetting' things, or a rule was recently added and has not been picked up yet. Fix the config when: Claude has never followed a particular rule, the same mistake happens in new sessions, or the same error recurs across multiple projects. Session restart fixes context overflow. Config changes fix actual gaps in your instructions." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to debug Claude Code when it writes wrong code"
+  description="Claude Code keeps using the wrong import style, ignoring your test framework, or creating files in the wrong directory. Here is a systematic way to find the actual cause and fix it."
+  date="April 11, 2026"
+  readTime="9 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Why Claude Code ignores half your instructions", slug: "why-claude-code-ignores-instructions" },
+    { title: "Claude Code guardrails: prevent destructive actions", slug: "claude-code-guardrails-prevent-destructive-actions" },
+    { title: "How to score your CLAUDE.md file", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    Claude Code writes a component using the wrong import style. You correct it. Next file, same mistake. You add a rule to your CLAUDE.md. Works for one session, then breaks again. You restart. Works again. Then does not.
+  </p>
+
+  <p>
+    This is not random. There are specific, diagnosable causes for each of these patterns, and each one has a different fix. Running through them in order takes less time than randomly tweaking your config and hoping something sticks.
+  </p>
+
+  <h2>Step 1: Check your CLAUDE.md before assuming anything else</h2>
+
+  <p>
+    The most common cause of wrong output is not a Claude bug or a context issue. It is a CLAUDE.md that does not actually say what you think it says.
+  </p>
+
+  <p>
+    Before anything else, open your CLAUDE.md and look for these specific problems:
+  </p>
+
+  <ul>
+    <li><strong>The rule is vague.</strong> "Write clean imports" is not a rule. "Use named exports only, no default exports, group imports as: built-in, external, internal, separated by blank lines" is a rule.</li>
+    <li><strong>The rule exists but is buried.</strong> Claude reads your entire CLAUDE.md, but rules near the top of prominent sections carry more weight. A single bullet in a long list is easy to de-prioritize.</li>
+    <li><strong>You only said what to do, not what to avoid.</strong> If your project uses Vitest but your CLAUDE.md only says "use Vitest for tests," Claude might still reach for Jest because the negative instruction is missing. Add: "Do not use Jest. Do not use Mocha."</li>
+    <li><strong>The rule contradicts something else in the file.</strong> Two sections saying different things about the same behavior create ambiguity. Claude picks one.</li>
+  </ul>
+
+  <p>
+    If your CLAUDE.md has any of these problems, fixing them is your first move. Everything else on this list is downstream of a solid config.
+  </p>
+
+  <p>
+    The <a href="/contextkit/analyze">ContextKit Analyzer</a> scores your file across five categories and shows you specifically which sections are weak or missing. Paste your CLAUDE.md, get a score, and look at which categories are below 1.5 out of 2. Those are where the gaps are.
+  </p>
+
+  <h2>Step 2: Context window overflow (when Claude forgets mid-session)</h2>
+
+  <p>
+    Claude Code has a fixed context window. In a long session with lots of file reads, code generation, and back-and-forth, the oldest content gets dropped to make room for new content. Your CLAUDE.md is loaded at the start of the session. If the session runs long enough, parts of it fall out of the window.
+  </p>
+
+  <p>
+    The symptom is specific: Claude follows a rule early in the session, then stops following it later. Same session, same rule, different behavior. This is almost always context overflow.
+  </p>
+
+  <p>
+    How to tell: look at how long the current session is. If you have done 30 or more substantial exchanges, read multiple large files, and worked across several different parts of the codebase, you are likely in overflow territory.
+  </p>
+
+  <p>
+    The fix is to start a new session. Claude reloads your CLAUDE.md fresh from the top, and the rules are back in full context. You lose the session history, but you gain a Claude that follows your conventions again.
+  </p>
+
+  <p>
+    To reduce how often this happens, keep your CLAUDE.md focused. Every line you add to CLAUDE.md is loaded into every session. A 400-line file that includes project history, deployment notes, and architecture explanations is using context that could be keeping your rules in window. Trim it to what actually changes Claude's coding behavior.
+  </p>
+
+  <h2>Step 3: Ambiguous instructions that Claude reads differently</h2>
+
+  <p>
+    Some rules fail not because they are missing but because Claude interprets them differently than you intended. This is especially common with instructions that have implicit assumptions.
+  </p>
+
+  <p>
+    A real example: a developer adds "use functional components" to their CLAUDE.md. They mean React functional components, no class components. Claude understands this. But Claude also continues using default exports because "functional components" says nothing about export style. The developer assumed the rule covered it. Claude read it literally.
+  </p>
+
+  <p>
+    Another common case: "follow the existing patterns in the codebase." This sounds comprehensive. In practice, if the codebase has inconsistent patterns (which most real codebases do), Claude picks one of them. Which one depends on what it found most recently. The result is technically compliant with your instruction but not what you wanted.
+  </p>
+
+  <p>
+    The test for an ambiguous instruction: can you look at any piece of Claude's output and immediately tell whether it followed the rule or violated it? If there is any ambiguity in how you would answer that, the instruction is ambiguous to Claude too.
+  </p>
+
+  <p>
+    Fix ambiguous rules by making them concrete and checkable:
+  </p>
+
+  <pre><code># Before (ambiguous)
+Use functional components and follow existing patterns.
+
+# After (concrete)
+- Only functional components. No class components.
+- Named exports only. No default exports.
+- Props interface named ComponentNameProps, defined above the component.
+- No inline styles. Tailwind classes only.
+- useCallback and useMemo only for proven performance issues, not by default.</code></pre>
+
+  <h2>Step 4: Missing .claude/rules/ files for team conventions</h2>
+
+  <p>
+    Your CLAUDE.md lives at the project root. But you can also create a <code>.claude/rules/</code> directory with additional rule files. Claude Code reads any <code>.md</code> files in this directory as supplementary project instructions.
+  </p>
+
+  <p>
+    Many teams put team-wide conventions in CLAUDE.md and project-specific rules in <code>.claude/rules/</code>. If the rules directory exists but some files are missing, Claude gets a partial picture of your conventions. It follows what it can find and falls back to defaults for the rest.
+  </p>
+
+  <p>
+    Check whether your project has a <code>.claude/rules/</code> directory:
+  </p>
+
+  <pre><code>ls .claude/rules/</code></pre>
+
+  <p>
+    If the directory exists, check that all the rule files are present and not empty. Common rule files that get accidentally omitted: <code>git.md</code> (git safety rules), <code>testing.md</code> (test conventions), <code>security.md</code> (what never to commit).
+  </p>
+
+  <p>
+    If you are working on a team and cloned a repo, these files should be in version control. If they are in <code>.gitignore</code>, every team member needs to add them manually. That is a common gap.
+  </p>
+
+  <h2>Step 5: The "works on first try, breaks on retry" pattern</h2>
+
+  <p>
+    This one is specific: Claude generates correct code on the first attempt. You ask it to modify or extend that code. The second version breaks a rule the first version followed.
+  </p>
+
+  <p>
+    The cause is stale context. When Claude edits existing code, it reads the existing file to understand what is there. If the existing code has patterns that conflict with your CLAUDE.md rules (legacy code, code from before you added the rule), Claude picks up those patterns from the file and they compete with your explicit instructions.
+  </p>
+
+  <p>
+    Example: your CLAUDE.md says "no default exports." You have an old component that uses a default export. Claude reads that component, generates a new version, and mirrors the default export pattern from the original because it just read it.
+  </p>
+
+  <p>
+    The fix has two parts. First, make the rule emphatic in your CLAUDE.md:
+  </p>
+
+  <pre><code># Conventions
+- Named exports ONLY. No default exports under any circumstances.
+- If editing a file with a default export, convert it to named export as part of the task.</code></pre>
+
+  <p>
+    Second, when asking Claude to modify existing code that has legacy patterns, explicitly call out the pattern conflict: "This file uses default exports but our convention is named exports. Fix that as part of this task."
+  </p>
+
+  <h2>Step 6: Using the Analyzer to find config gaps</h2>
+
+  <p>
+    If the above checks do not surface the problem, the issue is probably a missing section you have not thought to add. The <a href="/contextkit/analyze">ContextKit Analyzer</a> is useful here because it checks for categories you might not realize are missing.
+  </p>
+
+  <p>
+    Paste your CLAUDE.md and look specifically at the categories scoring below 1 out of 2:
+  </p>
+
+  <ul>
+    <li><strong>Low structure score:</strong> Your file does not tell Claude where things go. This explains wrong directory placement and missed existing utilities.</li>
+    <li><strong>Low architecture score:</strong> Your file does not describe how layers connect. This explains Claude putting business logic in the wrong place or introducing the wrong patterns.</li>
+    <li><strong>Low testing score:</strong> No test framework or command specified. This explains wrong test framework, skipped tests, or tests placed in the wrong location.</li>
+    <li><strong>Low guardrails score:</strong> No negative rules. This explains Claude doing things you did not want but never explicitly prohibited.</li>
+  </ul>
+
+  <p>
+    The analyzer gives you specific suggestions for each low-scoring category. Add those sections to your CLAUDE.md, run through a few tasks, and check whether the problematic behavior is gone.
+  </p>
+
+  <h2>Step 7: When to restart a session vs when to fix the config</h2>
+
+  <p>
+    These are two different fixes for two different problems. Using the wrong one wastes time.
+  </p>
+
+  <p>
+    <strong>Restart the session when:</strong>
+  </p>
+  <ul>
+    <li>Claude was following a rule earlier in the session but stopped following it later</li>
+    <li>The session has been running for a while and involved reading many files</li>
+    <li>You just added a new rule to CLAUDE.md and want Claude to pick it up immediately</li>
+    <li>Claude seems to be working from assumptions that were true 20 exchanges ago but are no longer relevant</li>
+  </ul>
+
+  <p>
+    <strong>Fix the config when:</strong>
+  </p>
+  <ul>
+    <li>The problem happens in the first 5-10 exchanges of a fresh session</li>
+    <li>The same mistake recurs across multiple separate sessions</li>
+    <li>You have never seen Claude follow this particular rule, even in short sessions</li>
+    <li>The same error appears in different projects that share similar configs</li>
+  </ul>
+
+  <p>
+    Session restart fixes context overflow and picks up config changes. Config fixes eliminate the root cause. If you are always restarting sessions to get correct behavior, you have a config problem you are treating as a session problem.
+  </p>
+
+  <h2>Real examples: what the mistake looks like and where to find the fix</h2>
+
+  <h3>Wrong import style</h3>
+
+  <p>
+    Claude generates <code set:html="import React, { useState } from 'react'"></code> when you want just <code set:html="import { useState } from 'react'"></code> (React 17+ JSX transform does not need the React import).
+  </p>
+
+  <p>
+    Where to look first: CLAUDE.md conventions section. The rule "no unused React imports" or "use automatic JSX transform, do not import React unless using React APIs directly" fixes this immediately.
+  </p>
+
+  <pre><code># Conventions
+- React 18 project. Do not import React unless using React.forwardRef, React.memo,
+  or similar. JSX transform handles the rest.
+- No `import React from 'react'` at the top of component files.</code></pre>
+
+  <h3>Ignoring the test framework</h3>
+
+  <p>
+    Your project uses Vitest. Claude writes <code>describe</code> and <code>it</code> blocks, imports from <code>@jest/globals</code>, and expects Jest to run the tests.
+  </p>
+
+  <p>
+    Where to look first: CLAUDE.md testing section, or lack of one. Add:
+  </p>
+
+  <pre><code set:html={`# Testing
+- Framework: Vitest (not Jest)
+- Run all tests: \`npx vitest\`
+- Run single file: \`npx vitest run src/utils/format.test.ts\`
+- Import from 'vitest': \`import { describe, it, expect, vi } from 'vitest'\`
+- Do not import from '@jest/globals' or use jest.fn(). Use vi.fn() for mocks.`}></code></pre>
+
+  <h3>Creating files in the wrong directory</h3>
+
+  <p>
+    You ask Claude to add a new utility function. It creates <code>src/components/dateUtils.ts</code> instead of <code>src/lib/date.ts</code>.
+  </p>
+
+  <p>
+    Where to look first: CLAUDE.md file structure section. Without explicit mapping, Claude reads the directory listing and makes a judgment call. Add a structure section:
+  </p>
+
+  <pre><code># File Structure
+- src/components/ -- React components only. No utility functions or business logic.
+- src/lib/ -- Utility functions, helpers, business logic. One file per domain.
+- src/hooks/ -- Custom React hooks only.
+- src/types/ -- TypeScript interfaces and types. No runtime code.
+- src/pages/ -- Next.js pages/routes only. Thin files that import from components and lib.</code></pre>
+
+  <p>
+    With this in place, Claude knows that a utility function belongs in <code>src/lib/</code>, not <code>src/components/</code>.
+  </p>
+
+  <h3>Creating a new file instead of editing the existing one</h3>
+
+  <p>
+    You ask Claude to add a function to your auth service. It creates <code>src/lib/auth-v2.ts</code> instead of editing <code>src/lib/auth.ts</code>.
+  </p>
+
+  <p>
+    Where to look first: this is usually a vague instruction problem. "Add a password reset function" does not tell Claude whether to create a new file or edit an existing one. More explicit: "Add a <code>resetPassword()</code> function to the existing <code>src/lib/auth.ts</code> file."
+  </p>
+
+  <p>
+    You can also prevent the pattern in CLAUDE.md:
+  </p>
+
+  <pre><code># Rules
+- Before creating a new file, check whether the functionality fits in an existing file.
+- Do not create versioned files (auth-v2.ts, utils-new.ts). Edit the existing file.</code></pre>
+
+  <h2>Summary: the debugging order</h2>
+
+  <p>
+    When Claude Code produces wrong output, work through this order:
+  </p>
+
+  <ol>
+    <li>Check CLAUDE.md for vague, missing, or contradictory rules for the specific behavior that is wrong</li>
+    <li>If the problem started mid-session after working correctly: context overflow. Start a new session.</li>
+    <li>If the rule exists but Claude interprets it differently: make the rule more specific and add a negative version</li>
+    <li>If you are on a team: check whether <code>.claude/rules/</code> files are all present</li>
+    <li>If editing existing code triggers the problem: add a rule that explicitly overrides patterns from existing code</li>
+    <li>Run your CLAUDE.md through the <a href="/contextkit/analyze">ContextKit Analyzer</a> and fix any category scoring below 1.5</li>
+  </ol>
+
+  <p>
+    Most wrong output traces back to step 1. The config has a gap, and Claude fills it with training defaults. Every other item on this list is a real cause, but less common than a CLAUDE.md that looks complete but does not actually cover the behavior you want.
+  </p>
+
+  <p>
+    If you want to audit your config thoroughly before debugging further, the <a href="/contextkit/analyze">ContextKit Analyzer</a> surfaces the gaps in under a minute. Low scores in specific categories point directly at the rules you need to add.
+  </p>
+</BlogPost>

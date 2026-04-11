@@ -1,0 +1,305 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Do I need a CLAUDE.md file for Python projects?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Python projects have specific conventions around virtual environments, import ordering, type hints, and testing frameworks that Claude Code cannot infer from your code alone. A CLAUDE.md file with these details prevents Claude from mixing up pytest and unittest, creating files outside your package structure, or ignoring your type annotation style." }},
+    { "@type": "Question", "name": "What should a Python CLAUDE.md include?", "acceptedAnswer": { "@type": "Answer", "text": "A Python CLAUDE.md should include your project structure (src layout vs flat layout), package manager (pip, poetry, uv), virtual environment path, test framework and command (pytest, unittest), type checking tool (mypy, pyright), linting setup (ruff, flake8), naming conventions (snake_case everywhere), and import ordering rules." }},
+    { "@type": "Question", "name": "How do I handle virtual environments in CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Tell Claude exactly where your venv lives and how to activate it. For example: 'Virtual environment: .venv/ (activate with source .venv/bin/activate). Always run Python commands inside the venv. Never install packages globally.' This prevents Claude from running pip install without the venv active." }},
+    { "@type": "Question", "name": "Should I put my pyproject.toml settings in CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "No. Claude already reads pyproject.toml automatically. Your CLAUDE.md should contain the rules that are NOT in config files: architectural patterns, where to put new modules, what not to touch, and project-specific conventions that a config file cannot express." }}
+  ]
+};
+---
+
+<BlogPost
+  title="CLAUDE.md for Python projects: the complete configuration guide"
+  description="Python projects need specific CLAUDE.md sections for virtual environments, testing, type hints, and package structure. Here is a complete guide with examples for Django, FastAPI, and data science projects."
+  date="April 11, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "CLAUDE.md examples for every stack", slug: "claude-code-claudemd-examples" },
+    { title: "Score your CLAUDE.md", slug: "score-your-claudemd" },
+  ]}
+>
+  <p>
+    Python is one of the most popular languages for Claude Code users, and one of the trickiest to configure well. The language itself is flexible enough that Claude has dozens of reasonable choices for any given task: pytest or unittest, classes or functions, src layout or flat layout, type hints or no type hints.
+  </p>
+
+  <p>
+    Without a CLAUDE.md, Claude picks based on training data patterns. Sometimes that matches your project. Often it does not. You end up correcting import styles, fixing test commands, and moving files that got created in the wrong directory.
+  </p>
+
+  <p>
+    A good Python CLAUDE.md eliminates this. Here is what it should contain, with real examples you can adapt.
+  </p>
+
+  <h2>The Python-specific sections your CLAUDE.md needs</h2>
+
+  <h3>1. Project structure and package layout</h3>
+
+  <p>
+    Python projects use two common layouts, and mixing them creates import errors that waste time. Tell Claude which one you use:
+  </p>
+
+  <pre><code># Project Structure
+- src/myapp/          — Main package (src layout, installed via pip install -e .)
+- src/myapp/api/      — FastAPI route modules (one file per resource)
+- src/myapp/models/   — SQLAlchemy models (one class per file)
+- src/myapp/services/ — Business logic (no HTTP or DB imports here)
+- tests/              — Mirrors src/myapp/ structure
+- migrations/         — Alembic migrations (never edit after applying)
+- scripts/            — CLI tools and one-off scripts</code></pre>
+
+  <p>
+    The key detail is "src layout" vs flat layout. In a src layout, the package lives inside <code>src/</code> and must be installed with <code>pip install -e .</code> before imports work. In a flat layout, the package sits at the project root. Claude needs to know this or it will create files in the wrong place and generate imports that fail.
+  </p>
+
+  <h3>2. Virtual environment and package manager</h3>
+
+  <p>
+    This is where most Python CLAUDE.md files fall short. Claude needs to know how to install packages and which environment to use:
+  </p>
+
+  <pre><code># Environment
+- Package manager: uv (pyproject.toml)
+- Virtual environment: .venv/ (activate: source .venv/bin/activate)
+- Install dependencies: uv pip install -r requirements.txt
+- Add new dependency: uv pip install <package> && uv pip freeze > requirements.txt
+- Python version: 3.12
+- ALWAYS run commands inside the venv. Never install packages globally.</code></pre>
+
+  <p>
+    If you use Poetry, the instructions are different. If you use pip with requirements.txt, different again. If you use uv, Claude might not know about it yet from training data. Be explicit.
+  </p>
+
+  <h3>3. Testing setup</h3>
+
+  <p>
+    Python has at least three common test runners, and Claude will guess wrong if you do not specify:
+  </p>
+
+  <pre><code># Testing
+- Framework: pytest
+- Run all tests: pytest
+- Run single file: pytest tests/test_users.py
+- Run single test: pytest tests/test_users.py::test_create_user
+- Run with coverage: pytest --cov=src/myapp
+- Fixtures: use conftest.py files (one per test directory)
+- Mocking: use unittest.mock.patch, never monkeypatch global state
+- Database tests: use the test_db fixture (creates a fresh SQLite for each test)
+- NEVER use unittest.TestCase. All tests are plain functions with pytest fixtures.</code></pre>
+
+  <p>
+    The difference between "pytest" and "python -m pytest" matters when you have a src layout. The fixture conventions matter because Claude will create inline setup code instead of using your existing fixtures if it does not know about them.
+  </p>
+
+  <h3>4. Type hints and checking</h3>
+
+  <p>
+    Python's type system is optional, which means Claude needs to know your stance:
+  </p>
+
+  <pre><code># Type Hints
+- All functions must have type annotations (parameters + return type)
+- Use builtin generics (list[str], dict[str, int]) not typing module (List, Dict)
+- Use | for unions (str | None) not Optional[str]
+- Type checker: mypy --strict
+- No # type: ignore without a comment explaining why
+- Pydantic models for all API request/response schemas</code></pre>
+
+  <p>
+    Without this, Claude alternates between modern syntax (<code>str | None</code>) and legacy syntax (<code>Optional[str]</code>) within the same file. It also tends to skip return type annotations on short functions, which breaks strict mypy.
+  </p>
+
+  <h3>5. Coding conventions</h3>
+
+  <p>
+    Python has PEP 8, but every project has its own interpretation:
+  </p>
+
+  <pre><code># Conventions
+- Style: ruff format (88 char line length)
+- Linting: ruff check --fix
+- Imports: sorted by ruff (isort compatible)
+- Naming: snake_case for functions/variables, PascalCase for classes, UPPER_CASE for constants
+- No wildcard imports (from x import *)
+- Prefer pathlib.Path over os.path
+- Use f-strings, never .format() or %
+- Docstrings: only on public API functions. Use Google style.
+- No print() in library code. Use logging module.</code></pre>
+
+  <p>
+    The linting tool matters because Claude will sometimes auto-format or suggest style changes. If you use ruff, Claude should run ruff. If you use black + isort + flake8, that is a different set of commands.
+  </p>
+
+  <h3>6. Guardrails</h3>
+
+  <p>
+    Python-specific guardrails prevent the kind of mistakes that break production:
+  </p>
+
+  <pre><code># Guardrails
+- Never modify migrations/ files after they have been applied
+- Never use subprocess.shell=True (security risk)
+- Never hardcode secrets. Use environment variables via python-dotenv.
+- Do not add dependencies without asking. Check if an existing package already does it.
+- Never use eval() or exec()
+- Do not create __init__.py files that import everything. Keep them minimal.
+- Never catch bare Exception. Catch specific exception types.</code></pre>
+
+  <h2>Complete examples by project type</h2>
+
+  <h3>FastAPI project</h3>
+
+  <p>
+    FastAPI projects have specific patterns around dependency injection, async, and Pydantic models:
+  </p>
+
+  <pre><code># FastAPI CLAUDE.md
+
+## Project
+FastAPI REST API for inventory management. Python 3.12, PostgreSQL, SQLAlchemy 2.0.
+
+## Structure
+- src/app/           — Main package
+- src/app/routes/    — FastAPI routers (one file per resource, e.g. routes/products.py)
+- src/app/models/    — SQLAlchemy models
+- src/app/schemas/   — Pydantic request/response models
+- src/app/services/  — Business logic (no FastAPI or SQLAlchemy imports)
+- src/app/deps.py    — Dependency injection functions (get_db, get_current_user)
+- tests/             — Mirrors src/app/
+
+## Architecture
+- Routes are thin: validate input via Pydantic, call service, return response
+- Services contain all business logic. Services receive a db Session, not a Request.
+- Models and schemas are separate. Never return a SQLAlchemy model from a route.
+- Use async def for routes. Use sync for services (SQLAlchemy sessions are sync).
+
+## Testing
+- pytest with httpx.AsyncClient (not TestClient)
+- Run: pytest
+- Database: test uses SQLite in-memory (conftest.py creates it)
+- Each test gets a fresh database via the db_session fixture
+
+## Conventions
+- Pydantic models: ProductCreate, ProductRead, ProductUpdate (verb suffix)
+- Route functions: create_product, list_products, get_product (verb_noun)
+- HTTP status codes: 201 for create, 200 for read/update, 204 for delete
+- All responses use response_model= parameter, never manual dict returns</code></pre>
+
+  <h3>Django project</h3>
+
+  <pre><code># Django CLAUDE.md
+
+## Project
+Django 5.1 web application. PostgreSQL, Celery for background tasks, Redis for cache.
+
+## Structure
+- apps/users/        — User management (custom User model)
+- apps/products/     — Product catalog
+- apps/orders/       — Order processing + Celery tasks
+- config/            — Django settings (split: base.py, dev.py, prod.py)
+- templates/         — Django templates (one directory per app)
+- static/            — CSS/JS (collected via collectstatic)
+
+## Architecture
+- Fat models, thin views. Business logic lives in model methods and managers.
+- Views use class-based views (ListView, DetailView, CreateView).
+- Forms handle validation. Views handle HTTP. Models handle data.
+- Celery tasks in each app's tasks.py. Never call tasks synchronously.
+
+## Testing
+- pytest-django
+- Run: pytest
+- Factory Boy for test data (factories.py in each app)
+- NEVER use Django's TestCase for new tests. Use pytest fixtures.
+
+## Conventions
+- Models: singular (Product, not Products)
+- URL names: app_name:action_model (products:create_product)
+- Settings via django-environ. Never hardcode config values.</code></pre>
+
+  <h3>Data science / ML project</h3>
+
+  <pre><code># ML Project CLAUDE.md
+
+## Project
+Machine learning pipeline for customer churn prediction. Python 3.11, scikit-learn, pandas.
+
+## Structure
+- src/data/          — Data loading and preprocessing
+- src/features/      — Feature engineering (one module per feature group)
+- src/models/        — Model training and evaluation
+- src/utils/         — Shared utilities (logging, config loading)
+- notebooks/         — Jupyter notebooks (exploration only, not production)
+- data/raw/          — Immutable raw data (never modify)
+- data/processed/    — Transformed data (reproducible from raw + code)
+- models/            — Serialized models (.pkl, .joblib)
+- configs/           — YAML config files for experiments
+
+## Architecture
+- Notebooks are for exploration. Production code goes in src/.
+- Every pipeline step is a function that takes a DataFrame and returns a DataFrame.
+- Config-driven experiments: model hyperparameters live in YAML, not in code.
+- Reproducibility: random seeds set in config, all data paths relative to project root.
+
+## Testing
+- pytest
+- Run: pytest tests/
+- Test data transformations with small fixtures (5-10 rows)
+- Do not test model accuracy in unit tests. Test data shapes and types.
+
+## Conventions
+- pandas: never chain more than 3 operations. Use intermediate variables with clear names.
+- No global mutable state. Pass DataFrames as function arguments.
+- Logging, not print. Use structured logs for experiment tracking.
+- Type hints on all functions. Use pandas type stubs.</code></pre>
+
+  <h2>Common mistakes in Python CLAUDE.md files</h2>
+
+  <h3>Listing your requirements.txt contents</h3>
+
+  <p>
+    Claude can read requirements.txt directly. Your CLAUDE.md should not duplicate it. Instead, tell Claude <em>how</em> to manage dependencies: which tool to use for installation, whether to pin versions, and whether to ask before adding new packages.
+  </p>
+
+  <h3>Describing what the project does instead of how it works</h3>
+
+  <p>
+    "This project processes customer data and generates reports" tells Claude nothing useful. "Data processing modules live in src/etl/, each module has a process() function that takes a DataFrame and returns a DataFrame" tells Claude exactly how to add new functionality.
+  </p>
+
+  <h3>Not specifying the Python version</h3>
+
+  <p>
+    Python 3.9 and Python 3.12 support different syntax. Without a version, Claude might use match statements (3.10+), walrus operators (3.8+), or <code>str | None</code> unions (3.10+) in a project that targets 3.9.
+  </p>
+
+  <h3>Ignoring the import system</h3>
+
+  <p>
+    Python imports are one of the most common sources of errors in Claude Code sessions. If your project uses a src layout, relative imports, or namespace packages, Claude needs to know. "All imports are absolute from the package root" or "Use relative imports within the same app" saves multiple rounds of fixing ImportError.
+  </p>
+
+  <h2>Generate and score your Python CLAUDE.md</h2>
+
+  <p>
+    The <a href="/contextkit/generate">ContextKit Generator</a> has a Python template that covers all the sections above. Pick Python as your language, answer five questions about your project, and export a ready-to-use CLAUDE.md.
+  </p>
+
+  <p>
+    If you already have a CLAUDE.md, paste it into the <a href="/contextkit/analyze">ContextKit Analyzer</a> to see how it scores. The analyzer checks all five categories (structure, architecture, conventions, testing, guardrails) and tells you exactly what is missing.
+  </p>
+
+  <p>
+    For CI integration, run <code>npx contextkit score</code> in your project directory. It scores your config from the terminal and exits with code 1 if the score drops below 5, so you can catch regressions in pull requests.
+  </p>
+
+  <p>
+    All three tools are free, run client-side, and do not upload your code anywhere.
+  </p>
+</BlogPost>

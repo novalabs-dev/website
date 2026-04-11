@@ -1,0 +1,633 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What should I put in CLAUDE.md for a TypeScript project?", "acceptedAnswer": { "@type": "Answer", "text": "At minimum: your tsconfig setup (especially whether strict mode is on and what path aliases you use), your package manager, testing framework, linting config, and any framework-specific conventions. The most important thing is to be specific about TypeScript strictness - Claude defaults to permissive TypeScript if you don't tell it otherwise." }},
+    { "@type": "Question", "name": "Does CLAUDE.md work with Node.js projects?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. For Node.js projects, include your Node version, module system (CommonJS vs ESM), whether you use a framework like Express or Fastify, and any important path conventions. If you use path aliases in tsconfig, document them explicitly - Claude gets import paths wrong without this information." }},
+    { "@type": "Question", "name": "How do I stop Claude from using 'any' type in TypeScript?", "acceptedAnswer": { "@type": "Answer", "text": "Add an explicit rule in your CLAUDE.md: 'No any types. Use unknown for values of uncertain type, then narrow with type guards.' Also include your tsconfig settings so Claude knows strict mode is enabled. Claude still occasionally slips, but an explicit rule reduces it significantly." }},
+    { "@type": "Question", "name": "Should I put my full tsconfig in CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "No. Claude can read your tsconfig.json directly when needed. What belongs in CLAUDE.md is a summary of the settings that affect how Claude writes code: strict mode on/off, path aliases and their mappings, module resolution (Node vs Bundler), and target runtime. That's enough context without wasting tokens on every compiler option." }}
+  ]
+};
+---
+
+<BlogPost
+  title="CLAUDE.md for TypeScript and Node.js: the complete configuration guide"
+  description="A complete guide to configuring CLAUDE.md for TypeScript and Node.js projects. Covers tsconfig, package managers, testing, linting, build tools, and the mistakes Claude makes most often in TS codebases."
+  date="April 11, 2026"
+  readTime="12 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md for Python projects: the complete guide", slug: "claudemd-for-python-projects" },
+    { title: "Claude Code monorepo setup: one CLAUDE.md or many?", slug: "claude-code-monorepo-setup" },
+    { title: "CLAUDE.md starter templates for every stack", slug: "claudemd-starter-templates" },
+  ]}
+>
+  <p>
+    TypeScript projects have more configuration surface area than almost any other stack. You have tsconfig settings, path aliases, module resolution modes, multiple package managers, several competing test runners, and a build toolchain that varies wildly between projects. Without a CLAUDE.md that covers this ground, Claude makes a lot of reasonable-but-wrong assumptions.
+  </p>
+
+  <p>
+    This guide covers exactly what to put in your CLAUDE.md for TypeScript and Node.js projects, with real config examples for each section. If you want to skip the reading, <a href="/contextkit/generate">use the free ContextKit generator</a> - it handles TypeScript projects with a guided wizard.
+  </p>
+
+  <h2>Why TypeScript projects need a detailed CLAUDE.md</h2>
+
+  <p>
+    In a Python project, Claude mostly needs to know your framework and testing setup. TypeScript adds several layers of configuration that meaningfully change how correct code looks:
+  </p>
+
+  <ul>
+    <li>Strict mode changes which types are valid</li>
+    <li>Path aliases change all import statements</li>
+    <li>Module resolution (Node vs Bundler) changes how imports resolve</li>
+    <li>ESM vs CommonJS changes how you write imports and exports</li>
+    <li>The framework (Next.js, Astro, Express, Fastify) changes the entire pattern set</li>
+  </ul>
+
+  <p>
+    Without these in CLAUDE.md, Claude writes code that compiles in isolation but doesn't fit your project. The import paths are wrong, strict types are violated, and the patterns don't match your framework.
+  </p>
+
+  <h2>1. Project structure</h2>
+
+  <p>
+    Start with what you have: monorepo or single package, and your directory layout. This tells Claude where to look for existing code and where to put new files.
+  </p>
+
+  <h3>Single package</h3>
+
+  <pre><code>## Project Structure
+
+Single package TypeScript project.
+
+src/
+  index.ts          # Entry point
+  lib/              # Core library code
+  types/            # Shared TypeScript interfaces and types
+  utils/            # Pure utility functions
+  __tests__/        # Test files (or co-located .test.ts files)
+dist/               # Compiled output (never modify directly)
+tsconfig.json
+package.json</code></pre>
+
+  <h3>Monorepo (pnpm workspaces)</h3>
+
+  <pre><code>## Project Structure
+
+pnpm monorepo with workspace packages.
+
+packages/
+  api/              # Express API server (Node.js, CommonJS)
+  web/              # React frontend (Vite, ESM)
+  shared/           # Shared types and utilities (dual CJS/ESM)
+  config/           # Shared tsconfig and eslint configs
+apps/
+  docs/             # Documentation site
+
+Each package has its own tsconfig.json extending from packages/config/tsconfig.base.json.
+Never import across packages with relative paths - use workspace package names (e.g., @myproject/shared).
+Build order: shared -> api, web (in parallel).</code></pre>
+
+  <p>
+    The monorepo case is worth being explicit about. Claude defaults to relative paths between packages if you don't tell it otherwise, which breaks workspace resolution.
+  </p>
+
+  <h2>2. TypeScript configuration</h2>
+
+  <p>
+    You don't need to paste your full tsconfig into CLAUDE.md - Claude can read the file when needed. What you do need is a summary of the settings that change how Claude writes code.
+  </p>
+
+  <pre><code>## TypeScript Config
+
+Strict mode on. Key settings that affect how you write code:
+
+- strict: true (noImplicitAny, strictNullChecks, strictFunctionTypes, all on)
+- target: ES2022
+- module: NodeNext (for the API package)
+- moduleResolution: NodeNext
+- noUncheckedIndexedAccess: true
+- exactOptionalPropertyTypes: true
+
+Path aliases (configured in tsconfig.json, resolved by tsconfig-paths at runtime):
+  @/* -> src/*
+  @shared/* -> ../../packages/shared/src/*
+
+Never use 'any'. Use 'unknown' for values of uncertain type, then narrow.
+When a type assertion is necessary, use 'as Type' with a comment explaining why.</code></pre>
+
+  <p>
+    The <code>noUncheckedIndexedAccess</code> setting is worth calling out explicitly because it's non-default and changes a lot of code - array access returns <code>T | undefined</code> instead of <code>T</code>, which requires null checks Claude won't add unless it knows this is on.
+  </p>
+
+  <h3>Path aliases deserve special attention</h3>
+
+  <p>
+    This is the single most common source of wrong imports from Claude. If your project uses <code>@/components/Button</code> instead of <code>../../components/Button</code>, say so clearly and show the mapping. Show a correct import example:
+  </p>
+
+  <pre><code set:html={`## Import Conventions
+
+Use path aliases, never deep relative imports:
+
+// Correct
+import { Button } from '@/components/ui/Button';
+import type { User } from '@/types/user';
+import { formatDate } from '@/lib/utils';
+
+// Wrong - do not use relative paths that go more than one level up
+import { Button } from '../../../components/ui/Button';`}></code></pre>
+
+  <h2>3. Package manager</h2>
+
+  <p>
+    Specify your package manager and include the commands Claude will actually run. Claude defaults to npm when it's unsure, and running <code>npm install</code> in a pnpm workspace creates the wrong lockfile.
+  </p>
+
+  <pre><code>## Package Manager
+
+pnpm (version 9). Never use npm or yarn in this project.
+
+Install a package: pnpm add &lt;package&gt;
+Install dev dep: pnpm add -D &lt;package&gt;
+Install workspace dep: pnpm add &lt;package&gt; --filter @myproject/api
+Run script: pnpm --filter @myproject/api dev
+Run all: pnpm -r build
+
+Do not run 'npm install' or 'yarn add' - this will create the wrong lockfile.</code></pre>
+
+  <p>
+    If you use Bun, the lockfile situation is different. Since Bun 1.1, the lockfile is <code>bun.lock</code> (text-based), replacing the old binary <code>bun.lockb</code>:
+  </p>
+
+  <pre><code>## Package Manager
+
+Bun (latest stable). Never use npm or pnpm.
+
+Install: bun add &lt;package&gt;
+Install dev: bun add -d &lt;package&gt;
+Run: bun run &lt;script&gt;
+Execute: bunx &lt;package&gt;
+
+Bun uses bun.lock (text-based since Bun 1.1). Do not run npm install or pnpm install -
+this creates a package-lock.json or pnpm-lock.yaml that conflicts with the Bun setup.</code></pre>
+
+  <h2>4. Testing</h2>
+
+  <p>
+    TypeScript projects have three mainstream test runners right now - Jest, Vitest, and (for E2E) Playwright. Each has different import conventions and configuration. Tell Claude which one you use and how to run it.
+  </p>
+
+  <h3>Vitest</h3>
+
+  <pre><code set:html={`## Testing
+
+Vitest for unit and integration tests.
+
+Run all tests: pnpm test
+Run with UI: pnpm test --ui
+Run a specific file: pnpm test src/lib/format.test.ts
+Coverage: pnpm test --coverage
+
+Test file naming: [filename].test.ts, co-located with source files.
+Not in a separate __tests__/ folder.
+
+Vitest globals are not enabled - import describe, it, expect from 'vitest':
+
+  import { describe, it, expect, vi } from 'vitest';
+
+Use vi.fn() for mocks (not jest.fn()). Use vi.spyOn() for spies.
+For async tests, use vi.useFakeTimers() when testing timers.
+
+Test structure:
+  describe('FunctionName', () => {
+    it('should [expected behavior] when [condition]', () => {
+      // arrange
+      // act
+      // assert
+    });
+  });`}></code></pre>
+
+  <h3>Jest with ts-jest</h3>
+
+  <pre><code set:html={`## Testing
+
+Jest with ts-jest transformer.
+
+Run all tests: npx jest
+Run single file: npx jest src/lib/format.test.ts
+Watch mode: npx jest --watch
+Coverage: npx jest --coverage
+
+Test files: *.test.ts, co-located with source files.
+Config in jest.config.ts (not jest.config.js).
+
+Import from '@jest/globals' explicitly (globals are disabled):
+
+  import { describe, it, expect, jest } from '@jest/globals';
+
+Module name mapper in jest.config.ts handles path aliases - check the config
+before writing imports in test files.
+
+Mock modules: jest.mock('../path/to/module')
+Reset mocks between tests: configured in jest.config.ts (clearMocks: true)`}></code></pre>
+
+  <h3>Playwright for E2E</h3>
+
+  <pre><code set:html={`## E2E Testing
+
+Playwright for end-to-end tests.
+
+Tests in: e2e/ directory (not mixed with unit tests)
+Run: npx playwright test
+Run with UI: npx playwright test --ui
+Debug: npx playwright test --debug
+
+Test files: *.spec.ts
+
+Base URL configured in playwright.config.ts (http://localhost:3000).
+Start the dev server before running e2e tests (or use webServer config in playwright.config.ts).
+
+Use page.getByRole() and page.getByLabel() over CSS selectors.
+Never use page.waitForTimeout() - use page.waitForSelector() or proper assertions.
+
+import { test, expect } from '@playwright/test';`}></code></pre>
+
+  <h2>5. Linting and formatting</h2>
+
+  <p>
+    Tell Claude your formatter and linter, the commands to run them, and any rules that affect how code is written. This prevents Claude from writing code that immediately fails your CI.
+  </p>
+
+  <h3>ESLint + Prettier</h3>
+
+  <pre><code>## Linting & Formatting
+
+ESLint for linting, Prettier for formatting.
+
+Lint: pnpm lint (eslint . --ext .ts,.tsx)
+Format: pnpm format (prettier --write .)
+Check format: pnpm format:check
+
+Key ESLint rules in effect:
+  - @typescript-eslint/no-explicit-any: error
+  - @typescript-eslint/explicit-function-return-type: warn (on public functions)
+  - @typescript-eslint/no-unused-vars: error
+  - no-console: warn (use the logger utility instead)
+  - import/order: enforced (external, then internal, then relative)
+
+Prettier config (in .prettierrc):
+  - singleQuote: true
+  - trailingComma: 'es5'
+  - semi: true
+  - printWidth: 100
+
+Always write code that passes the linter. Run 'pnpm lint' before declaring a task done.</code></pre>
+
+  <h3>Biome (replaces ESLint + Prettier)</h3>
+
+  <pre><code>## Linting & Formatting
+
+Biome for both linting and formatting (replaces ESLint and Prettier).
+Config in biome.json.
+
+Lint + format: pnpm biome check --apply .
+Check only: pnpm biome check .
+Format only: pnpm biome format --write .
+
+Biome is strict on:
+  - No any types
+  - No non-null assertions (!.) without justification
+  - Consistent import ordering
+  - No unused imports or variables
+
+Use Biome's opinionated defaults. Do not fight the formatter - write code that
+Biome accepts, not code that you then have to auto-fix.</code></pre>
+
+  <h2>6. Build tooling</h2>
+
+  <p>
+    Mention your build tool and the output it produces. This matters because Claude sometimes tries to reference build outputs in source code, or runs the wrong build command.
+  </p>
+
+  <h3>Vite</h3>
+
+  <pre><code>## Build
+
+Vite for development and production builds.
+
+Dev server: pnpm dev (http://localhost:5173)
+Production build: pnpm build (outputs to dist/)
+Preview built output: pnpm preview
+
+Vite handles TypeScript transpilation. Do not run tsc separately for the browser build.
+tsc is used only for type checking: pnpm typecheck (tsc --noEmit)
+
+Environment variables: prefix with VITE_ to expose to the browser.
+  VITE_API_URL is available in code as import.meta.env.VITE_API_URL
+  Never use process.env in browser code.</code></pre>
+
+  <h3>tsc for Node.js</h3>
+
+  <pre><code>## Build
+
+tsc for compilation (Node.js API server).
+
+Compile: pnpm build (tsc -p tsconfig.build.json)
+Output: dist/ (mirrors src/ structure)
+Watch: pnpm build:watch
+
+Do not edit files in dist/. Always edit src/ and recompile.
+tsconfig.json is for editor/type-checking. tsconfig.build.json is for compilation
+(excludes test files, includes only src/).
+
+Production: node dist/index.js
+Development (with ts-node): pnpm dev</code></pre>
+
+  <h3>esbuild or tsup</h3>
+
+  <pre><code>## Build
+
+tsup (esbuild-based) for library builds.
+
+Build: pnpm build
+Outputs:
+  dist/index.js       # CJS bundle
+  dist/index.mjs      # ESM bundle
+  dist/index.d.ts     # Type declarations
+
+tsup config in tsup.config.ts. Do not modify dist/ directly.
+When adding new entry points, update tsup.config.ts and the package.json exports field.</code></pre>
+
+  <h2>7. Framework-specific sections</h2>
+
+  <p>
+    Add a framework section if you're using one. Each framework has patterns Claude needs to know to write correct code.
+  </p>
+
+  <h3>Next.js App Router</h3>
+
+  <pre><code>## Framework: Next.js 14 App Router
+
+Key conventions:
+- Server Components by default. Add 'use client' only when needed (browser APIs, hooks, interactivity)
+- 'use server' for Server Actions (form submissions, mutations)
+- Data fetching: fetch() with cache options in Server Components, not useEffect
+- Loading states: loading.tsx files, not manual loading state
+- Error boundaries: error.tsx files at the appropriate layout level
+
+File conventions:
+  app/             # Routes (folder = route segment)
+  app/page.tsx     # Route page (always default export)
+  app/layout.tsx   # Layout (always default export)
+  app/loading.tsx  # Suspense loading state
+  app/error.tsx    # Error boundary
+  app/not-found.tsx
+
+Metadata: export const metadata or generateMetadata from page/layout files.
+Route handlers: app/api/[route]/route.ts, export GET, POST, etc.
+
+Never use the pages/ router - this project uses App Router only.</code></pre>
+
+  <h3>Express</h3>
+
+  <pre><code set:html={`## Framework: Express + TypeScript
+
+Pattern: router -> middleware -> controller -> service -> repository
+
+src/
+  routes/       # Express routers (one file per resource)
+  middleware/   # Request middleware (auth, validation, logging)
+  controllers/  # Request/response handling (thin, delegates to services)
+  services/     # Business logic
+  repositories/ # Database access
+  types/        # Express augmentations and shared types
+
+Controllers handle HTTP concerns only. No business logic in controllers.
+Services do not import from express - no req/res in service layer.
+
+Error handling: throw typed errors in services, catch in a central error middleware.
+Don't use try/catch in every route handler.
+
+Type augmentation for req.user:
+  // src/types/express.d.ts
+  declare global {
+    namespace Express {
+      interface Request {
+        user?: AuthUser;
+      }
+    }
+  }`}></code></pre>
+
+  <h3>Fastify</h3>
+
+  <pre><code set:html={`## Framework: Fastify + TypeScript
+
+Use Fastify's type providers for request/response typing:
+
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+
+Routes are plugins - one file per resource, registered with fastify.register().
+Schema validation via Zod (not JSON Schema directly).
+
+src/
+  plugins/      # Fastify plugins (db, auth, cors - registered in app.ts)
+  routes/       # Route handlers as plugins
+  schemas/      # Zod schemas for request/response
+  services/     # Business logic
+  app.ts        # Fastify instance setup
+
+Always use typed route handlers:
+  fastify.get<{ Params: ParamsType; Reply: ReplyType }>('/path', handler)
+
+Do not use fastify.route() with inline schemas - use Zod schemas imported from /schemas.`}></code></pre>
+
+  <h3>Astro</h3>
+
+  <pre><code set:html={`## Framework: Astro 4
+
+src/
+  pages/        # File-based routing (.astro files = pages)
+  layouts/      # Page layouts
+  components/   # Reusable components (.astro or framework components)
+  content/      # Content collections (Markdown/MDX)
+  styles/       # Global CSS
+
+Astro components (.astro) for static content.
+React/Svelte islands only when interactivity is needed (client:load, client:visible).
+Content collections via defineCollection and getCollection.
+
+TypeScript is configured in tsconfig.json extending astro/tsconfigs/strict.
+Use Astro.props for component props - define Props interface in the component frontmatter.
+
+Images: use the <Image /> component from 'astro:assets' for optimization.
+Links: use relative paths for internal links.`}></code></pre>
+
+  <h2>8. Common mistakes Claude makes in TypeScript projects</h2>
+
+  <p>
+    These are the issues that come up most often. Adding rules for them to your CLAUDE.md reduces the frequency significantly.
+  </p>
+
+  <h3>The any type</h3>
+
+  <p>
+    Claude reaches for <code>any</code> when it's unsure about a type, when handling errors, and when working with external data. The fix is explicit:
+  </p>
+
+  <pre><code set:html={`## TypeScript Rules
+
+No any types. Alternatives:
+- Use 'unknown' for values of uncertain type, then narrow with type guards
+- Use proper generics instead of any for flexible functions
+- Use proper types for caught errors:
+    try { ... } catch (error) {
+      if (error instanceof Error) { ... }
+    }
+- For third-party libraries without types: create a .d.ts file, don't use any
+
+If you genuinely can't type something, use 'as unknown as Type' with a comment
+explaining why - this is explicit and searchable, unlike any.`}></code></pre>
+
+  <h3>Wrong import paths</h3>
+
+  <p>
+    Claude generates imports based on what it knows about your structure. If path aliases aren't documented, it defaults to relative paths. If the alias mapping is wrong, imports break at runtime even if TypeScript compiles.
+  </p>
+
+  <pre><code set:html={`## Imports
+
+This project uses path aliases. Always check the alias mapping before writing imports.
+
+Configured aliases (from tsconfig.json):
+  @/* maps to ./src/*
+  @api/* maps to ./packages/api/src/*
+  @shared/* maps to ./packages/shared/src/*
+
+Correct:
+  import { createUser } from '@/services/users';
+  import type { User } from '@shared/types';
+
+Wrong:
+  import { createUser } from '../../services/users';
+  import type { User } from '../../../packages/shared/src/types';`}></code></pre>
+
+  <h3>Wrong module resolution</h3>
+
+  <p>
+    The difference between <code>moduleResolution: Node</code> and <code>moduleResolution: NodeNext</code> (or <code>Bundler</code>) affects import syntax. With NodeNext and ESM, you need explicit file extensions on imports. Claude often generates extension-less imports that break in strict ESM mode.
+  </p>
+
+  <pre><code set:html={`## Module System
+
+This project uses ESM (type: "module" in package.json) with moduleResolution: NodeNext.
+
+Import conventions for ESM + NodeNext:
+- Relative imports require explicit .js extension (TypeScript resolves .ts but emits .js):
+    import { helper } from './utils.js';      // Correct
+    import { helper } from './utils';          // Wrong - breaks at runtime
+- Importing types: use 'import type' to avoid runtime issues
+    import type { User } from './types.js';
+- Path aliases do not need extensions (resolved by bundler/tsconfig-paths)
+
+If you're unsure: check an existing import in the codebase and follow its pattern.`}></code></pre>
+
+  <h3>Incorrect generic usage</h3>
+
+  <p>
+    Claude sometimes writes overly specific generic constraints, or forgets generics entirely and uses <code>any</code> as a shortcut. Set the standard:
+  </p>
+
+  <pre><code set:html={`## Generics
+
+Prefer generics over any for flexible functions:
+
+// Correct
+function first<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+// Wrong
+function first(arr: any[]): any {
+  return arr[0];
+}
+
+Constrain generics when the constraint matters:
+  function getProperty<T, K extends keyof T>(obj: T, key: K): T[K]
+
+Don't over-constrain. If a function works on any type, T is fine without a constraint.`}></code></pre>
+
+  <h2>Putting it all together</h2>
+
+  <p>
+    Here's a complete CLAUDE.md for a typical full-stack TypeScript project (Next.js frontend + Express API backend in a monorepo):
+  </p>
+
+  <pre><code set:html={`# Project: [Your Project Name]
+
+## Overview
+pnpm monorepo with a Next.js 14 App Router frontend and Express API backend.
+TypeScript strict mode throughout.
+
+packages/
+  web/    # Next.js frontend (App Router, Tailwind)
+  api/    # Express API server
+  shared/ # Shared types and utilities
+
+## TypeScript
+Strict mode on in all packages. No any types.
+Path aliases: @/* -> src/* (per package), @shared/* -> packages/shared/src/*
+Module: ESM in web, CommonJS in api.
+
+## Package Manager
+pnpm 9. Never use npm or yarn.
+  Install: pnpm add &lt;pkg&gt; --filter @project/web
+  Run: pnpm --filter @project/web dev
+  Run all: pnpm -r build
+
+## Testing
+Vitest for unit tests. Playwright for e2e.
+  Unit: pnpm test (per package)
+  E2E: pnpm test:e2e (from root)
+Import from 'vitest': import { describe, it, expect, vi } from 'vitest';
+Test files co-located: component.test.ts next to component.ts
+
+## Linting
+ESLint + Prettier.
+  Lint: pnpm lint
+  Format: pnpm format
+No unused imports, no console.log in production code.
+
+## Next.js (packages/web)
+Server Components by default. 'use client' only when needed.
+Data fetching in Server Components. Route handlers in app/api/.
+Metadata exports for SEO.
+
+## Express (packages/api)
+Pattern: router -> controller -> service -> repository.
+No business logic in controllers. No express imports in services.
+Central error middleware handles all thrown errors.
+
+## Guardrails
+- Do not modify packages/shared types without checking all consumers
+- Run pnpm typecheck before declaring a task done
+- Ask before adding new package dependencies`}></code></pre>
+
+  <h2>Analyze your current config</h2>
+
+  <p>
+    If you already have a CLAUDE.md and want to know what's missing, <a href="/contextkit/analyze">ContextKit's free analyzer</a> reviews your config against a TypeScript-specific checklist. It flags missing sections, vague rules, and common TypeScript gotchas that aren't covered.
+  </p>
+
+  <p>
+    Or if you're starting fresh, the <a href="/contextkit/generate">ContextKit generator</a> walks you through a wizard for TypeScript/Node.js projects - you pick your package manager, framework, test runner, and linter, and it generates a production-ready config with the rules above already included.
+  </p>
+
+  <p>
+    The generator also exports to <code>.cursorrules</code> and <code>GEMINI.md</code> if you work across multiple AI coding tools.
+  </p>
+
+</BlogPost>
