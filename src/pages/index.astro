@@ -853,7 +853,7 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/42602dd3-c435-4294-88d2-d871f76ff5c6" class="btn-secondary w-full text-center checkout-link" data-value="9" data-product="skillpack">Get the Skill Pack - $9</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/42602dd3-c435-4294-88d2-d871f76ff5c6" class="btn-secondary w-full text-center checkout-link lemonsqueezy-button" data-value="9" data-product="skillpack">Get the Skill Pack - $9</a>
           </div>
 
           <!-- Playbook — RECOMMENDED -->
@@ -885,7 +885,7 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary w-full text-center checkout-link" data-value="47" data-product="playbook">Get the Playbook - $47</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary w-full text-center checkout-link lemonsqueezy-button" data-value="47" data-product="playbook">Get the Playbook - $47</a>
           </div>
 
           <!-- Bundle -->
@@ -919,7 +919,7 @@ const jsonLd = {
               ))}
             </ul>
 
-            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary w-full text-center checkout-link" data-value="97" data-product="bundle">Get the Bundle - $97</a>
+            <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary w-full text-center checkout-link lemonsqueezy-button" data-value="97" data-product="bundle">Get the Bundle - $97</a>
           </div>
         </div>
 
@@ -1064,13 +1064,13 @@ const jsonLd = {
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary text-lg checkout-link" data-value="47" data-product="playbook">
+          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/142170b8-348f-42fa-aa57-5954f195e266" class="btn-primary text-lg checkout-link lemonsqueezy-button" data-value="47" data-product="playbook">
             Get the Playbook - $47
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </a>
-          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary checkout-link" data-value="97" data-product="bundle">
+          <a href="https://novalabs-ai.lemonsqueezy.com/checkout/buy/e686f7b7-1b44-4454-b67b-20fc86a31a85" class="btn-secondary checkout-link lemonsqueezy-button" data-value="97" data-product="bundle">
             Get the Bundle - $97
           </a>
         </div>
@@ -1140,17 +1140,12 @@ const jsonLd = {
       }
     });
 
-    // Google Ads checkout click tracking (backup voor conversion tracking)
+    // GA4 checkout intent tracking (conversion tracking is on thank-you page only)
     document.querySelectorAll('.checkout-link').forEach(link => {
       link.addEventListener('click', () => {
         const value = parseFloat((link as HTMLElement).dataset.value || '47');
         const product = (link as HTMLElement).dataset.product || 'playbook';
         if (typeof gtag === 'function') {
-          gtag('event', 'conversion', {
-            'send_to': 'AW-18013644812/8ZpPCI7G-4ccEIzQyY1D',
-            'value': value,
-            'currency': 'USD'
-          });
           gtag('event', 'begin_checkout', {
             'currency': 'USD',
             'value': value,
