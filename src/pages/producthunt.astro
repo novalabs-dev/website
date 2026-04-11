@@ -3,19 +3,19 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="ContextKit on Product Hunt | Free CLAUDE.md Generator - Nova Labs"
-  description="ContextKit generates optimized CLAUDE.md files for any project in 30 seconds. Free, runs in your browser. Launching on Product Hunt April 14, 2026."
+  title="ContextKit on Product Hunt | Score & Generate CLAUDE.md Files - Nova Labs"
+  description="Score your CLAUDE.md out of 10, generate optimized configs for any AI coding tool, and lint configs in CI. Free, runs in your browser. Launching on Product Hunt April 15, 2026."
 >
   <!-- REDIRECT: Uncomment and replace URL when the Product Hunt listing goes live -->
   <!-- <meta http-equiv="refresh" content="0;url=https://www.producthunt.com/posts/contextkit" slot="head" /> -->
 
-  <meta property="og:title" content="ContextKit on Product Hunt | Free CLAUDE.md Generator" slot="head" />
-  <meta property="og:description" content="Generate optimized config files for Claude Code, Cursor, Gemini CLI, and Copilot in 30 seconds. Free, no account needed." slot="head" />
+  <meta property="og:title" content="ContextKit on Product Hunt | Score & Generate CLAUDE.md Files" slot="head" />
+  <meta property="og:description" content="Score your CLAUDE.md out of 10, generate configs for Claude Code, Cursor, Gemini CLI, and Copilot. Free CLI for CI pipelines." slot="head" />
   <meta property="og:type" content="website" slot="head" />
   <meta property="og:url" content="https://nova-labs.dev/producthunt" slot="head" />
   <meta name="twitter:card" content="summary_large_image" slot="head" />
   <meta name="twitter:title" content="ContextKit on Product Hunt" slot="head" />
-  <meta name="twitter:description" content="Generate optimized CLAUDE.md files in 30 seconds. Free, runs in your browser." slot="head" />
+  <meta name="twitter:description" content="Score your CLAUDE.md out of 10 and generate optimized configs for any AI coding tool. Free." slot="head" />
 
   <!-- NAV -->
   <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
@@ -25,8 +25,8 @@ import Layout from '../layouts/Layout.astro';
       </a>
       <div class="flex items-center gap-6">
         <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
-        <a href="/contextkit/generate" class="btn-primary !py-2.5 !px-5 !text-sm">
-          Try ContextKit free
+        <a href="/contextkit/analyze" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Score your CLAUDE.md
         </a>
       </div>
     </div>
@@ -49,15 +49,15 @@ import Layout from '../layouts/Layout.astro';
       </div>
 
       <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6 tracking-tight">
-        Generate the perfect <span class="gradient-text">CLAUDE.md</span> in 30 seconds
+        Score your <span class="gradient-text">CLAUDE.md</span> out of 10
       </h1>
 
       <p class="text-xl text-text-muted max-w-2xl mx-auto mb-4 leading-relaxed">
-        Every AI coding tool needs a config file. Claude Code needs CLAUDE.md. Cursor needs .cursorrules. Gemini CLI needs GEMINI.md. Stop writing them from scratch.
+        Find out what your AI coding config is missing. Score it, fix it with the generator, and lint it in CI with the CLI. Works with Claude Code, Cursor, Gemini CLI, and Copilot.
       </p>
 
       <p class="text-text-dim mb-12">
-        Launching on Product Hunt on April 14, 2026.
+        Launching on Product Hunt on April 15, 2026.
       </p>
 
       <!-- Launch date card -->
@@ -66,7 +66,7 @@ import Layout from '../layouts/Layout.astro';
           <svg class="w-6 h-6 text-[#ff6154]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span class="text-2xl font-bold">April 14, 2026</span>
+          <span class="text-2xl font-bold">April 15, 2026</span>
         </div>
         <p class="text-text-muted text-sm">Mark your calendar for launch day</p>
 
@@ -88,7 +88,7 @@ import Layout from '../layouts/Layout.astro';
 
         <script>
           (function() {
-            const launch = new Date('2026-04-14T07:01:00Z'); // 12:01 AM PT (PDT = UTC-7)
+            const launch = new Date('2026-04-15T07:01:00Z'); // 12:01 AM PT (PDT = UTC-7)
             function tick() {
               const now = new Date();
               const diff = launch.getTime() - now.getTime();
@@ -109,29 +109,29 @@ import Layout from '../layouts/Layout.astro';
         </script>
       </div>
 
-      <!-- What ContextKit does -->
+      <!-- Three tools -->
       <div class="glass-card p-8 mb-10 text-left max-w-xl mx-auto">
-        <h2 class="text-lg font-bold mb-6 text-center">How it works</h2>
-        <div class="space-y-4">
+        <h2 class="text-lg font-bold mb-6 text-center">Three tools, one mission: better AI configs</h2>
+        <div class="space-y-6">
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">1</span>
+            <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/20 text-primary-light font-bold flex items-center justify-center text-lg">10</span>
             <div>
-              <p class="font-semibold text-text">Pick your stack</p>
-              <p class="text-text-muted text-sm">12+ languages, 16+ frameworks</p>
+              <p class="font-semibold text-text">Analyzer</p>
+              <p class="text-text-muted text-sm">Paste your CLAUDE.md and get a score out of 10. Five categories: structure, architecture, conventions, testing, guardrails. Specific suggestions for every gap.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">2</span>
+            <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/20 text-accent-light font-bold flex items-center justify-center text-sm">GEN</span>
             <div>
-              <p class="font-semibold text-text">Set your conventions</p>
-              <p class="text-text-muted text-sm">Testing, linting, project-specific rules</p>
+              <p class="font-semibold text-text">Generator</p>
+              <p class="text-text-muted text-sm">Pick your language, framework, and conventions. Get a production-ready config in 30 seconds. Export as CLAUDE.md, .cursorrules, GEMINI.md, or AGENTS.md.</p>
             </div>
           </div>
           <div class="flex items-start gap-4">
-            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary-light font-bold flex items-center justify-center text-sm">3</span>
+            <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-success/20 text-success font-bold flex items-center justify-center text-sm">CLI</span>
             <div>
-              <p class="font-semibold text-text">Get your config file</p>
-              <p class="text-text-muted text-sm">Copy, download, or share a link with your team</p>
+              <p class="font-semibold text-text">CLI (npx contextkit score)</p>
+              <p class="text-text-muted text-sm">Score your config from the terminal. Exit code 1 for scores below 5 — add it to your CI pipeline and never deploy a bad config again.</p>
             </div>
           </div>
         </div>
@@ -165,11 +165,11 @@ import Layout from '../layouts/Layout.astro';
         <h2 class="text-lg font-bold mb-4 text-center">Built by an AI-run company</h2>
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">100+</span>
+            <span class="text-2xl font-black text-primary-light">128</span>
             <span class="text-text-muted">pages on nova-labs.dev</span>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-2xl font-black text-primary-light">2</span>
+            <span class="text-2xl font-black text-primary-light">3</span>
             <span class="text-text-muted">free developer tools</span>
           </div>
           <div class="flex items-center gap-3">
@@ -185,11 +185,11 @@ import Layout from '../layouts/Layout.astro';
 
       <!-- CTAs -->
       <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-        <a href="/contextkit/generate" class="btn-primary !py-3 !px-8">
-          Try ContextKit now (free)
+        <a href="/contextkit/analyze" class="btn-primary !py-3 !px-8">
+          Score your CLAUDE.md (free)
         </a>
-        <a href="/cost-dashboard/analyze" class="btn-secondary !py-3 !px-8">
-          Try CostPilot (free)
+        <a href="/contextkit/generate" class="btn-secondary !py-3 !px-8">
+          Generate a config (free)
         </a>
       </div>
 
