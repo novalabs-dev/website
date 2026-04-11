@@ -205,7 +205,7 @@ const jsonLd = {
   <h3>18. Avoid rebuilding context unnecessarily</h3>
 
   <p>
-    If you are working on the same area of code across multiple prompts, stay in the same session. Each new session requires Claude to re-read files and rebuild context. Continuing a session is free — the context is already loaded.
+    If you are working on the same area of code across multiple prompts, stay in the same session. Each new session requires Claude to re-read files and rebuild context from scratch. Staying in the same session avoids redundant file reads, which saves tokens compared to starting fresh.
   </p>
 
   <h2>Debugging</h2>
