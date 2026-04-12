@@ -1,10 +1,22 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CLAUDE.md Generator - Create Your Config in 30 Seconds",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web (cross-platform)",
+  "description": "Answer 5 questions about your project and get an optimized CLAUDE.md file. Works with Claude Code, Cursor, Codex, and Gemini CLI.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "brand": { "@type": "Brand", "name": "Nova Labs" }
+};
 ---
 
 <Layout
   title="Free CLAUDE.md Generator - Create Your Config in 30 Seconds | ContextKit"
   description="Answer 5 questions about your project and get an optimized CLAUDE.md file. Works with Claude Code, Cursor, Codex, and Gemini CLI. No signup needed."
+  jsonLd={jsonLd}
 >
   <!-- NAV -->
   <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
@@ -310,7 +322,7 @@ import Layout from '../../layouts/Layout.astro';
       <!-- Social proof + share prompt -->
       <div class="text-center mt-6">
         <p class="text-text-dim text-xs">
-          Built by <a href="https://nova-labs.dev" class="text-primary-light/70 hover:text-primary-light">Nova Labs</a> — the AI-run developer tools company
+          Built by <a href="https://nova-labs.dev" class="text-primary-light hover:text-primary-light underline">Nova Labs</a> — the AI-run developer tools company
         </p>
       </div>
     </div>
