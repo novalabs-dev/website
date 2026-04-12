@@ -1,0 +1,236 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does Claude Code understand Rust borrow checker errors?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, Claude Code handles borrow checker errors well when you give it the full error context. The key is running cargo check or cargo build and letting Claude see the complete compiler output, not just the line that failed. It can trace lifetime conflicts across multiple functions and suggest the minimal fix rather than cloning everything to make errors disappear. That said, complex pin + async combinations still require careful review." }},
+    { "@type": "Question", "name": "How do I configure Claude Code for a Go project?", "acceptedAnswer": { "@type": "Answer", "text": "The most important thing is telling Claude Code your error handling convention in CLAUDE.md. Go projects vary widely: some use sentinel errors, some use wrapped errors with fmt.Errorf, some use custom error types. Without explicit instructions, Claude will mix styles. Also document whether you use context.Context threading, your module path, and which linter (golangci-lint, staticcheck) is configured. Those three pieces of information cover 80% of style drift." }},
+    { "@type": "Question", "name": "Can Claude Code help with unsafe Rust code?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code can write and review unsafe Rust, but you should add a guardrail in CLAUDE.md stating that unsafe blocks require a safety comment explaining the invariants. This produces code that is actually reviewable later. Claude is good at explaining why a particular unsafe usage is sound, which is useful during code review. For FFI boundaries, it handles the common patterns well but always verify pointer lifetimes manually." }},
+    { "@type": "Question", "name": "How do I get Claude Code to run Go tests in the right order?", "acceptedAnswer": { "@type": "Answer", "text": "Go tests are parallel by default within a package, and sequential across packages unless you specify otherwise. In CLAUDE.md, document whether you use t.Parallel() consistently and any packages that must run with -count=1 due to shared state. If you have integration tests that require a running database or external service, note that separately so Claude does not try to run them during a unit test pass." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code for Rust and Go projects: CLAUDE.md configs and real workflows"
+  description="Stack-specific CLAUDE.md configurations for Rust and Go projects, covering cargo, clippy, gofmt, error handling conventions, and common pitfalls with lifetimes and goroutines."
+  date="April 12, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md for Python projects", slug: "claudemd-for-python-projects" },
+    { title: "CLAUDE.md for TypeScript and Node.js", slug: "claudemd-for-typescript-nodejs" },
+    { title: "Claude Code guardrails to prevent destructive actions", slug: "claude-code-guardrails-prevent-destructive-actions" },
+  ]}
+>
+  <p>
+    Most Claude Code documentation uses JavaScript or Python examples. That makes sense for reach, but it leaves Rust and Go developers without concrete guidance on the configuration that actually matters for their stacks. The defaults work poorly for both languages without some upfront setup.
+  </p>
+
+  <p>
+    This covers what to put in <code>CLAUDE.md</code> for Rust and Go projects, which pitfalls keep coming up, and how to structure a testing workflow that doesn't fight the language toolchain.
+  </p>
+
+  <h2>Why Rust and Go need custom CLAUDE.md configs</h2>
+
+  <p>
+    Both languages have strong opinions baked into their toolchains. Rust has <code>clippy</code>, the borrow checker, and a compiler that rejects code other languages would happily run. Go has <code>gofmt</code>, <code>go vet</code>, and a community that cares a lot about error handling style.
+  </p>
+
+  <p>
+    Without explicit instructions, Claude Code produces code that compiles but drifts from your conventions. It might clone when borrowing would work, or add <code>unwrap()</code> calls you'd never accept in production. In Go it might use blank identifier error suppression when you want explicit handling. These aren't hard to fix individually, but they accumulate and become a review burden.
+  </p>
+
+  <p>
+    A good <code>CLAUDE.md</code> sets the constraints once and they apply to every session.
+  </p>
+
+  <h2>CLAUDE.md configuration for Rust projects</h2>
+
+  <p>
+    Here is a starting template for a Rust project. Adjust the specifics to your codebase:
+  </p>
+
+  <pre><code>{`# Project: [Name]
+
+## Stack
+- Rust (stable toolchain, minimum 1.75)
+- Cargo workspace with crates: [list them]
+- Async runtime: Tokio (if applicable)
+
+## Build and check commands
+- Check: cargo check --all-targets
+- Lint: cargo clippy --all-targets -- -D warnings
+- Test: cargo test
+- Format check: cargo fmt --check
+- Always run clippy before calling a task complete
+
+## Code conventions
+- No unwrap() or expect() in library code; use proper error propagation with ?
+- unwrap() is acceptable in tests and main() with a comment explaining why it's safe
+- Prefer borrowing over cloning; if you clone to satisfy the borrow checker, add a comment
+- unsafe blocks must include a SAFETY comment explaining the invariants being upheld
+- Use thiserror for library error types, anyhow for application-level error handling
+
+## Lifetime rules
+- Prefer explicit lifetime annotations over introducing unnecessary cloning
+- When lifetimes become complex, add a comment explaining the ownership model
+- Avoid 'static bounds unless the type genuinely needs static lifetime
+
+## What NOT to do
+- Do not add allow(dead_code) or allow(unused) to silence warnings; fix them instead
+- Do not use unwrap() as a placeholder unless the code is clearly marked as a draft
+- Do not write unsafe code without explicit instruction`}</code></pre>
+
+  <p>
+    The clippy rule matters more than it looks. Without <code>-D warnings</code>, clippy suggestions are advisory. With it, Claude Code will fix them because the build fails otherwise. That single flag shifts the default from "suggestions" to "requirements."
+  </p>
+
+  <h2>Handling the borrow checker with Claude Code</h2>
+
+  <p>
+    The most common mistake is pasting only the error line. Borrow checker errors are contextual. The issue is often not where the compiler points, but several lines earlier where you moved a value or took a reference. Give Claude the full compiler output:
+  </p>
+
+  <pre><code>{`cargo build 2>&1 | head -80`}</code></pre>
+
+  <p>
+    Then ask Claude to read the error and trace where the conflicting borrows originate. It's generally good at this. Where it struggles is with complex pin + async combinations (common in custom futures), and with lifetime variance in trait objects. For those, the fix Claude suggests is often correct but the explanation may gloss over the actual variance issue. Worth double-checking.
+  </p>
+
+  <p>
+    A useful prompt when you're stuck: "Explain why this borrow checker error occurs, then suggest the minimal fix that doesn't involve cloning." The minimal fix constraint prevents the shortcut of cloning everything into silence.
+  </p>
+
+  <h2>Testing setup for Rust</h2>
+
+  <p>
+    Rust tests live in the same file as the code under a <code>#[cfg(test)]</code> module, which is a different pattern from most other languages. Claude handles this correctly, but your <code>CLAUDE.md</code> should clarify whether you also use a <code>tests/</code> directory for integration tests, and whether you use <code>cargo-nextest</code> instead of the default test runner.
+  </p>
+
+  <pre><code>{`## Testing
+- Unit tests: inline #[cfg(test)] modules in each file
+- Integration tests: tests/ directory, one file per major feature area
+- Run unit tests: cargo test --lib
+- Run all tests including integration: cargo test
+- Test runner: cargo-nextest (install if not present: cargo install cargo-nextest)
+- nextest run: cargo nextest run
+- Mocking: mockall crate (already in dev-dependencies)
+- Do not add test utilities to non-test code paths`}</code></pre>
+
+  <p>
+    If you use <code>cargo-nextest</code>, say so explicitly. It has different output format and different flags. Claude will default to <code>cargo test</code> otherwise and the output parsing differs.
+  </p>
+
+  <h2>CLAUDE.md configuration for Go projects</h2>
+
+  <p>
+    Go configuration is slightly different because the language is more permissive by default. The compiler won't stop Claude from writing code that is technically valid but stylistically wrong for your project. Explicit rules matter more here:
+  </p>
+
+  <pre><code>{`# Project: [Name]
+
+## Stack
+- Go 1.22+
+- Module path: github.com/yourorg/yourrepo
+- Database: [postgres/sqlite/none]
+- HTTP framework: [net/http stdlib / chi / gin / echo]
+
+## Build and check commands
+- Build: go build ./...
+- Vet: go vet ./...
+- Test: go test ./...
+- Lint: golangci-lint run (config in .golangci.yml)
+- Format: gofmt -w . (all new code must be gofmt-clean)
+- Always run go vet before marking a task complete
+
+## Error handling conventions
+- Always handle errors explicitly; never use _ to discard errors except in defer
+- Wrap errors with context: fmt.Errorf("doing X: %w", err)
+- Return errors to the caller; do not log and return nil
+- Sentinel errors in pkg/errors/errors.go; check with errors.Is() not string comparison
+- Custom error types implement the error interface with Error() string
+
+## Context handling
+- All functions that do I/O must accept context.Context as the first parameter
+- Name it ctx, not context or c
+- Do not store context in structs; pass it through function calls
+
+## Goroutine conventions
+- Every goroutine must have a clear owner responsible for waiting on it
+- Use errgroup for goroutine fans that can fail
+- Do not start goroutines in init() or package-level variable initialization
+
+## What NOT to do
+- Do not use panic() for error handling outside of truly unrecoverable states
+- Do not use global variables for state that should be passed as parameters
+- Do not write tests that depend on external network resources without a build tag`}</code></pre>
+
+  <h2>Goroutine patterns: where Claude Code gets it wrong</h2>
+
+  <p>
+    The most common goroutine problem Claude Code produces without guardrails is the unowned goroutine. It will write:
+  </p>
+
+  <pre><code>{`go func() {
+    doSomething()
+}()`}</code></pre>
+
+  <p>
+    That goroutine has no owner. If <code>doSomething()</code> panics, the program crashes. If the function returns before the goroutine finishes, you have a data race. Adding the errgroup convention to your <code>CLAUDE.md</code> makes Claude use <code>golang.org/x/sync/errgroup</code> by default when you need concurrent work:
+  </p>
+
+  <pre><code>{`g, ctx := errgroup.WithContext(ctx)
+g.Go(func() error {
+    return doSomething(ctx)
+})
+if err := g.Wait(); err != nil {
+    return fmt.Errorf("concurrent work failed: %w", err)
+}`}</code></pre>
+
+  <p>
+    That pattern is composable, handles cancellation, and gives the caller a clean error. It takes one line in <code>CLAUDE.md</code> to make it the default.
+  </p>
+
+  <h2>Testing setup for Go</h2>
+
+  <p>
+    Go's testing package is minimal by design. Whether you use <code>testify</code>, table-driven tests, or something else should be documented:
+  </p>
+
+  <pre><code>{`## Testing
+- Framework: testify (assert and require packages in dev deps)
+- Pattern: table-driven tests for functions with multiple input/output cases
+- Test files: foo_test.go next to foo.go in the same package
+- Integration tests: tag with //go:build integration and run with -tags integration
+- Run unit tests only: go test ./... (no build tags)
+- Run integration tests: go test -tags integration ./...
+- Use t.Parallel() for tests that don't share state
+- Do not use time.Sleep in tests; use channels or sync primitives to wait`}</code></pre>
+
+  <p>
+    The <code>t.Parallel()</code> note is important. Claude will add it correctly when you ask for it, but without instruction it will omit it, and your test suite runs slower than it needs to.
+  </p>
+
+  <h2>Generate your stack config in 30 seconds</h2>
+
+  <p>
+    If you want a complete <code>CLAUDE.md</code> for your Rust or Go project without building it from scratch, <a href="/contextkit/generate">the ContextKit Generator</a> produces a full config based on your stack inputs. Already have a config? <a href="/contextkit/analyze">Score it out of 10</a> with the Analyzer to find gaps.
+  </p>
+
+  <h2>Common pitfalls summary</h2>
+
+  <p>
+    For Rust: paste full compiler output, not just the error line. Add <code>-D warnings</code> to clippy. Require SAFETY comments on unsafe blocks. Distinguish library error handling from application error handling.
+  </p>
+
+  <p>
+    For Go: define error handling convention explicitly. Require context threading on I/O functions. Mandate errgroup for concurrent work. Separate integration tests with build tags so unit test runs stay fast.
+  </p>
+
+  <p>
+    Both languages reward upfront investment in <code>CLAUDE.md</code>. The time spent writing these rules pays back within the first session when Claude stops producing code you have to fix on review.
+  </p>
+</BlogPost>

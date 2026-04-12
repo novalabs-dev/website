@@ -1,0 +1,277 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can Claude Code write tests for existing code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, and this is one of the most reliable things Claude Code does. Point it at a file with no test coverage, describe the test framework you use, and it will generate a full test file covering happy paths, edge cases, and error conditions. The output quality is higher when your CLAUDE.md includes your testing conventions, because Claude won't have to guess whether you use testify vs standard assertions, or whether integration tests are separate from unit tests." }},
+    { "@type": "Question", "name": "How do I use Claude Code for test-driven development?", "acceptedAnswer": { "@type": "Answer", "text": "Write the test first, then ask Claude to implement the function that makes it pass. This works well because Claude Code can see both the test and any existing code, and it will implement the minimal function that satisfies the test rather than over-engineering it. The key discipline is resisting the urge to describe the implementation in your prompt. Describe the behavior the test should verify, write the test, then let Claude implement." }},
+    { "@type": "Question", "name": "Can Claude Code run tests and fix failures automatically?", "acceptedAnswer": { "@type": "Answer", "text": "It can run tests, read the output, and attempt fixes in a loop. This works reliably for compilation errors and simple assertion failures. It gets less reliable when the failure is caused by a non-obvious side effect or environmental issue. Set a limit in your workflow: if Claude has not fixed a test failure in two iterations, it should stop and explain the problem rather than continuing to guess. You can write this as a rule in CLAUDE.md." }},
+    { "@type": "Question", "name": "How do subagents help with parallel test execution in Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code subagents can run independent test suites simultaneously. For example, you might have one subagent running unit tests, another running linting, and a third running type checks. Each completes in parallel and reports back. This is most useful in CI contexts or when you have a large test suite split across packages. For interactive sessions, the overhead of spawning subagents isn't worth it unless the test run genuinely takes several minutes." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to use Claude Code for automated testing: unit, integration, and e2e"
+  description="A practical guide to writing tests with Claude Code, setting up CLAUDE.md testing conventions, using subagents for parallel test runs, and working test-driven in practice."
+  date="April 12, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Claude Code CI/CD integration", slug: "claude-code-ci-cd-integration" },
+    { title: "Claude Code guardrails to prevent destructive actions", slug: "claude-code-guardrails-prevent-destructive-actions" },
+    { title: "Automate code reviews with Claude Code", slug: "automate-code-reviews-claude-code" },
+  ]}
+>
+  <p>
+    Writing tests is one of those tasks that developers reliably delay. The code works, the feature is shipped, the tests are "coming later." Claude Code doesn't solve the motivation problem, but it removes the friction. When writing a test takes thirty seconds instead of ten minutes, the calculus changes.
+  </p>
+
+  <p>
+    This covers the practical side: how to configure Claude Code for testing work, how to run a test-driven workflow that actually holds up, and where to use subagents when the test suite grows large enough to be slow.
+  </p>
+
+  <h2>Setting up CLAUDE.md for testing</h2>
+
+  <p>
+    The testing section of your <code>CLAUDE.md</code> is the most important part for getting consistent output. Without it, Claude will make assumptions about your framework, test organization, and naming conventions. Those assumptions are often wrong and the inconsistency compounds across a codebase.
+  </p>
+
+  <p>
+    Here is a concrete example for a TypeScript project using Vitest:
+  </p>
+
+  <pre><code>{`## Testing conventions
+
+### Framework and tooling
+- Test framework: Vitest
+- Run unit tests: npx vitest run
+- Run with watch: npx vitest
+- Run specific file: npx vitest run src/utils/parser.test.ts
+- Coverage: npx vitest run --coverage (uses v8 provider)
+
+### File organization
+- Unit tests: co-located with source, same directory, .test.ts extension
+- Integration tests: tests/integration/ directory
+- E2E tests: tests/e2e/ directory, run with Playwright
+- Test helpers and fixtures: tests/helpers/ (shared utilities only)
+
+### Writing tests
+- Use describe() to group related tests
+- Test names should complete the sentence "it should..."
+- One assertion type per test where possible; use test.each for parameterized cases
+- Use vi.mock() for module mocking; prefer dependency injection over module mocks when possible
+- beforeEach/afterEach for setup and teardown; avoid beforeAll unless truly necessary
+
+### What makes a complete test
+- Happy path: the function works with valid input
+- Edge cases: empty input, boundary values, null/undefined where relevant
+- Error cases: invalid input throws or returns the expected error
+- Side effects: database writes, network calls, file I/O are mocked or use test doubles
+
+### Integration tests
+- Use a real test database (SQLite in-memory for speed, or Postgres with a test schema)
+- Clean state before each test; do not share state between integration tests
+- Do not mock the database layer in integration tests; that defeats the purpose
+
+### What NOT to do
+- Do not write tests that call external APIs without explicit instruction
+- Do not use arbitrary time.Sleep or setTimeout in tests; use proper async/await
+- Do not test implementation details; test behavior through public interfaces`}</code></pre>
+
+  <p>
+    The "what makes a complete test" section is the most valuable part. Without it, Claude will write tests that cover only the happy path. With it, you get coverage of edge cases and error conditions without asking for them each time.
+  </p>
+
+  <h2>Writing unit tests with Claude Code</h2>
+
+  <p>
+    The fastest workflow for adding unit tests to existing code: point Claude at the file and ask for tests. Give it the source file, not just the function signature.
+  </p>
+
+  <pre><code>{`# Prompt
+Read src/utils/parser.ts and write a complete test file in src/utils/parser.test.ts.
+Cover the happy path, edge cases, and error conditions for every exported function.
+Run the tests when done and fix any failures.`}</code></pre>
+
+  <p>
+    Claude Code will read the source, write the tests, run them, and fix compilation or assertion errors in a loop. For a straightforward utility file, this produces a working test file in under two minutes.
+  </p>
+
+  <p>
+    Where it produces weaker output is for code that has complex side effects or dependencies that aren't obvious from the function signature. If a function makes a database call buried three levels deep, Claude may mock the wrong layer. For those cases, point it at the dependency chain explicitly:
+  </p>
+
+  <pre><code>{`# More specific prompt
+Read src/services/order.ts and src/db/queries.ts.
+Write tests for orderService.createOrder() that mock at the database layer (src/db/queries.ts).
+The mock should simulate: successful insert, unique constraint violation, and connection timeout.`}</code></pre>
+
+  <h2>Test-driven workflow: write the test first</h2>
+
+  <p>
+    TDD with Claude Code is more useful than it might seem at first. The workflow is:
+  </p>
+
+  <ol>
+    <li>Describe the behavior you want in plain language.</li>
+    <li>Ask Claude to write the failing test.</li>
+    <li>Review the test. Edit it if the behavior isn't what you intended.</li>
+    <li>Ask Claude to implement the function that makes the test pass.</li>
+    <li>Run tests. Iterate.</li>
+  </ol>
+
+  <p>
+    Step 3 is where most of the value lives. Reading Claude's test before it writes the implementation forces you to be explicit about what "correct" means. You catch misunderstandings before they're baked into the implementation.
+  </p>
+
+  <p>
+    An example session:
+  </p>
+
+  <pre><code>{`You: I need a function that parses a date string in "YYYY-MM-DD" format and returns
+a Date object. Invalid strings should throw a TypeError with a useful message.
+Timezone should be UTC. Write the test first.
+
+Claude: [writes tests checking valid dates, invalid format, invalid values, timezone]
+
+You: [review] Add a case for leap year February 29th on both a leap year and non-leap year.
+
+Claude: [updates tests]
+
+You: Good. Now implement the function.
+
+Claude: [implements parseDate() and runs the tests]`}</code></pre>
+
+  <p>
+    The constraint of writing the test before the implementation also tends to produce simpler code. When Claude knows the exact interface the test expects, it doesn't build extra abstractions.
+  </p>
+
+  <h2>Integration tests</h2>
+
+  <p>
+    Integration tests are where Claude Code needs more guidance. The key decisions that vary by project:
+  </p>
+
+  <p>
+    What is the database strategy? In-memory SQLite for speed, a test container, a shared test schema on a real database, or test fixtures loaded from SQL files. Claude needs to know which approach you use or it will pick one that conflicts with your setup.
+  </p>
+
+  <p>
+    How is state reset between tests? Truncation, transaction rollback, or full schema recreation. Each has tradeoffs for speed vs isolation. Document what you use.
+  </p>
+
+  <p>
+    What gets mocked? The network? External APIs? File system? Defining the mocking boundary prevents Claude from writing integration tests that accidentally call real services.
+  </p>
+
+  <pre><code>{`## Integration test conventions
+- Database: Postgres test container (testcontainers-go or similar)
+- State reset: truncate all tables in beforeEach
+- External HTTP calls: intercept with nock (Node) or httptest (Go)
+- File system: tmp directory per test, cleaned up in afterEach
+- Run: npm run test:integration (separate script from unit tests)
+- Never run integration tests with --watch; they are slow and stateful`}</code></pre>
+
+  <h2>End-to-end tests</h2>
+
+  <p>
+    E2E tests with Playwright are where Claude Code is most useful for writing the test scaffolding and least useful for filling in the assertions. Claude can generate the page navigation and interaction code reliably. But whether an assertion like <code>expect(page.getByRole('button', {'{'}name: 'Submit'{'}'}))</code> reflects what your actual UI contains is something only you can verify.
+  </p>
+
+  <p>
+    A practical workflow: ask Claude to write the test skeleton (navigation, actions, assertions as stubs), then fill in the actual selectors and expected values yourself. This is faster than writing the whole test from scratch, but you're still the one who knows what the UI looks like.
+  </p>
+
+  <pre><code>{`## E2E test conventions
+- Framework: Playwright
+- Test location: tests/e2e/
+- Run: npx playwright test
+- Base URL: set in playwright.config.ts, do not hardcode localhost:3000 in tests
+- Authentication: use storageState to reuse logged-in session across tests
+- Selectors: prefer role-based selectors (getByRole, getByLabel) over CSS selectors
+- Screenshots on failure: already configured in playwright.config.ts`}</code></pre>
+
+  <h2>Using subagents for parallel test runs</h2>
+
+  <p>
+    If your test suite is large enough that running everything serially takes several minutes, Claude Code subagents can parallelize the work. A common pattern is splitting by test type:
+  </p>
+
+  <pre><code>{`Run these three tasks in parallel using subagents:
+1. Run the unit test suite: npx vitest run --reporter=json > .tmp/unit-results.json
+2. Run lint and type checks: npx tsc --noEmit && npx eslint src/
+3. Run integration tests: npm run test:integration
+
+Report the results of all three when complete.`}</code></pre>
+
+  <p>
+    Each subagent runs independently and the results come back together. For a CI-like check before committing, this pattern cuts the wall-clock time significantly when the tasks don't share state.
+  </p>
+
+  <p>
+    One constraint: subagents don't share file handles or database connections. Tests that require a single shared resource (a port, a file lock, a specific database state) can't be parallelized this way. Keep those in a single sequential run.
+  </p>
+
+  <h2>How ContextKit scores your testing setup</h2>
+
+  <p>
+    The testing category is one of the sections <a href="/contextkit/analyze">the ContextKit Analyzer</a> checks when scoring your <code>CLAUDE.md</code>. It looks for framework documentation, test organization conventions, state management rules, and mocking strategy. If you've been using Claude Code for testing but the output feels inconsistent, running the Analyzer often shows which pieces of context are missing.
+  </p>
+
+  <h2>Fixing test failures in a loop</h2>
+
+  <p>
+    Claude Code can run tests, read failures, and attempt fixes automatically. This works well for compilation errors, type mismatches, and straightforward assertion failures where the expected value is clearly wrong.
+  </p>
+
+  <p>
+    It works less well when the failure is caused by:
+  </p>
+
+  <p>
+    Environmental issues (missing env variable, database not running, wrong port). Claude will attempt code fixes when the real problem is configuration.
+  </p>
+
+  <p>
+    Flaky tests. If a test fails 30% of the time due to timing, Claude will try to fix the test code when the real issue is a race condition in the implementation.
+  </p>
+
+  <p>
+    Design problems. If a function is hard to test because it has too many side effects, Claude will add mocks to work around it rather than suggesting a refactor. Sometimes that's fine; sometimes it's hiding a design issue worth fixing.
+  </p>
+
+  <p>
+    A useful rule to add to <code>CLAUDE.md</code>:
+  </p>
+
+  <pre><code>{`## Test failure handling
+- If a test failure is not resolved in 2 attempts, stop and explain the root cause
+- Do not add arbitrary delays to fix timing-related failures
+- If a function is difficult to test, flag it rather than adding complex mocks`}</code></pre>
+
+  <p>
+    That instruction stops the loop-and-guess pattern and forces a diagnosis instead.
+  </p>
+
+  <h2>Getting coverage that matters</h2>
+
+  <p>
+    Coverage metrics are useful as a floor, not a ceiling. 80% line coverage doesn't mean your edge cases are covered. When asking Claude to write tests for a file, pair the coverage metric with a behavior checklist:
+  </p>
+
+  <pre><code>{`Write tests for src/billing/invoiceCalculator.ts.
+After writing, verify your tests cover:
+- Standard invoice with multiple line items
+- Invoice with zero-quantity line items
+- Discount codes (valid, expired, and invalid)
+- Tax calculation for EU vs non-EU addresses
+- Rounding to 2 decimal places for all currency values
+Report which cases you couldn't cover and why.`}</code></pre>
+
+  <p>
+    The explicit checklist produces better tests than asking for "comprehensive" coverage. Claude matches the list rather than making its own judgment about what matters.
+  </p>
+</BlogPost>

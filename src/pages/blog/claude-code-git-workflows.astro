@@ -1,0 +1,256 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can Claude Code write commit messages automatically?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code generates commit messages from staged changes by default. The quality depends on how well your CLAUDE.md defines the convention. With explicit commit format instructions (prefix types, scope rules, imperative mood, line length limits), the output matches your project style. Without them, the messages are generic and often too long. Most teams find it worth spending 10 minutes writing a commit convention section in CLAUDE.md to get consistent output from the start." }},
+    { "@type": "Question", "name": "How does Claude Code handle PR descriptions?", "acceptedAnswer": { "@type": "Answer", "text": "Claude Code can generate PR descriptions by reading the diff, the commit history on the branch, and any related files. The output is most useful when you tell it the PR template format your team uses. Without a template, it produces a reasonable summary but may not include sections your reviewers expect (test plan, breaking changes, migration steps). Point Claude at your .github/PULL_REQUEST_TEMPLATE.md and it will follow the structure." }},
+    { "@type": "Question", "name": "Is it safe to let Claude Code run git commands?", "acceptedAnswer": { "@type": "Answer", "text": "Most git commands are safe because they're reversible. The ones to guard against are force pushes, hard resets, and branch deletions. You can add explicit rules to CLAUDE.md prohibiting these without confirmation. Claude Code respects CLAUDE.md guardrails. A simple rule like 'never run git push --force or git reset --hard without explicit confirmation' is enough to prevent the common accidents. The git reflog covers most other mistakes." }},
+    { "@type": "Question", "name": "What is git worktree and how does Claude Code use it?", "acceptedAnswer": { "@type": "Answer", "text": "Git worktrees let you check out multiple branches of the same repository simultaneously in separate directories. Claude Code can work in one worktree while you continue work in another, without either side needing to stash or switch branches. This is useful for long-running tasks where you want Claude working in isolation: create a worktree for the feature branch, point Claude at that directory, and your main working tree stays clean. The worktree shares the same git history and object store, so no duplication." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code Git workflows: commits, PR descriptions, and code review"
+  description="How to configure Claude Code for consistent git commit conventions, generate useful PR descriptions, use worktrees for isolated feature work, and add branch protection guardrails."
+  date="April 12, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Automate code reviews with Claude Code", slug: "automate-code-reviews-claude-code" },
+    { title: "Claude Code CI/CD integration", slug: "claude-code-ci-cd-integration" },
+    { title: "Claude Code open source contributor configs", slug: "claude-code-open-source-contributor-configs" },
+  ]}
+>
+  <p>
+    Git workflows are one of those things that teams develop strong opinions about and then rarely write down in a way a new contributor (or an AI) can actually follow. The branch naming convention lives in someone's head. The commit message format is enforced by review comments, not config. The PR template exists but half the fields get deleted before submission.
+  </p>
+
+  <p>
+    Claude Code surfaces this problem quickly because it needs explicit rules to produce consistent output. The upside is that fixing it for Claude also fixes it for your team.
+  </p>
+
+  <h2>Commit conventions in CLAUDE.md</h2>
+
+  <p>
+    The most impactful section to add to your <code>CLAUDE.md</code> for git workflows is commit conventions. Here is a concrete example using Conventional Commits:
+  </p>
+
+  <pre><code>{`## Git conventions
+
+### Commit messages
+- Format: <type>(<scope>): <description>
+- Types: feat, fix, docs, refactor, test, chore, perf, ci
+- Scope: optional, use the affected module or area (e.g. auth, billing, api)
+- Description: imperative mood, no period at end, max 72 characters
+- Body: optional, wrap at 72 characters, explain WHY not WHAT
+- Footer: use "BREAKING CHANGE:" prefix for breaking changes
+
+### Examples
+- feat(auth): add OAuth2 login via GitHub
+- fix(billing): correct rounding for fractional line item quantities
+- refactor(api): extract pagination logic into shared middleware
+- docs: update CONTRIBUTING.md with new branch naming rules
+
+### What NOT to do
+- Do not write commit messages like "fix bug" or "update code"
+- Do not include "I" or "we" in commit messages
+- Do not summarize what files changed; git diff shows that already
+- Do not combine unrelated changes in one commit; stage selectively
+
+### Branch naming
+- Features: feat/<short-description>
+- Bug fixes: fix/<short-description>
+- Use hyphens, not underscores
+- Keep it under 40 characters
+
+### Before committing
+- Run the project's lint and test commands
+- Stage only the files relevant to this change
+- Review the diff before committing: git diff --staged`}</code></pre>
+
+  <p>
+    The "what NOT to do" section matters as much as the positive examples. Claude learns the pattern from examples but defaults to habits that are common across codebases. "Fix bug" is a common default; telling Claude explicitly that it's not acceptable prevents backsliding.
+  </p>
+
+  <h2>How Claude Code generates commits in practice</h2>
+
+  <p>
+    When you ask Claude to commit changes, it reads the staged diff and generates a message following your convention. If nothing is staged, it will typically ask what to include rather than staging everything with <code>git add -A</code>.
+  </p>
+
+  <p>
+    A practical workflow for end-of-task commits:
+  </p>
+
+  <pre><code>{`# After Claude completes a feature
+You: Stage the relevant files and commit with an appropriate message.
+     Review the diff first and don't include any debug code or temporary files.
+
+Claude: [runs git diff --staged, identifies files, stages selectively, writes commit]`}</code></pre>
+
+  <p>
+    The instruction to review the diff first is worth making a habit. Claude will sometimes stage more than intended, especially if it created temporary files during its work. A brief check before committing catches that.
+  </p>
+
+  <p>
+    If your team uses signed commits or a specific GPG key configuration, add that to <code>CLAUDE.md</code> as well. Claude won't know to use <code>git commit -S</code> unless you tell it.
+  </p>
+
+  <h2>PR descriptions that reviewers actually read</h2>
+
+  <p>
+    Claude Code is good at summarizing what changed and why when it has access to the full branch diff and commit history. The common mistake is asking for a PR description without providing enough context:
+  </p>
+
+  <pre><code>{`# Weak prompt
+Write a PR description for my changes.
+
+# Better prompt
+Read the diff between main and this branch (git diff main...HEAD),
+the commit messages (git log main..HEAD --oneline), and
+.github/PULL_REQUEST_TEMPLATE.md.
+Write a PR description that fills in every section of the template.
+For the test plan, describe what was tested, not what should be tested.`}</code></pre>
+
+  <p>
+    The distinction between "what was tested" and "what should be tested" is important. PR descriptions that say "add unit tests" in the test plan are not useful to reviewers. Claude will write that if you don't constrain it. Asking for what was actually verified produces a more honest and useful document.
+  </p>
+
+  <p>
+    You can also ask Claude to call out breaking changes explicitly:
+  </p>
+
+  <pre><code>{`After the description, list any breaking changes separately.
+A breaking change is anything that changes a public API surface, modifies
+database schema in a non-backward-compatible way, or requires env variable
+changes in production.`}</code></pre>
+
+  <h2>Code review with Claude Code</h2>
+
+  <p>
+    Using Claude Code to review code before you submit a PR is more useful than using it after. The workflow:
+  </p>
+
+  <pre><code>{`Review the changes in git diff main...HEAD.
+Focus on:
+1. Logic errors and edge cases not covered by tests
+2. Security issues: SQL injection, unvalidated input, exposed secrets
+3. Performance problems: N+1 queries, unnecessary re-renders, missing indexes
+4. Consistency with our existing patterns (see CLAUDE.md conventions)
+
+Do not comment on style issues that our linter catches automatically.
+For each issue found, explain why it matters and suggest the fix.`}</code></pre>
+
+  <p>
+    The "do not comment on style" instruction is worth including. Without it, Claude will list style issues alongside actual bugs, diluting the signal. If your linter handles it, Claude flagging it wastes review time.
+  </p>
+
+  <p>
+    Claude Code also works well for reviewing someone else's PR. Point it at the diff, ask it to evaluate against your team's CLAUDE.md conventions, and it will produce comments calibrated to your project's standards rather than generic advice.
+  </p>
+
+  <h2>Worktree-based feature development</h2>
+
+  <p>
+    Git worktrees are underused and pair well with Claude Code. The setup:
+  </p>
+
+  <pre><code>{`# Create a worktree for a feature branch
+git worktree add ../myproject-feature-auth feat/oauth-github
+
+# Now you have two working directories:
+# ~/myproject (main branch, your interactive work)
+# ~/myproject-feature-auth (feat/oauth-github, Claude's work)`}</code></pre>
+
+  <p>
+    Point Claude Code at the worktree directory. It can build the feature there, run tests, and commit progress while your main directory stays on the current branch. You can review the work at any point without interrupting either side.
+  </p>
+
+  <p>
+    This pattern is especially useful for long-running tasks. If you're asking Claude to implement a feature that will take twenty minutes, you don't want to sit on a detached HEAD or a half-committed branch in your main directory. The worktree keeps the states cleanly separated.
+  </p>
+
+  <p>
+    Cleaning up when done:
+  </p>
+
+  <pre><code>{`# After merging
+git worktree remove ../myproject-feature-auth
+git branch -d feat/oauth-github`}</code></pre>
+
+  <h2>Branch protection and safety rules</h2>
+
+  <p>
+    Add git safety rules to your <code>CLAUDE.md</code> to prevent the commands that are difficult to recover from:
+  </p>
+
+  <pre><code>{`## Git safety rules
+- Never run git push --force or git push --force-with-lease without explicit confirmation
+- Never run git reset --hard without explicit confirmation
+- Never run git clean -fd without explicit confirmation
+- Never commit directly to main or master; always use a feature branch
+- Before any destructive operation, explain what it will do and ask to confirm
+
+## Protected branches
+- main: no direct commits, requires PR
+- release/*: no direct commits, requires PR from main
+
+## Recovery
+- If something goes wrong, use git reflog to find the previous HEAD
+- Never delete .git directory`}</code></pre>
+
+  <p>
+    The reflog note is practical. Claude Code will sometimes suggest a reflog recovery when you've lost work, but knowing it's there is only useful if you know to look. Putting it in the safety rules section makes it findable.
+  </p>
+
+  <h2>Generate your git config with ContextKit</h2>
+
+  <p>
+    If you want to generate a complete git conventions section for your <code>CLAUDE.md</code>, <a href="/contextkit/generate">the ContextKit Generator</a> includes git workflow configuration as part of the full config output. If you already have a <code>CLAUDE.md</code> and want to know whether the git section is complete, <a href="/contextkit/analyze">the Analyzer scores it</a> and identifies missing pieces.
+  </p>
+
+  <h2>Rebasing and history cleanup</h2>
+
+  <p>
+    Interactive rebase is one git workflow where Claude Code is less useful for the interactive parts (it can't operate <code>git rebase -i</code> interactively) but more useful for the planning:
+  </p>
+
+  <pre><code>{`# Ask Claude to plan the rebase, then execute manually
+You: I have 8 commits on this branch. Run git log --oneline to see them.
+     Tell me which ones should be squashed, which should be reworded,
+     and whether any are out of logical order. I'll run the rebase myself.
+
+Claude: [reads log, recommends squash plan, explains rationale]
+
+You: [runs git rebase -i and follows the plan]`}</code></pre>
+
+  <p>
+    Claude is good at identifying commits that belong together (multiple "fix typo" commits that should be squashed into their parent) and commits whose messages don't meet your convention. Having it produce the plan and executing it yourself is a clean split of responsibilities.
+  </p>
+
+  <h2>Automating the pre-commit check</h2>
+
+  <p>
+    A practical addition to your <code>CLAUDE.md</code>: define what Claude should do before every commit. This functions like a lightweight pre-commit hook but operates at the AI level:
+  </p>
+
+  <pre><code>{`## Pre-commit checklist
+Before committing, always:
+1. Run the project lint command and fix any errors
+2. Run the project type check if applicable
+3. Run the fast test suite (unit tests, not integration)
+4. Review git diff --staged and remove any debug logs, console.logs, or TODO placeholders
+5. Verify the commit message matches the convention`}</code></pre>
+
+  <p>
+    This doesn't replace a real pre-commit hook (which runs regardless of who or what is committing), but it improves the quality of Claude's commits in sessions where the hook isn't configured.
+  </p>
+
+  <p>
+    Combined with a solid commit convention and branch safety rules, this section of <code>CLAUDE.md</code> makes Claude Code a disciplined contributor rather than a fast one that leaves cleanup for you.
+  </p>
+</BlogPost>
