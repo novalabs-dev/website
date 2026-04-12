@@ -1,0 +1,233 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can I use Claude Code and Gemini CLI on the same project?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code reads CLAUDE.md and .claude/rules/ for its configuration. Gemini CLI reads GEMINI.md. Both files can exist in the same project root without conflicts. Each tool ignores the other's config files. You can switch between them depending on the task or use them for different types of work within the same codebase." }},
+    { "@type": "Question", "name": "Do CLAUDE.md and GEMINI.md need different content?", "acceptedAnswer": { "@type": "Answer", "text": "They share a similar purpose, defining project conventions and instructions for the AI tool, but they use different syntax and support different features. CLAUDE.md supports tool-specific features like subagent configuration and context management. GEMINI.md is structured more like a system prompt. The core project information (directory structure, coding conventions, test commands) should be the same in both. The tool-specific configuration sections will differ." }},
+    { "@type": "Question", "name": "Which is better: Claude Code or Gemini CLI?", "acceptedAnswer": { "@type": "Answer", "text": "They have different strengths. Claude Code excels at complex multi-file refactoring, long-running implementation sessions, and agentic workflows with subagents and tool use. Gemini CLI has strong integration with Google services, competitive pricing on its free tier, and handles some tasks differently due to Gemini's training. Most developers who use both find they reach for Claude Code for complex implementation work and Gemini CLI for quick questions, code review, or tasks that benefit from a second perspective." }},
+    { "@type": "Question", "name": "How do I keep CLAUDE.md and GEMINI.md in sync?", "acceptedAnswer": { "@type": "Answer", "text": "The simplest approach is to maintain one canonical source of project conventions, either as a shared markdown file or as structured sections in your README, and generate tool-specific config files from it. ContextKit can generate both CLAUDE.md and GEMINI.md from the same set of project inputs, keeping the core information consistent while formatting each file for its respective tool." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to run Claude Code and Gemini CLI on the same project"
+  description="Using multiple AI coding tools on the same codebase means maintaining multiple config files. Here is how to set up Claude Code and Gemini CLI side by side without the configs drifting apart."
+  date="April 12, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Gemini CLI vs Claude Code: how project configs differ", slug: "gemini-cli-vs-claude-code-config" },
+    { title: "How to prepare any repo for AI coding tools in 2026", slug: "prepare-repo-for-ai-coding-tools" },
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+  ]}
+>
+  <p>
+    The AI coding tool landscape is fragmenting. Claude Code uses CLAUDE.md. Gemini CLI uses GEMINI.md. Cursor uses .cursorrules. GitHub Copilot uses its own instruction format. If you or your team uses more than one of these tools, you now have a configuration management problem that did not exist six months ago.
+  </p>
+
+  <p>
+    The most common multi-tool combination right now is Claude Code and Gemini CLI. Claude Code for heavy implementation work. Gemini CLI for quick tasks, code review, or getting a second opinion. Both are terminal-native, both read project config files, and both work well on the same codebase. The challenge is keeping the configurations consistent.
+  </p>
+
+  <p>
+    This guide covers the practical setup for running both tools on the same project, how the config files differ, and how to prevent them from drifting apart over time.
+  </p>
+
+  <h2>What each tool reads</h2>
+
+  <p>
+    Claude Code loads these files at session start:
+  </p>
+
+  <ul>
+    <li><strong>CLAUDE.md</strong> in the project root (primary configuration)</li>
+    <li><strong>.claude/rules/*.md</strong> for additional rule files (loaded on demand)</li>
+    <li><strong>~/.claude/CLAUDE.md</strong> for global user-level configuration</li>
+  </ul>
+
+  <p>
+    Gemini CLI loads:
+  </p>
+
+  <ul>
+    <li><strong>GEMINI.md</strong> in the project root</li>
+    <li><strong>.gemini/rules/*.md</strong> for additional rules (similar concept to Claude's rules directory)</li>
+    <li><strong>~/.gemini/GEMINI.md</strong> for global configuration</li>
+  </ul>
+
+  <p>
+    Each tool ignores the other's files. Having both CLAUDE.md and GEMINI.md in your project root causes no conflicts. Git tracks both, your team can use whichever tool they prefer, and the project supports both without anyone having to choose.
+  </p>
+
+  <h2>What goes in both files</h2>
+
+  <p>
+    The core project information should be identical in both configs. This is the information that any AI tool needs to work well with your codebase:
+  </p>
+
+  <ul>
+    <li>Project description and purpose</li>
+    <li>Directory structure and file organization</li>
+    <li>Language and framework versions</li>
+    <li>Coding conventions (naming, imports, patterns)</li>
+    <li>Test commands and how to run them</li>
+    <li>Build commands</li>
+    <li>Common tasks and how to perform them</li>
+  </ul>
+
+  <p>
+    This information is the same regardless of which tool reads it. The difference is in how you format it and what tool-specific features you add on top.
+  </p>
+
+  <h2>What differs between the files</h2>
+
+  <p>
+    <strong>CLAUDE.md-specific sections:</strong>
+  </p>
+
+  <ul>
+    <li>Subagent configuration (how to use parallel agents for complex tasks)</li>
+    <li>Tool use preferences (which tools to prefer or avoid)</li>
+    <li>Context management rules (what to read first, tiered loading)</li>
+    <li>Hook configuration references</li>
+    <li>Memory and session continuity instructions</li>
+  </ul>
+
+  <p>
+    <strong>GEMINI.md-specific sections:</strong>
+  </p>
+
+  <ul>
+    <li>Google service integration preferences</li>
+    <li>Output format instructions (Gemini handles formatting directives differently)</li>
+    <li>Model-specific behavior adjustments</li>
+    <li>Extension and plugin references</li>
+  </ul>
+
+  <p>
+    The tool-specific sections make up maybe 20-30% of each file. The remaining 70-80% is the same project information expressed in slightly different formatting.
+  </p>
+
+  <h2>Keeping configs in sync</h2>
+
+  <p>
+    Config drift is the main risk of maintaining multiple files. Someone updates the test command in CLAUDE.md but forgets GEMINI.md. A new coding convention gets added to one file but not the other. Over weeks, the files diverge and the tools start behaving differently on the same project.
+  </p>
+
+  <p>
+    There are three approaches to managing this:
+  </p>
+
+  <h3>Approach 1: shared conventions file</h3>
+
+  <p>
+    Create a <code>CONVENTIONS.md</code> file that contains all the shared project information. Reference it from both CLAUDE.md and GEMINI.md. Each tool-specific file contains only the tool-specific configuration plus a note to read CONVENTIONS.md for project details.
+  </p>
+
+  <p>
+    This works well for teams. One person maintains the conventions. Each developer maintains their preferred tool config. The shared information stays in one place.
+  </p>
+
+  <h3>Approach 2: generate from a single source</h3>
+
+  <p>
+    Use a tool like <a href="https://nova-labs.dev/contextkit/generate">ContextKit</a> to generate both files from the same inputs. Answer the project questions once, export in CLAUDE.md format, then export again in GEMINI.md format. The core information is identical because it came from the same source. You customize the tool-specific sections afterward.
+  </p>
+
+  <p>
+    When conventions change, regenerate both files from the updated inputs. This is the lowest-maintenance approach for projects that do not change their tooling frequently.
+  </p>
+
+  <h3>Approach 3: CI enforcement</h3>
+
+  <p>
+    Add a CI check that compares the key sections of both files. You can write a simple script that extracts project structure, conventions, and test commands from both files and fails the build if they have diverged. This is the most rigorous approach but requires some initial setup.
+  </p>
+
+  <p>
+    For teams that take this seriously, <code>npx contextkit score</code> can check both files in CI and enforce a minimum quality threshold on each. If someone updates CLAUDE.md but lets GEMINI.md degrade, the CI check catches it.
+  </p>
+
+  <h2>Practical multi-tool workflow</h2>
+
+  <p>
+    Here is how developers who use both tools typically organize their work:
+  </p>
+
+  <p>
+    <strong>Claude Code for implementation.</strong> When you are building features, refactoring code, or doing complex multi-file changes, Claude Code's agentic capabilities (subagents, long-running sessions, tool use) make it the stronger choice. It handles the "build this feature from spec" type of work well.
+  </p>
+
+  <p>
+    <strong>Gemini CLI for review and quick tasks.</strong> For getting a second opinion on code, quick questions about APIs, or tasks where you want a different perspective, Gemini CLI provides value as a complement rather than a replacement. If Claude Code suggested an approach and you are not sure about it, asking Gemini for its take gives you two independent assessments.
+  </p>
+
+  <p>
+    <strong>Either tool for code review.</strong> Running both tools as reviewers on the same PR catches different things. Claude tends to focus on architectural patterns and consistency with project conventions. Gemini often catches different edge cases and suggests alternative approaches. The overlap is useful as confirmation; the differences are useful as things to investigate.
+  </p>
+
+  <p>
+    <strong>Switch tools when stuck.</strong> If you have been going back and forth with one tool on a problem and not making progress, switching to the other tool with a fresh session often breaks the deadlock. Each model has different strengths and different failure modes. A problem that confuses one model might be straightforward for the other.
+  </p>
+
+  <h2>File structure for a multi-tool project</h2>
+
+  <p>
+    Here is what the root of a multi-tool project looks like:
+  </p>
+
+  <pre><code>{`project-root/
+  CLAUDE.md           # Claude Code configuration
+  GEMINI.md           # Gemini CLI configuration
+  .cursorrules        # Cursor configuration (if applicable)
+  AGENTS.md           # GitHub Copilot / multi-agent config
+  .claude/
+    rules/            # Claude-specific rule files
+      testing.md
+      security.md
+  .gemini/
+    rules/            # Gemini-specific rule files
+      testing.md
+      security.md
+  src/
+  tests/
+  ...`}</code></pre>
+
+  <p>
+    Each tool has its own config file and rules directory. The .claude/ and .gemini/ directories are separate. Git tracks everything. Team members use whichever tool they prefer without affecting anyone else.
+  </p>
+
+  <h2>Getting started with a multi-tool setup</h2>
+
+  <p>
+    If you already have a CLAUDE.md and want to add Gemini CLI support (or vice versa), the fastest path is:
+  </p>
+
+  <p>
+    1. Go to <a href="https://nova-labs.dev/contextkit/generate">ContextKit's generator</a> and answer the 5 questions about your project.
+  </p>
+
+  <p>
+    2. Export as CLAUDE.md format. Compare it with your existing file. Keep your existing file if it is more detailed, but note any sections the generator suggests that you are missing.
+  </p>
+
+  <p>
+    3. Export as GEMINI.md format. This gives you a baseline GEMINI.md with the same project information.
+  </p>
+
+  <p>
+    4. Customize the tool-specific sections in each file.
+  </p>
+
+  <p>
+    5. Score both files with the <a href="https://nova-labs.dev/contextkit/analyze">Analyzer</a> to check for gaps.
+  </p>
+
+  <p>
+    The whole process takes about 10 minutes and gives you a consistent multi-tool configuration from a single source of project information.
+  </p>
+</BlogPost>

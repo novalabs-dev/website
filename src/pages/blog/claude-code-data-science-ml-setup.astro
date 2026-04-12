@@ -1,0 +1,226 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can Claude Code work with Jupyter notebooks?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code can read .ipynb files and understands the cell structure including code cells, markdown cells, and outputs. It can suggest modifications to specific cells, add new cells, and interpret output including error tracebacks. However, Claude Code does not execute notebook cells directly. It works best when you have equivalent .py scripts that can be run from the terminal for verification, or when you use notebooks for exploration and scripts for production code." }},
+    { "@type": "Question", "name": "How do I configure CLAUDE.md for a machine learning project?", "acceptedAnswer": { "@type": "Answer", "text": "Focus on three areas: data conventions (where data lives, naming patterns, never commit raw data), model conventions (framework preference like PyTorch or scikit-learn, experiment tracking tool, checkpoint directory), and reproducibility rules (random seed requirements, environment specification, logging format). Also specify your compute constraints so Claude does not suggest approaches that require more GPU memory or training time than you have available." }},
+    { "@type": "Question", "name": "Does Claude Code understand pandas and NumPy code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code handles pandas, NumPy, scikit-learn, PyTorch, TensorFlow, and other common data science libraries well. It understands DataFrame operations, array broadcasting, model training loops, and common patterns like train-test splits and cross-validation. Where it sometimes struggles is with very large or complex data transformations where the intermediate shapes are non-obvious. Adding shape comments to your CLAUDE.md conventions can help with this." }},
+    { "@type": "Question", "name": "Should I use Claude Code for EDA or just for production ML code?", "acceptedAnswer": { "@type": "Answer", "text": "Both, but with different session strategies. For exploratory data analysis, use shorter sessions focused on specific questions about the data. Let Claude generate visualization code and statistical summaries, then evaluate the output yourself. For production ML code like training pipelines, data processing scripts, and model serving, use longer sessions with stricter CLAUDE.md rules about code quality, testing, and documentation. The configuration should match the rigor you need for the task." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code for data science and ML projects: configuration and workflow guide"
+  description="Data science projects have unique requirements for AI coding tools: notebook workflows, data pipelines, experiment tracking, and reproducibility. Here is how to configure Claude Code for ML work."
+  date="April 12, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md for Python projects", slug: "claudemd-for-python-projects" },
+    { title: "How to write the perfect CLAUDE.md", slug: "how-to-write-the-perfect-claude-md" },
+    { title: "Claude Code tips and tricks", slug: "claude-code-tips-and-tricks" },
+  ]}
+>
+  <p>
+    Data science and machine learning projects do not fit neatly into the patterns that most Claude Code guides assume. You are not building a web app with routes and components. You are working with notebooks, data pipelines, experiment tracking, model training scripts, and a mix of exploratory and production code that live in the same repository.
+  </p>
+
+  <p>
+    Without specific configuration, Claude Code will treat your ML project like any other Python codebase. It will suggest changes that break reproducibility, create files in the wrong directories, use libraries you do not have installed, or generate training code that exceeds your GPU memory. The fix is a CLAUDE.md that understands the specific constraints and conventions of ML work.
+  </p>
+
+  <p>
+    This guide covers how to configure Claude Code for data science projects, the specific CLAUDE.md sections that matter most, and the workflow patterns that work well for different types of ML work.
+  </p>
+
+  <h2>The CLAUDE.md sections that matter for ML</h2>
+
+  <p>
+    A standard CLAUDE.md covers project structure, coding conventions, and test commands. For ML projects, you need four additional sections that do not appear in typical web development configs.
+  </p>
+
+  <h3>Data conventions</h3>
+
+  <p>
+    Where data lives, how it is organized, and what should never be committed to git. This is the single most important section for ML projects because data handling mistakes are the hardest to undo.
+  </p>
+
+  <pre><code>{`# Data conventions
+- Raw data: data/raw/ (NEVER modify, NEVER commit to git)
+- Processed data: data/processed/ (generated by scripts in src/data/)
+- Features: data/features/ (generated by feature engineering pipeline)
+- Models: models/ (checkpoints and artifacts, gitignored)
+- All data paths use pathlib.Path, never string concatenation
+- Data loading functions return typed DataFrames (pandera schemas in src/schemas/)
+- Maximum dataset size for local development: 10GB
+- For larger datasets, use DVC with remote storage`}</code></pre>
+
+  <p>
+    Without this section, Claude will sometimes suggest hardcoded paths, commit data files, or create data processing scripts that modify raw data in place. Specifying these conventions once prevents recurring mistakes.
+  </p>
+
+  <h3>Compute constraints</h3>
+
+  <p>
+    Claude has no way to know what hardware you are running on unless you tell it. This matters because the difference between a suggestion that works on your machine and one that crashes it is often just a batch size or model size parameter.
+  </p>
+
+  <pre><code>{`# Compute constraints
+- GPU: NVIDIA RTX 4090 (24GB VRAM) — local development
+- Training: max batch size 32 for transformer models, 128 for CNNs
+- CPU RAM: 64GB — can load datasets up to ~40GB into memory
+- Training jobs >2 hours: must use checkpoint saving every 30 minutes
+- Production inference: CPU-only (no GPU on deployment server)
+- Always include torch.cuda.is_available() checks in training scripts`}</code></pre>
+
+  <p>
+    This prevents Claude from suggesting a batch size of 256 for a vision transformer on a 24GB GPU, or generating inference code that assumes CUDA availability on a CPU deployment target.
+  </p>
+
+  <h3>Experiment tracking</h3>
+
+  <p>
+    ML projects need reproducibility in a way that web projects do not. Every training run should be traceable back to its exact configuration, data version, and code state.
+  </p>
+
+  <pre><code>{`# Experiment tracking
+- Tool: MLflow (local tracking server at localhost:5000)
+- Every training script must log: hyperparameters, metrics, model artifact, git hash
+- Random seeds: always set torch.manual_seed(42), numpy.random.seed(42), random.seed(42)
+- Config files: YAML in configs/ directory, one per experiment type
+- Naming convention: experiments are named YYYY-MM-DD_description
+- Never use wandb, neptune, or other tools — we standardized on MLflow`}</code></pre>
+
+  <h3>Model conventions</h3>
+
+  <p>
+    How models are structured, trained, and saved. This is where framework-specific patterns live.
+  </p>
+
+  <pre><code>{`# Model conventions
+- Framework: PyTorch (no TensorFlow unless wrapping a specific pretrained model)
+- Model definitions: src/models/ (one file per model architecture)
+- Training loops: src/training/ (use PyTorch Lightning for new models)
+- Inference: src/inference/ (must work without GPU)
+- Model saving: torch.save(model.state_dict(), path) — never save full model objects
+- Pretrained models: download to models/pretrained/ using huggingface_hub
+- Model configs: dataclass in same file as model definition`}</code></pre>
+
+  <h2>Notebook workflows with Claude Code</h2>
+
+  <p>
+    Claude Code reads .ipynb files. It understands the cell structure, can parse both code and markdown cells, and interprets output including plots (as text descriptions) and error tracebacks. But notebooks present a workflow challenge because Claude cannot execute cells.
+  </p>
+
+  <p>
+    The practical approach is to use notebooks for exploration and Claude Code for turning exploration into production code. When you have a notebook that does something useful, ask Claude to refactor the working cells into a proper Python script with error handling, logging, and tests.
+  </p>
+
+  <p>
+    For EDA work, Claude is useful for generating visualization code. Describe what you want to see in the data and Claude generates the matplotlib, seaborn, or plotly code. You paste it into a notebook cell and run it. The feedback loop is: describe what you want, Claude writes the code, you execute it and see the output, then iterate.
+  </p>
+
+  <p>
+    Add a section to your CLAUDE.md for notebook conventions:
+  </p>
+
+  <pre><code>{`# Notebook conventions
+- Notebooks live in notebooks/ (never in src/)
+- Naming: NN_description.ipynb (01_eda.ipynb, 02_feature_engineering.ipynb)
+- Every notebook starts with a markdown cell: title, purpose, date, author
+- Production code extracted from notebooks goes to src/ with tests
+- Notebooks are NOT tested in CI — they are exploration tools
+- Visualization library: plotly for interactive, matplotlib for static/publication`}</code></pre>
+
+  <h2>Data pipeline patterns</h2>
+
+  <p>
+    Data pipelines in ML projects are different from web application data flows. They are typically batch-oriented, stateful, and expensive to rerun. Your CLAUDE.md should reflect this.
+  </p>
+
+  <p>
+    <strong>Idempotent scripts.</strong> Tell Claude that data processing scripts must be idempotent, meaning running them twice produces the same output. This prevents the common bug where a script appends to an output file instead of overwriting it, silently doubling your dataset.
+  </p>
+
+  <p>
+    <strong>Intermediate outputs.</strong> Specify that expensive processing steps should save intermediate results. If a pipeline takes 4 hours to run, you do not want to restart from scratch because step 7 of 10 failed.
+  </p>
+
+  <p>
+    <strong>Schema validation.</strong> If you use pandera, great_expectations, or even just assert statements, specify that in your CLAUDE.md. Claude will add schema checks to new pipeline steps if it knows that is your convention.
+  </p>
+
+  <pre><code>{`# Pipeline conventions
+- Pipeline orchestration: prefect (not airflow, not dagster)
+- Each pipeline step: one function, one input, one output
+- All steps save intermediate results to data/intermediate/
+- Schema validation on every DataFrame transformation (pandera)
+- Pipeline scripts in src/pipelines/ — run with: python -m src.pipelines.name
+- Test with sample data: tests/fixtures/ contains 100-row samples of each dataset`}</code></pre>
+
+  <h2>Testing ML code</h2>
+
+  <p>
+    Testing ML code is different from testing web applications. You cannot assert that a model produces exactly the right output because training involves randomness. But you can test everything around the model.
+  </p>
+
+  <p>
+    Tell Claude what to test and what not to test:
+  </p>
+
+  <pre><code>{`# Testing
+- Framework: pytest
+- Run: pytest tests/ -v --tb=short
+- Test data processing functions with deterministic fixtures
+- Test model architecture: correct input/output shapes, forward pass runs without error
+- Test data loading: schema validation passes, no NaN in required columns
+- Do NOT test model accuracy in unit tests (that is evaluation, not testing)
+- Test inference endpoints: correct response format, handles edge cases (empty input, wrong dtype)
+- Coverage target: 80% on src/ excluding src/notebooks/`}</code></pre>
+
+  <h2>Common ML-specific Claude mistakes and how to prevent them</h2>
+
+  <p>
+    <strong>Suggesting GPU code for CPU environments.</strong> If your deployment is CPU-only, add an explicit rule: "Inference code must never assume GPU availability." Claude will add device-agnostic code patterns.
+  </p>
+
+  <p>
+    <strong>Creating data leakage.</strong> Claude sometimes normalizes features using statistics from the full dataset instead of the training set only. Add a rule: "All feature transformations must be fit on training data only, then applied to test data using the fitted transformer."
+  </p>
+
+  <p>
+    <strong>Ignoring memory constraints.</strong> For large datasets, Claude might suggest loading everything into memory at once. Add your RAM limit and specify that data loading should use generators or chunked reading for datasets larger than a certain size.
+  </p>
+
+  <p>
+    <strong>Using deprecated APIs.</strong> ML libraries move fast. If you are on a specific version of PyTorch, scikit-learn, or pandas, specify it. Claude might suggest APIs from newer versions that are not available in your environment.
+  </p>
+
+  <h2>Generating your ML config automatically</h2>
+
+  <p>
+    Writing all of these sections from scratch takes time. <a href="https://nova-labs.dev/contextkit/generate">ContextKit's free generator</a> includes Python and data science as project types. Answer the 5 questions about your stack and it generates a CLAUDE.md with the right structure for ML work. You can then customize the specific details (your GPU, your tracking tool, your framework preferences) in a few minutes.
+  </p>
+
+  <p>
+    After customizing, run your config through the <a href="https://nova-labs.dev/contextkit/analyze">Analyzer</a> to check what you might still be missing. ML projects often score low on the guardrails category because developers forget to add rules about data safety, compute limits, and reproducibility.
+  </p>
+
+  <p>
+    If you prefer the terminal, <code>npx contextkit score</code> checks your CLAUDE.md from the command line and returns specific suggestions for improvement. It runs in 2 seconds and works in CI if you want to enforce a minimum config quality across your team's ML repos.
+  </p>
+
+  <h2>The bottom line</h2>
+
+  <p>
+    ML projects benefit more from a good CLAUDE.md than most other project types. The gap between "Claude generates generic Python" and "Claude generates code that fits your exact data pipeline, respects your compute limits, and follows your experiment tracking conventions" is entirely in the configuration.
+  </p>
+
+  <p>
+    The investment is 15-20 minutes of setup for a config that pays back on every session. For ML work where a single mistake in data handling or training configuration can cost hours of retraining, that setup time is trivial.
+  </p>
+</BlogPost>

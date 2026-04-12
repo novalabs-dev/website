@@ -1,0 +1,200 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Does Claude Code work in VS Code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code has an official VS Code extension that integrates directly into the editor. It runs the same Claude Code CLI under the hood but adds visual features like inline diff views, status bar indicators, and a dedicated chat panel. You install it from the VS Code marketplace, authenticate with your Anthropic or Claude Max account, and it works immediately in any project that has a CLAUDE.md file." }},
+    { "@type": "Question", "name": "Does Claude Code work in JetBrains IDEs?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Claude Code has a JetBrains extension that works across IntelliJ, WebStorm, PyCharm, GoLand, and other JetBrains IDEs. It provides a tool window for chat-based interaction, inline diff views for proposed changes, and project-aware context loading. The extension uses the same CLI and respects the same CLAUDE.md configuration as the terminal version." }},
+    { "@type": "Question", "name": "Is the Claude Code IDE extension the same as the terminal CLI?", "acceptedAnswer": { "@type": "Answer", "text": "The extensions wrap the same CLI engine. Your CLAUDE.md, .claude/rules/, and project configuration work identically in both. The IDE extensions add visual conveniences like click-to-apply diffs, inline annotations, and editor-native keybindings. If something works in the terminal, it works in the extension. The main difference is that the extensions can read your open editor tabs and cursor position for additional context." }},
+    { "@type": "Question", "name": "Can I use Claude Code in both the terminal and my IDE at the same time?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, but be careful with concurrent file edits. Both the terminal CLI and IDE extension read and write to the same project files. Running them simultaneously on the same files can cause conflicts. The practical approach is to use the IDE extension for most work and drop to the terminal for background tasks like running test suites or batch operations where you do not need the visual diff interface." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to use Claude Code in VS Code and JetBrains: complete IDE setup guide"
+  description="Claude Code works in VS Code, JetBrains, and the terminal. Here is how to set up each environment, configure your project for IDE-aware AI coding, and get the most out of the editor integration."
+  date="April 12, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to set up Claude Code for a new project", slug: "set-up-claude-code-new-project" },
+    { title: "Claude Code session management tips", slug: "claude-code-session-management-tips" },
+    { title: "How to write a CLAUDE.md file that actually works", slug: "claude-md-file-guide-best-practices" },
+  ]}
+>
+  <p>
+    Most Claude Code tutorials start in the terminal. That makes sense for learning the tool, but it is not where most developers spend their day. If you work in VS Code or a JetBrains IDE, the terminal-first workflow means constant context switching between your editor and a separate window.
+  </p>
+
+  <p>
+    Claude Code now has extensions for both VS Code and JetBrains that bring the full CLI experience into your editor. Same engine, same CLAUDE.md configuration, same tool calls. The extensions add visual diffs, inline annotations, and editor-native keybindings on top.
+  </p>
+
+  <p>
+    This guide covers how to set up Claude Code in each environment, how to configure your project so the IDE integration works well, and the practical differences between terminal, VS Code, and JetBrains workflows.
+  </p>
+
+  <h2>VS Code setup</h2>
+
+  <p>
+    Install the Claude Code extension from the VS Code marketplace. Search for "Claude Code" by Anthropic. After installation, you will see a Claude icon in the activity bar on the left side of your editor.
+  </p>
+
+  <p>
+    Click the icon to open the Claude Code panel. The first time you open it, you will be prompted to authenticate. If you already use Claude Code in the terminal and have an active session, the extension picks up your existing credentials automatically. If not, it walks you through the OAuth flow for your Anthropic account or Claude Max subscription.
+  </p>
+
+  <p>
+    Once authenticated, the extension is ready. Open any project with a CLAUDE.md file and the extension loads your project configuration automatically. You can start typing in the Claude panel exactly like you would in the terminal.
+  </p>
+
+  <h3>VS Code features worth knowing about</h3>
+
+  <p>
+    <strong>Inline diffs.</strong> When Claude proposes a file change, VS Code shows it as a native diff view in your editor tab. You can review each change, accept or reject individual hunks, and see exactly what will change before it happens. This is significantly easier to review than terminal output for large changes.
+  </p>
+
+  <p>
+    <strong>Editor context.</strong> The extension knows which files you have open, which file is active, and where your cursor is. This means you can say "fix the function I am looking at" and Claude understands which function you mean without you having to specify the file path and line number.
+  </p>
+
+  <p>
+    <strong>Status bar.</strong> The bottom status bar shows Claude's current state: idle, thinking, reading files, or writing. It also shows the running token cost for the current session. This is useful for staying aware of session costs without checking the terminal.
+  </p>
+
+  <p>
+    <strong>Keybindings.</strong> The default keybinding to open the Claude panel is <code>Cmd+Shift+P</code> (or <code>Ctrl+Shift+P</code>) then typing "Claude." You can rebind this to any shortcut you prefer. Common choices are <code>Cmd+K Cmd+C</code> or a dedicated function key.
+  </p>
+
+  <h2>JetBrains setup</h2>
+
+  <p>
+    Open your JetBrains IDE (IntelliJ, WebStorm, PyCharm, GoLand, or any other). Go to Settings, then Plugins, then Marketplace. Search for "Claude Code" and install the plugin by Anthropic.
+  </p>
+
+  <p>
+    After installation, restart the IDE. A new tool window called "Claude Code" appears in the bottom panel, similar to the Terminal or Version Control tool windows. Authentication works the same way as VS Code: existing terminal credentials are picked up automatically, or you go through the OAuth flow.
+  </p>
+
+  <p>
+    The JetBrains plugin reads the same CLAUDE.md and .claude/rules/ as the terminal CLI. Your project configuration does not need any changes.
+  </p>
+
+  <h3>JetBrains-specific features</h3>
+
+  <p>
+    <strong>Diff viewer.</strong> Proposed changes open in JetBrains' native diff viewer, which supports three-way merge if needed. The diff quality in JetBrains is arguably the best of any IDE, so this integration is particularly useful for reviewing complex multi-file changes.
+  </p>
+
+  <p>
+    <strong>Project-aware navigation.</strong> When Claude references a file or symbol, the JetBrains plugin can link directly to the definition in your IDE. Click a file path in the Claude output and it opens in the editor at the correct line.
+  </p>
+
+  <p>
+    <strong>Run configurations.</strong> You can create JetBrains run configurations that invoke Claude Code commands. This is useful for teams that want to standardize common Claude workflows, like running a review pass or generating test stubs, as repeatable IDE actions.
+  </p>
+
+  <h2>Configuring your CLAUDE.md for IDE workflows</h2>
+
+  <p>
+    The same CLAUDE.md works in all three environments, but some configuration choices work better when you are primarily using an IDE.
+  </p>
+
+  <p>
+    <strong>Keep your CLAUDE.md concise.</strong> IDE sessions tend to be shorter and more focused than terminal sessions. A 300-word CLAUDE.md that covers your project structure, coding conventions, and test commands is better than a 2,000-word document. In an IDE, you are usually working on one file or feature at a time. The context window should not be dominated by project instructions.
+  </p>
+
+  <p>
+    <strong>Use .claude/rules/ for specific conventions.</strong> Move detailed rules about testing, security, API patterns, and framework-specific conventions into separate files under .claude/rules/. These load on demand rather than on every message. In an IDE workflow where sessions are focused on a single concern, this keeps the active context tight.
+  </p>
+
+  <p>
+    <strong>Specify your preferred file structure.</strong> IDE users tend to work within established directory conventions more strictly than terminal users. Make your directory structure explicit in your CLAUDE.md so Claude creates new files in the right places. Something like:
+  </p>
+
+  <pre><code>{`# File structure
+src/components/    — React components (PascalCase.tsx)
+src/hooks/         — Custom hooks (use*.ts)
+src/utils/         — Utility functions (camelCase.ts)
+src/types/         — TypeScript type definitions
+tests/             — Mirror src/ structure`}</code></pre>
+
+  <p>
+    <strong>Add your IDE-specific test commands.</strong> If you run tests through your IDE rather than the terminal, still document the CLI test commands in CLAUDE.md. Claude needs to be able to verify its own work, and it does that by running commands, not by clicking IDE buttons.
+  </p>
+
+  <h2>Terminal vs IDE: when to use which</h2>
+
+  <p>
+    The IDE extensions are better for focused, iterative work on specific files. Reviewing diffs visually, applying changes selectively, and staying in your editor flow. This covers most day-to-day development.
+  </p>
+
+  <p>
+    The terminal is better for broad, multi-file operations. Refactoring across 20 files, running batch operations, or doing exploratory work where you are not sure which files will change. The terminal output is faster for scanning large volumes of changes.
+  </p>
+
+  <p>
+    The terminal is also better for automation. If you are running Claude Code in CI/CD pipelines, pre-commit hooks, or scheduled tasks, the CLI is the only option. IDE extensions are interactive tools.
+  </p>
+
+  <p>
+    Many developers use both. IDE for feature work and bug fixes during the day. Terminal for larger refactors, project setup, and automation tasks. The CLAUDE.md configuration is shared, so there is no duplication.
+  </p>
+
+  <h2>Setting up a project from scratch for IDE use</h2>
+
+  <p>
+    If you are starting a new project and want Claude Code to work well from the IDE immediately, here is the minimal setup:
+  </p>
+
+  <p>
+    <strong>Step 1: Generate a CLAUDE.md.</strong> Use <a href="https://nova-labs.dev/contextkit/generate">ContextKit's free generator</a> to create a config file for your stack. Answer 5 questions about your project (language, framework, test runner, conventions) and get a production-ready CLAUDE.md in 30 seconds. Export it and drop it in your project root.
+  </p>
+
+  <p>
+    <strong>Step 2: Create .claude/rules/ for detailed conventions.</strong> If your project has strict patterns (API response format, error handling, naming conventions), create rule files. One file per concern. Keep each under 200 words.
+  </p>
+
+  <p>
+    <strong>Step 3: Open the project in your IDE.</strong> The Claude Code extension detects the CLAUDE.md automatically. Start a conversation and verify that Claude follows your conventions on the first task.
+  </p>
+
+  <p>
+    <strong>Step 4: Score your config.</strong> After your first session, paste your CLAUDE.md into the <a href="https://nova-labs.dev/contextkit/analyze">ContextKit Analyzer</a> to see what you might be missing. Most initial configs score 4-6 out of 10. The suggestions are specific enough to act on immediately.
+  </p>
+
+  <h2>Troubleshooting common IDE issues</h2>
+
+  <p>
+    <strong>"Claude Code not found" in the IDE.</strong> The extensions require the Claude Code CLI to be installed and on your PATH. Run <code>claude --version</code> in a terminal to verify. If it works in the terminal but not the IDE, your IDE might be using a different shell profile. Check the IDE's terminal settings and ensure the PATH includes the Claude Code binary location.
+  </p>
+
+  <p>
+    <strong>Changes not appearing in the editor.</strong> If Claude makes changes through the CLI that do not immediately appear in the IDE, it is usually a file watcher delay. Most IDEs refresh open files within a second. If you are using an external file sync tool (like Docker volumes or remote development), the delay can be longer.
+  </p>
+
+  <p>
+    <strong>Authentication expiring.</strong> Claude Code sessions use OAuth tokens that refresh automatically. If you see authentication errors in the IDE, close and reopen the Claude panel. If that does not work, run <code>claude auth</code> in the terminal to refresh your credentials. The IDE extension picks up new credentials on the next interaction.
+  </p>
+
+  <p>
+    <strong>High token usage in IDE mode.</strong> IDE extensions send additional context (open files, cursor position) that the terminal CLI does not. This adds a small amount to each message. If you are cost-sensitive, close files you are not actively working on before starting a Claude session. The extension only sends context for open editor tabs.
+  </p>
+
+  <h2>The practical difference IDE integration makes</h2>
+
+  <p>
+    The core improvement is that you stay in your editor. No terminal tab switching, no copy-pasting file paths, no mentally translating diff output into "what actually changed." The visual diff review alone saves significant time on anything beyond trivial changes.
+  </p>
+
+  <p>
+    The less obvious improvement is context. When Claude knows which file you are looking at and where your cursor is, your prompts can be shorter and more natural. "Add error handling to this function" works when Claude can see which function you mean. In the terminal, that same instruction requires specifying the file, the function name, and probably the line range.
+  </p>
+
+  <p>
+    The configuration investment is the same either way. A good CLAUDE.md makes Claude Code work well whether you use it from the terminal, VS Code, or JetBrains. The IDE extensions just make the interaction smoother.
+  </p>
+</BlogPost>
