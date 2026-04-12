@@ -1,0 +1,254 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is CLAUDE.md for open source projects?", "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is a markdown file in your repository root that tells Claude Code how to work with your project. For open source projects, it serves a second purpose: it guides AI-assisted contributors toward your conventions before they write a single line of code. It covers your stack, file structure, naming rules, testing setup, and any guardrails contributors should follow." }},
+    { "@type": "Question", "name": "Should I commit CLAUDE.md and .claude/rules to my open source repo?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Both files belong in version control. They are project conventions, not personal config. Any contributor cloning your repo gets the same AI behavior you get. That is the whole point. Your global ~/.claude/CLAUDE.md stays personal and local - never commit that." }},
+    { "@type": "Question", "name": "What is AGENTS.md and how is it different from CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "AGENTS.md is a convention for describing agent roles and responsibilities in a project. Where CLAUDE.md focuses on how to work with the code, AGENTS.md describes what different AI agents or contributors are responsible for. For multi-contributor OSS projects, it can document which areas different people or AI workflows own, so there is no overlap or conflict." }},
+    { "@type": "Question", "name": "What should I put in the contributor onboarding section of CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Cover: where to find first issues, how to fork and branch, the PR naming convention, how to run the test suite, and what the CI pipeline checks. Keep it short. Contributors who use AI tools will have this loaded into their session context automatically, so clear and specific beats comprehensive and vague." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code for open source: how to write contributor-friendly configs"
+  description="OSS maintainers lose hours reviewing PRs that ignore project conventions. A well-structured CLAUDE.md and .claude/rules/ directory fixes this for AI-assisted contributors."
+  date="April 12, 2026"
+  readTime="11 min read"
+  keywords={["claude code open source", "CLAUDE.md for contributors", "open source AI config", "contributor-friendly CLAUDE.md"]}
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to standardize CLAUDE.md across your development team", slug: "standardize-claudemd-for-teams" },
+    { title: "Claude Code guardrails: prevent destructive actions", slug: "claude-code-guardrails-prevent-destructive-actions" },
+    { title: "Claude Code project rules directory explained", slug: "claude-code-project-rules-directory" },
+  ]}
+>
+  <h2>The contributor quality problem</h2>
+
+  <p>
+    You have a clean codebase. Consistent naming, a clear folder structure, tests for everything. Then a contributor opens a PR and none of that carries over. Different variable names, no tests, a new utility function dropped in the wrong directory.
+  </p>
+
+  <p>
+    This is not laziness. Most contributors spend ten minutes with a README and then start coding. If your conventions are not immediately visible, they get missed. And now that a lot of contributors use AI coding tools, this problem is bigger than it used to be. An AI assistant with no context about your project will produce code that looks reasonable but does not fit your patterns at all.
+  </p>
+
+  <p>
+    The fix is not a longer CONTRIBUTING.md that nobody reads. It is a <code>CLAUDE.md</code> that any AI-assisted contributor picks up automatically when they clone your repo.
+  </p>
+
+  <h2>What AI-assisted contributors actually need</h2>
+
+  <p>
+    A contributor using Claude Code opens their terminal, runs <code>claude</code> in the cloned repo, and their AI assistant immediately reads your <code>CLAUDE.md</code>. From that point on, the AI knows your stack, your conventions, and what not to do.
+  </p>
+
+  <p>
+    If you have no <code>CLAUDE.md</code>, the AI fills in the blanks with generic patterns. That is where the off-convention PRs come from.
+  </p>
+
+  <p>
+    A good OSS <code>CLAUDE.md</code> answers these questions before a contributor asks them:
+  </p>
+
+  <ul>
+    <li>What is the tech stack and which versions matter?</li>
+    <li>How is the project structured? Where does new code go?</li>
+    <li>How do you run the tests? What is the coverage requirement?</li>
+    <li>What naming and formatting conventions apply?</li>
+    <li>What should contributors never do (force push, drop tables, break the public API)?</li>
+    <li>How do you submit a PR? What does the CI pipeline check?</li>
+  </ul>
+
+  <p>
+    That is a two-page document. Not twenty. Specific beats comprehensive every time.
+  </p>
+
+  <h2>The CLAUDE.md for OSS projects</h2>
+
+  <p>
+    Here is a working template for an open source project. Adjust the specifics to match your stack.
+  </p>
+
+  <pre><code># Project: OpenQueue
+
+A lightweight job queue library for Node.js.
+
+## Stack
+- Node.js 20+, TypeScript 5.x
+- Jest for tests
+- Prettier + ESLint (config in root)
+
+## Structure
+- src/         — Library source code
+- src/core/    — Queue engine, scheduler, worker pool
+- src/adapters/ — Storage adapters (Redis, Postgres, in-memory)
+- tests/       — Unit and integration tests (mirror src/ structure)
+- examples/    — Runnable examples, one file per use case
+- docs/        — Markdown docs, auto-deployed to GitHub Pages
+
+## Running tests
+npm test               # all tests
+npm test -- --watch    # watch mode
+npm test -- src/core   # single directory
+
+## Before submitting a PR
+- Run npm test — all tests must pass
+- Run npm run lint — zero lint errors
+- Add tests for any new functionality
+- Update docs/ if you change public API
+
+## Conventions
+- Exports: named exports only, no default exports
+- Error handling: throw typed errors (see src/errors.ts), never swallow exceptions
+- Async: async/await throughout, no raw Promise chains
+- Types: no 'any'. Use 'unknown' and narrow with type guards.
+
+## Guardrails
+- Never modify CHANGELOG.md manually — it is generated on release
+- Never change the public API without opening an issue first
+- Do not install new dependencies without discussion in the PR
+
+## Good first issues
+Look for the 'good-first-issue' label on GitHub. Most of these are isolated to one adapter or one utility function.</code></pre>
+
+  <p>
+    This is about 250 words. Short enough that someone actually reads it. Specific enough that an AI-assisted contributor gets real signal about how to work.
+  </p>
+
+  <p>
+    You can generate a starter config for your project with the <a href="/contextkit/generate">ContextKit generator</a>, then check its coverage with the <a href="/contextkit/analyze">Analyzer</a>.
+  </p>
+
+  <h2>Using .claude/rules/ for granular guidance</h2>
+
+  <p>
+    For larger projects, a single <code>CLAUDE.md</code> gets unwieldy fast. The <code>.claude/rules/</code> directory lets you split instructions into focused files. Claude Code loads every <code>.md</code> file in that directory automatically.
+  </p>
+
+  <pre><code>your-oss-project/
+  CLAUDE.md                       # Project overview, stack, quick start
+  .claude/
+    rules/
+      conventions.md              # Naming, formatting, code style
+      testing.md                  # Test framework, coverage, mocking rules
+      guardrails.md               # What contributors must never do
+      contributing-workflow.md    # PR process, branch naming, CI checks
+      adapter-interface.md        # Rules for writing new adapters</code></pre>
+
+  <p>
+    The split keeps each file focused. A contributor working on a new storage adapter reads <code>adapter-interface.md</code> and gets exactly what they need, not a 400-line document they have to scan.
+  </p>
+
+  <p>
+    Here is what a <code>contributing-workflow.md</code> looks like in practice:
+  </p>
+
+  <pre><code># Contributing Workflow
+
+## Branches
+- Feature branches: feature/short-description
+- Bug fixes: fix/short-description
+- Branch off main, target main in PR
+
+## Commits
+- Use conventional commits: feat:, fix:, docs:, chore:, test:
+- Keep commits atomic. One logical change per commit.
+
+## PR process
+1. Fork the repo and create your branch
+2. Write tests first or alongside the change (we review both)
+3. Run npm test and npm run lint before pushing
+4. Open a draft PR early if you want feedback before it is done
+5. Link the issue your PR resolves in the description
+
+## CI checks (all must pass before merge)
+- Unit tests (Jest)
+- Lint (ESLint + Prettier)
+- Type check (tsc --noEmit)
+- Bundle size check (no more than 5% increase without discussion)
+
+## What maintainers look for
+- Does it fit the existing patterns?
+- Is it tested?
+- Does it change the public API? (needs issue + discussion first)
+- Is the diff easy to review? (smaller is better)</code></pre>
+
+  <p>
+    Committing this to your repo means every contributor, human or AI-assisted, starts with the same understanding of how the workflow runs.
+  </p>
+
+  <h2>AGENTS.md for multi-contributor workflows</h2>
+
+  <p>
+    <code>AGENTS.md</code> is a newer convention that some projects are starting to use alongside <code>CLAUDE.md</code>. Where <code>CLAUDE.md</code> covers how to work with the code, <code>AGENTS.md</code> describes agent responsibilities.
+  </p>
+
+  <p>
+    For OSS projects with multiple active contributors, it can document which areas are owned by whom. This matters most when automated workflows (CI agents, bots, review agents) are also active on the repo.
+  </p>
+
+  <pre><code># AGENTS.md
+
+## Repository areas
+
+### Core engine (src/core/)
+Owner: @maintainer-handle
+New contributors: coordinate in GitHub issues before large changes.
+Safe to fix bugs and add tests without prior discussion.
+
+### Storage adapters (src/adapters/)
+Open for contributions. Follow the adapter interface in .claude/rules/adapter-interface.md.
+New adapters need a working example in examples/ and integration tests.
+
+### Documentation (docs/)
+Open for contributions. Run 'npm run docs:build' to preview locally.
+Typo fixes and clarifications do not need an issue first.
+
+## Automated agents on this repo
+- Renovate: opens dependency update PRs on Mondays
+- Label bot: applies labels based on PR title prefixes
+- Size bot: comments on PRs that increase bundle size</code></pre>
+
+  <p>
+    This gives AI-assisted contributors a map of where they can move fast and where they should slow down and coordinate. It also prevents an AI from happily rewriting core engine code that a maintainer guards carefully.
+  </p>
+
+  <h2>A real checklist for OSS maintainers</h2>
+
+  <p>
+    Use this before your next release or contributor drive:
+  </p>
+
+  <ul>
+    <li><strong>CLAUDE.md exists in the repo root.</strong> Not in docs/, not as a gist. In the root so Claude Code finds it automatically.</li>
+    <li><strong>Stack and versions are explicit.</strong> "Node.js 20+" is better than "Node.js". "Jest 29" is better than "Jest".</li>
+    <li><strong>Test commands are copy-paste ready.</strong> If a contributor has to figure out how to run tests, your config is missing information.</li>
+    <li><strong>Guardrails are concrete.</strong> "Do not change the public API" is concrete. "Be careful with breaking changes" is not.</li>
+    <li><strong>.claude/rules/ is used if the project is large.</strong> A 300-line CLAUDE.md is a sign you should split.</li>
+    <li><strong>Both files are committed to the repo.</strong> They are project conventions, not personal settings.</li>
+    <li><strong>The config is reviewed the same way code is.</strong> When conventions change, update the config in the same PR.</li>
+    <li><strong>AGENTS.md documents automated bots if any are active.</strong> Prevents contributors from being confused by automated PR activity.</li>
+  </ul>
+
+  <h2>Get started</h2>
+
+  <p>
+    If you maintain an open source project and you have no <code>CLAUDE.md</code>, start with a 30-minute audit. Open your repo, list your actual conventions, and write them down in a format a contributor could follow from day one.
+  </p>
+
+  <p>
+    The contributors who open the most off-convention PRs are usually the ones who would have followed the rules if the rules were visible. A well-written config closes that gap without adding any friction to the contribution process.
+  </p>
+
+  <p>
+    You can generate a starter config for your project with the <a href="/contextkit/generate">ContextKit generator</a>, then check its coverage with the <a href="/contextkit/analyze">Analyzer</a>.
+  </p>
+
+  <p>
+    Once your config is in the repo, every contributor who uses an AI coding tool gets your conventions loaded at the start of every session. That is the closest thing to onboarding that actually scales.
+  </p>
+</BlogPost>

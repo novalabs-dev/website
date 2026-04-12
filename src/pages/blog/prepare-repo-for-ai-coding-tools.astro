@@ -1,0 +1,299 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What files do I need to make a repo AI-ready?", "acceptedAnswer": { "@type": "Answer", "text": "At minimum: CLAUDE.md for Claude Code, .cursorrules for Cursor, AGENTS.md for GitHub Copilot and Codex, and GEMINI.md for Gemini CLI. If your team only uses one tool, you only need that tool's file. If you use multiple tools, you need all of them - but the core content is mostly shared across all four." }},
+    { "@type": "Question", "name": "What should go in a CLAUDE.md file?", "acceptedAnswer": { "@type": "Answer", "text": "Your project overview, tech stack, coding conventions, testing setup, file structure notes, and guardrails. The guardrails section is specific to Claude Code: it defines what the agent should never do autonomously, like running destructive commands or sending external communications without confirmation." }},
+    { "@type": "Question", "name": "How do I keep CLAUDE.md and .cursorrules in sync?", "acceptedAnswer": { "@type": "Answer", "text": "The most reliable approach is to treat one format as the source of truth and generate the others from it. Tools like ContextKit let you define your conventions once and output all four config files in their correct formats. Manual syncing across four files in multiple repos does not scale." }},
+    { "@type": "Question", "name": "Does Gemini CLI support the same config format as Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "No. Gemini CLI reads GEMINI.md, Claude Code reads CLAUDE.md. The structure is similar - both are markdown files in the project root - but GEMINI.md has fewer behavioral directives. The coding conventions section transfers directly; the agent behavior and guardrails sections are Claude Code specific." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to prepare any repo for AI coding tools in 2026"
+  description="Your repo needs CLAUDE.md, .cursorrules, AGENTS.md, and GEMINI.md. Here is what goes in each, what they share, and how to maintain them without the files drifting apart."
+  date="April 12, 2026"
+  readTime="10 min read"
+  keywords={["ai coding tools", "prepare repo for ai", "claudemd", "agentsmd", "cursorrules", "ai-ready codebase"]}
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md vs .cursorrules vs AGENTS.md", slug: "claudemd-vs-cursorrules-vs-agentsmd" },
+    { title: "How to create a CLAUDE.md: 4 approaches compared", slug: "how-to-create-claudemd-approaches-compared" },
+    { title: "Gemini CLI vs Claude Code: how project configs differ", slug: "gemini-cli-vs-claude-code-configs" },
+  ]}
+>
+  <p>
+    AI coding tools are no longer optional for most dev teams. Claude Code, Cursor, GitHub Copilot in agent mode, Gemini CLI - these are showing up in real workflows, sometimes all in the same repo. The problem is each one reads a different config file. If your repo does not have those files, you are leaving the AI to guess how your project works.
+  </p>
+
+  <p>
+    This guide covers what an AI-ready repo looks like in 2026: which files you need, what goes in each one, where they overlap, and how to keep them from drifting apart across repos and time.
+  </p>
+
+  <h2>The multi-tool reality</h2>
+
+  <p>
+    A year ago most teams picked one AI coding tool and stuck with it. That is changing. Cursor is common in editors. Claude Code is being used for agentic tasks and automation work. GitHub Copilot is already in the IDE for a lot of enterprise teams. Gemini CLI is getting traction among developers in the Google ecosystem.
+  </p>
+
+  <p>
+    You might use Cursor for your daily coding and Claude Code to run a longer automated task on the same repo. A contractor on your project might be using Copilot. The repo gets config files for some tools but not others, and they all say slightly different things about how the project works.
+  </p>
+
+  <p>
+    The fix is not complicated, but it does require being deliberate. You add the right config files, you fill them with accurate information, and you have a plan for keeping them current.
+  </p>
+
+  <h2>The four config files your repo needs</h2>
+
+  <p>
+    Each tool reads its own file. Here is the map:
+  </p>
+
+  <ul>
+    <li><strong>CLAUDE.md</strong> - read by Claude Code (Anthropic)</li>
+    <li><strong>.cursorrules</strong> - read by Cursor</li>
+    <li><strong>AGENTS.md</strong> - read by GitHub Copilot agent mode and OpenAI Codex CLI</li>
+    <li><strong>GEMINI.md</strong> - read by Gemini CLI (Google)</li>
+  </ul>
+
+  <p>
+    All four live in your project root. All four serve the same purpose: give the AI enough context about your project that it can help without having to ask basic questions every session.
+  </p>
+
+  <h3>CLAUDE.md</h3>
+
+  <p>
+    Claude Code loads CLAUDE.md at the start of every session, before any conversation. Everything in it is in the context window the whole time. This makes it the most powerful of the four formats, and the one with the most surface area.
+  </p>
+
+  <p>
+    A solid CLAUDE.md has these sections:
+  </p>
+
+  <ul>
+    <li>Project overview - what the project is, what it does</li>
+    <li>Tech stack - specific versions matter, not just "React"</li>
+    <li>Coding conventions - naming, structure, patterns to use and avoid</li>
+    <li>Testing setup - test runner, how to run tests, where tests live</li>
+    <li>File structure notes - anything non-obvious about where things are</li>
+    <li>Guardrails - what Claude should never do without confirmation</li>
+  </ul>
+
+  <p>
+    The guardrails section is specific to Claude Code's agent architecture. It covers things like: never run <code>rm</code>, ask before modifying migrations, do not make external API calls without confirmation. These matter more as Claude Code does more autonomous work.
+  </p>
+
+  <pre><code>## Project Overview
+Next.js 15 App Router, TypeScript strict, Tailwind CSS, Supabase (Postgres + Auth).
+Internal tool for managing client onboarding workflows.
+
+## Conventions
+- Named exports only, no default exports
+- No `any` - use `unknown` and narrow explicitly
+- Tailwind classes only, no CSS modules, no inline styles
+- Co-locate tests next to source: `Button.tsx` + `Button.test.tsx`
+- Use `server actions` for mutations, not API routes
+
+## Testing
+Run: `pnpm test` (Vitest). Run: `pnpm test:e2e` (Playwright).
+Tests must pass before committing. Do not skip tests.
+
+## Guardrails
+- Never run `rm` - use `mv &lt;file&gt; .trash/` instead
+- Ask before modifying database migration files
+- Do not add features or refactoring beyond what was asked
+- Do not commit .env files</code></pre>
+
+  <p>
+    Keep it under 150 lines. The file loads on every session. Every line costs tokens. If something is not actively shaping Claude's behavior, it does not belong there.
+  </p>
+
+  <h3>.cursorrules</h3>
+
+  <p>
+    Cursor reads <code>.cursorrules</code> and applies it to both chat and autocomplete. The format is simpler - plain text or markdown, no required structure. Write it as direct instructions.
+  </p>
+
+  <p>
+    The main difference from CLAUDE.md: there is no agent behavior section. Cursor is an editor, not an autonomous agent making decisions and running commands. The focus is purely on how to write code.
+  </p>
+
+  <pre><code>You are working on a Next.js 15 application using TypeScript strict mode, Tailwind CSS, and Supabase.
+
+Rules:
+- Named exports only, no default exports
+- Never use `any` - use `unknown` and narrow it
+- App Router patterns: server components by default, client only when needed
+- Co-locate test files next to source files
+- Use Tailwind for all styling - no CSS modules, no inline styles
+- Use server actions for mutations, not API routes
+- Do not add features beyond what was asked
+- Do not refactor code that is not related to the current task</code></pre>
+
+  <p>
+    Cursor also supports a global rules file that applies across all projects. That is a good place for personal preferences (your preferred code style, languages, general habits) that should follow you into every repo you open.
+  </p>
+
+  <h3>AGENTS.md</h3>
+
+  <p>
+    AGENTS.md was introduced with OpenAI's Codex CLI and is now used by GitHub Copilot's agent mode as well. The format is similar to CLAUDE.md structurally, but it makes certain sections more explicit: what tools the agent has access to, and how it should handle task execution.
+  </p>
+
+  <pre><code># Agent Configuration
+
+## Project
+Next.js 15 monorepo with TypeScript strict and Supabase backend.
+
+## Tools
+- read_file, write_file: enabled
+- run_command: enabled for test and build commands only
+- web_search: disabled
+
+## Conventions
+- Named exports only
+- TypeScript strict - no `any`
+- Use pnpm, not npm or yarn
+- Run `pnpm test` after making changes
+
+## Task Execution
+- Run tests after every change
+- Do not modify files outside the scope of the requested task
+- Write a short summary of what changed and why
+- Do not commit without explicit instruction</code></pre>
+
+  <p>
+    AGENTS.md is still evolving. The spec is less settled than <code>.cursorrules</code>, which has had years of adoption. Expect the format to change as Copilot's agent mode matures.
+  </p>
+
+  <h3>GEMINI.md</h3>
+
+  <p>
+    Gemini CLI reads <code>GEMINI.md</code> from the project root. It is the newest and most minimal of the four. The structure mirrors CLAUDE.md - markdown, project root, session-scoped - but without the behavioral depth. Think of it as a coding context file rather than an agent behavior spec.
+  </p>
+
+  <pre><code>## Project
+Next.js 15, TypeScript strict, Tailwind CSS, Supabase.
+
+## Conventions
+- Named exports only
+- No `any` type
+- Tailwind for all styling
+- Server components by default in App Router
+- Co-locate tests with source files
+
+## Testing
+Run tests with `pnpm test` before committing.
+
+## Notes
+- Read existing code before suggesting changes
+- Do not refactor outside the scope of the current task</code></pre>
+
+  <p>
+    If you are adding GEMINI.md to a repo that already has CLAUDE.md, the content transfers almost one-to-one. Drop the guardrails section (Gemini CLI does not have the same agent architecture) and simplify the rest.
+  </p>
+
+  <h2>The overlap problem</h2>
+
+  <p>
+    Look at the four examples above. The conventions are identical across all of them. Named exports, no <code>any</code>, Tailwind only, co-locate tests. That content does not change based on which tool is reading the file.
+  </p>
+
+  <p>
+    This is the overlap problem: most of what goes into these config files is shared. Only a small portion is tool-specific - the guardrails in CLAUDE.md, the tool permissions in AGENTS.md. Everything else is just your project's conventions, reformatted for each file.
+  </p>
+
+  <p>
+    When you maintain four files by hand, the shared content drifts. You update the TypeScript rules in CLAUDE.md, forget to update .cursorrules, and two weeks later a Cursor user on your team is getting different suggestions than a Claude Code user. Neither file is wrong - they just describe different versions of the same project.
+  </p>
+
+  <p>
+    This gets worse as you add more repos. If you are running five projects and each needs four config files, you are maintaining twenty files with significant overlap. Any convention change has to be made twenty times.
+  </p>
+
+  <p>
+    If you want to skip the manual setup, the <a href="/contextkit/generate">ContextKit generator</a> builds all four files from a single wizard. It takes about two minutes.
+  </p>
+
+  <h2>What actually goes wrong without these files</h2>
+
+  <p>
+    Without config files, the AI has to infer everything from the code it can see. That works for simple tasks in a well-organized repo. It breaks down when:
+  </p>
+
+  <ul>
+    <li>Your conventions are not obvious from the code (which export pattern you prefer, which CSS approach is intentional vs legacy)</li>
+    <li>There are things the AI should never touch (migration files, generated code, third-party vendored files)</li>
+    <li>You have non-standard tooling or an unusual file structure</li>
+    <li>The AI is doing autonomous work and needs to know its own limits</li>
+  </ul>
+
+  <p>
+    The config files are not magic. They do not make a bad AI tool good. But they cut out a lot of the back-and-forth where you correct the AI for not knowing things that were obvious from the project context. That correction loop adds up fast.
+  </p>
+
+  <h2>How to maintain them</h2>
+
+  <p>
+    The files are only useful if they are accurate. A CLAUDE.md that describes how the project worked six months ago is actively harmful - it gives the AI wrong information.
+  </p>
+
+  <p>
+    A few things that help:
+  </p>
+
+  <ul>
+    <li>Treat the files like part of the codebase, not documentation. Review them in PRs when something relevant changes.</li>
+    <li>Pick one file as the source of truth for shared conventions. When something changes, update that file first, then propagate to the others.</li>
+    <li>Keep the files short. Long files are harder to maintain and more likely to contain stale sections.</li>
+    <li>Add a comment or date stamp when you last reviewed them. It makes stale files more visible.</li>
+  </ul>
+
+  <p>
+    If you have multiple repos, consistency matters. The same conventions written differently across repos confuses both AI tools and developers switching between projects.
+  </p>
+
+  <p>
+    You can also run the <a href="/contextkit/analyze">ContextKit analyzer</a> on an existing config file to check for missing sections, stale content, and common mistakes. It reads the file and tells you what is likely to cause problems.
+  </p>
+
+  <h2>Quick start</h2>
+
+  <p>
+    If you are starting from scratch, here is the order that makes sense:
+  </p>
+
+  <ul>
+    <li>Write CLAUDE.md first. It has the most structure, which forces you to think through all the relevant sections. The content you write here transfers to the other three files.</li>
+    <li>Adapt to .cursorrules by stripping the agent-specific sections and rewriting as direct instructions.</li>
+    <li>Create AGENTS.md from CLAUDE.md by adding the tools and task execution sections.</li>
+    <li>Create GEMINI.md as a simplified version of CLAUDE.md, minus the guardrails.</li>
+  </ul>
+
+  <p>
+    Total time for a straightforward repo: 30-45 minutes if you are writing them by hand. The hardest part is deciding which conventions are worth documenting. Start with the things you most often correct the AI on, then add the project structure and testing setup.
+  </p>
+
+  <p>
+    If you want to skip the manual setup, the <a href="/contextkit/generate">ContextKit generator</a> builds all four files from a single wizard. It takes about two minutes.
+  </p>
+
+  <h2>One source, four files</h2>
+
+  <p>
+    The underlying goal is simple: every AI tool that touches your repo should know how the project works. The four-file reality is an artifact of how the ecosystem evolved - each tool built its own format before any standardization happened.
+  </p>
+
+  <p>
+    That means the practical approach is to define your conventions once and generate the format-specific files from that. The alternative is maintaining four files by hand, watching them drift, and spending time correcting AI tools that read the stale version of your project's rules.
+  </p>
+
+  <p>
+    Most repos are not AI-ready today. Adding these four files is a one-time investment that compounds every time someone uses an AI tool in your codebase.
+  </p>
+</BlogPost>

@@ -1,0 +1,232 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How do I audit all CLAUDE.md files across a team?", "acceptedAnswer": { "@type": "Answer", "text": "Run npx contextkit score on each repo and compare the results. A bash script can loop through multiple directories and output a summary table in under a minute. The ContextKit CLI returns a JSON score per file, so it is easy to aggregate and sort by lowest score." }},
+    { "@type": "Question", "name": "What is a minimum acceptable CLAUDE.md score for a team?", "acceptedAnswer": { "@type": "Answer", "text": "A score of 6 or above is a reasonable baseline for team environments. Below 6 usually means missing guardrails, no test setup, or no file structure section, which leads to inconsistent output across developers. Aim for 8 before marking a config production-ready." }},
+    { "@type": "Question", "name": "Can I enforce CLAUDE.md quality in CI?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The ContextKit CLI exits with a non-zero code if the score falls below a threshold you define with --min-score. Add a single step to your GitHub Actions workflow to block merges on any PR that drops the score below your team standard." }},
+    { "@type": "Question", "name": "What causes config drift in teams using Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Config drift usually starts when developers create their own CLAUDE.md from scratch without a shared template. Each file reflects individual habits, not team conventions. Over time, repos end up with different guardrails, different coding style rules, and different test commands, which means Claude behaves differently depending on whose project you open." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to audit your team's Claude Code configs in 5 minutes"
+  description="When every developer writes their own CLAUDE.md, quality drifts fast. Here is how to audit all configs across a team, fix the worst offenders first, and enforce a minimum score in CI."
+  date="April 12, 2026"
+  readTime="9 min read"
+  keywords={["audit claudemd", "team claude code config", "claude code quality", "config audit ci"]}
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to score your CLAUDE.md from the terminal", slug: "score-claudemd-from-terminal" },
+    { title: "How to standardize CLAUDE.md for teams", slug: "standardize-claudemd-for-teams" },
+    { title: "How to integrate Claude Code into your CI/CD pipeline", slug: "claude-code-ci-cd-integration" },
+  ]}
+>
+  <h2>The team config drift problem</h2>
+
+  <p>
+    Claude Code adoption in teams follows a predictable pattern. One developer starts using it, gets good results, and tells the rest of the team. Within a week, everyone has Claude Code installed. Within a month, every repo has a CLAUDE.md. Within two months, nobody knows what is in any of them.
+  </p>
+
+  <p>
+    The files diverge because there is no standard. One developer copies their personal config. Another generates one from scratch. A third inherits one from a blog post they read in January. They all look similar on the surface but do completely different things.
+  </p>
+
+  <p>
+    The result is inconsistent output across your codebase. Claude follows different guardrails in different repos. It uses different naming conventions per project. It runs different test commands, or none at all. Code reviews get harder because you cannot tell whether a weird pattern came from Claude or from the developer.
+  </p>
+
+  <p>
+    The fix is an audit. Not a manual read-through of every file, but a structured score across all repos with a clear standard for what passes.
+  </p>
+
+  <h2>Step 1: Run the audit</h2>
+
+  <p>
+    The <a href="/contextkit">ContextKit CLI</a> scores a CLAUDE.md file across five categories: structure, architecture guidance, coding conventions, testing setup, and guardrails. Each category scores 0 to 2, giving a total out of 10.
+  </p>
+
+  <p>Run it on a single repo first to see what you are working with:</p>
+
+  <pre><code>npx contextkit score ./CLAUDE.md</code></pre>
+
+  <p>Output looks like this:</p>
+
+  <pre><code>ContextKit Score: 4/10
+
+  Structure          1/2   Missing: explicit file paths for key directories
+  Architecture       0/2   Missing: no layer or pattern documentation
+  Conventions        2/2   Good: naming rules and import order defined
+  Testing            0/2   Missing: no test framework or command specified
+  Guardrails         1/2   Missing: no restrictions on destructive operations
+
+  Suggestions:
+  - Add a ## File Structure section listing your top-level directories
+  - Add your test command (e.g. "Run tests: npm test")
+  - Add at least 3 guardrails for actions Claude should never take</code></pre>
+
+  <p>
+    A 4 is a common score for a developer-written config. It usually means the file has some context but is missing the sections that actually constrain Claude's behavior.
+  </p>
+
+  <h2>Step 2: Compare scores across repos</h2>
+
+  <p>
+    Running the CLI one repo at a time does not scale. Use this bash script to audit an entire organization:
+  </p>
+
+  <pre><code>#!/bin/bash
+# audit-team-configs.sh
+# Usage: ./audit-team-configs.sh /path/to/repos
+
+REPOS_DIR="$1"    # pass path to repos directory
+MIN_SCORE=6
+FAILURES=0
+
+echo "Repo | Score | Status"
+echo "-----|-------|-------"
+
+for repo in "$REPOS_DIR"/*/; do
+  if [ -f "$repo/CLAUDE.md" ]; then
+    SCORE=$(npx contextkit score "$repo/CLAUDE.md" --format json | jq '.score')
+    NAME=$(basename "$repo")
+
+    if [ "$SCORE" -lt "$MIN_SCORE" ]; then
+      echo "$NAME | $SCORE/10 | BELOW THRESHOLD"
+      FAILURES=$((FAILURES + 1))
+    else
+      echo "$NAME | $SCORE/10 | OK"
+    fi
+  else
+    echo "$(basename $repo) | -/10 | NO CLAUDE.md"
+    FAILURES=$((FAILURES + 1))
+  fi
+done
+
+echo ""
+echo "$FAILURES repo(s) need attention"</code></pre>
+
+  <p>Run it against your cloned repos directory:</p>
+
+  <pre><code>chmod +x audit-team-configs.sh
+./audit-team-configs.sh ~/work/repos
+
+Repo              | Score | Status
+------------------|-------|-------
+api-gateway       | 7/10  | OK
+frontend          | 4/10  | BELOW THRESHOLD
+billing-service   | 8/10  | OK
+auth-service      | 2/10  | BELOW THRESHOLD
+data-pipeline     | -/10  | NO CLAUDE.md
+
+3 repo(s) need attention</code></pre>
+
+  <p>
+    This gives you a clear picture of where the problems are without reading a single file manually.
+  </p>
+
+  <h2>Step 3: Fix the worst offenders first</h2>
+
+  <p>
+    Sort by score ascending and start at the bottom. A repo with a score of 2 is actively hurting output quality. A repo with a 5 is close enough to fix in 15 minutes.
+  </p>
+
+  <p>
+    For repos missing a CLAUDE.md entirely, use the <a href="/contextkit/generate">ContextKit Generator</a>. Pick the stack, answer five questions, and export a file that scores 8 or above out of the box. Takes three minutes.
+  </p>
+
+  <p>
+    For repos with a low score, use the <a href="/contextkit/analyze">ContextKit Analyzer</a>. Paste the existing file and it tells you exactly which sections are missing. The most common issues in order of impact:
+  </p>
+
+  <ul>
+    <li><strong>No testing section.</strong> Without a test command, Claude skips tests or guesses wrong. Add the framework name and one command. Two lines.</li>
+    <li><strong>No guardrails.</strong> Missing guardrails mean Claude uses its own judgment on destructive actions. Add "never use rm, move to .trash/" and "never force-push" as a starting point.</li>
+    <li><strong>No file structure section.</strong> Without explicit paths, Claude reads directory listings and places files based on pattern matching. Write out your top-level directories and what goes in each one.</li>
+  </ul>
+
+  <p>
+    Do not try to write a perfect file from scratch. Take the lowest-scoring file, add the missing sections from the analyzer output, and rescore. Most files can go from 3 to 7 in under 20 minutes.
+  </p>
+
+  <h2>Step 4: Add CI enforcement</h2>
+
+  <p>
+    Auditing once is useful. Enforcing a standard automatically is what actually stops drift. Add a GitHub Actions workflow that blocks any PR that drops a CLAUDE.md below your team's minimum score.
+  </p>
+
+  <pre><code># .github/workflows/claude-config-check.yml
+name: CLAUDE.md Quality Check
+
+on:
+  pull_request:
+    paths:
+      - 'CLAUDE.md'
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Score CLAUDE.md
+        run: |
+          npx contextkit score ./CLAUDE.md --min-score 6 --format json > score.json
+          cat score.json
+
+      - name: Fail if below threshold
+        run: |
+          SCORE=$(cat score.json | jq '.score')
+          MIN=6
+          echo "Score: $SCORE/10 (minimum: $MIN)"
+          if [ "$SCORE" -lt "$MIN" ]; then
+            echo "CLAUDE.md score is below the team minimum of $MIN. Run npx contextkit analyze to see what to fix."
+            exit 1
+          fi</code></pre>
+
+  <p>
+    This workflow only runs when CLAUDE.md changes, so it adds no overhead to normal PRs. When someone submits a PR that degrades the config, CI fails with a clear message pointing them to the analyzer.
+  </p>
+
+  <p>
+    Set your threshold based on where your team is today. If the average score across your repos is 5, start at 5 and raise it to 6 after the first wave of fixes. Getting everyone above the threshold matters more than setting an aggressive bar that nobody passes.
+  </p>
+
+  <h2>What a healthy team looks like</h2>
+
+  <p>
+    After running this process across multiple repos, a healthy baseline is:
+  </p>
+
+  <ul>
+    <li>Every repo has a CLAUDE.md (no exceptions)</li>
+    <li>All files score 7 or above</li>
+    <li>CI blocks PRs that drop below 6</li>
+    <li>A shared team template exists so new repos start at 8+</li>
+  </ul>
+
+  <p>
+    The shared template is what prevents drift from coming back. Create a <code>claude-config-template.md</code> in a shared tooling repo. When a new project starts, the template is the starting point, not a blank file. Developers customize it for their stack rather than inventing conventions from scratch.
+  </p>
+
+  <p>
+    At that point, Claude Code output is consistent across your codebase. Same guardrails everywhere. Same test approach. Same file organization conventions. Code reviews get easier because Claude follows the same rules in every repo.
+  </p>
+
+  <p>
+    The audit takes five minutes. The enforcement setup takes twenty. The inconsistency it removes would have cost your team hours per month in review cycles and unexpected Claude behavior.
+  </p>
+
+  <p>
+    Start with the <a href="/contextkit">ContextKit CLI</a> to score your current repos. Use the <a href="/contextkit/analyze">Analyzer</a> to fix the ones that are below threshold. Use the <a href="/contextkit/generate">Generator</a> for any repos that are missing a config entirely.
+  </p>
+</BlogPost>
