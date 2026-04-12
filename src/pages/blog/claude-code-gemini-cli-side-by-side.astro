@@ -26,7 +26,7 @@ const jsonLd = {
   ]}
 >
   <p>
-    The AI coding tool landscape is fragmenting. Claude Code uses CLAUDE.md. Gemini CLI uses GEMINI.md. Cursor uses .cursorrules. GitHub Copilot uses its own instruction format. If you or your team uses more than one of these tools, you now have a configuration management problem that did not exist six months ago.
+    Claude Code uses CLAUDE.md. Gemini CLI uses GEMINI.md. Cursor uses .cursorrules. GitHub Copilot reads AGENTS.md. If you or your team uses more than one of these tools, you now have a configuration management problem that did not exist six months ago.
   </p>
 
   <p>
@@ -55,8 +55,7 @@ const jsonLd = {
 
   <ul>
     <li><strong>GEMINI.md</strong> in the project root</li>
-    <li><strong>.gemini/rules/*.md</strong> for additional rules (similar concept to Claude's rules directory)</li>
-    <li><strong>~/.gemini/GEMINI.md</strong> for global configuration</li>
+    <li>Additional context files as referenced in GEMINI.md</li>
   </ul>
 
   <p>
@@ -167,7 +166,7 @@ const jsonLd = {
   </p>
 
   <p>
-    <strong>Either tool for code review.</strong> Running both tools as reviewers on the same PR catches different things. Claude tends to focus on architectural patterns and consistency with project conventions. Gemini often catches different edge cases and suggests alternative approaches. The overlap is useful as confirmation; the differences are useful as things to investigate.
+    <strong>Either tool for code review.</strong> Running both tools as reviewers on the same PR catches different things. In our experience, they tend to flag different issues. The overlap gives you confidence in the shared findings. The differences point to things worth investigating further.
   </p>
 
   <p>
@@ -187,10 +186,6 @@ const jsonLd = {
   AGENTS.md           # GitHub Copilot / multi-agent config
   .claude/
     rules/            # Claude-specific rule files
-      testing.md
-      security.md
-  .gemini/
-    rules/            # Gemini-specific rule files
       testing.md
       security.md
   src/
