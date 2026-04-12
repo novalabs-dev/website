@@ -1,0 +1,238 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "How long should a Claude Code session be before I restart?", "acceptedAnswer": { "@type": "Answer", "text": "For most work, aim to restart after completing each logical unit of work rather than after a fixed number of messages. In practice, sessions longer than 15-20 substantial exchanges start costing noticeably more per message due to accumulated conversation history. If you are doing deep exploratory work, use /compact at message 10-12 to compress the history and extend the session efficiently." }},
+    { "@type": "Question", "name": "What does /compact do in Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "The /compact command summarizes the current conversation history into a shorter representation that gets carried into subsequent messages instead of the full conversation. It reduces the context that gets added to each new message by 50-70%, lowering per-message token costs for the rest of the session. The trade-off is that some detail from early in the session is lost in the summary, but for most coding tasks the summary retains the information that matters." }},
+    { "@type": "Question", "name": "How does my CLAUDE.md size affect session cost?", "acceptedAnswer": { "@type": "Answer", "text": "Your CLAUDE.md loads on every single message in every session. A 2,000-word CLAUDE.md costs roughly 3,000 tokens per message just for the project instructions. In a 15-message session, that is 45,000 tokens before Claude has read a single file or written a line of code. A well-trimmed CLAUDE.md of 300-500 words reduces this by 60-75%. Move reference material to separate files and load them on demand rather than globally." }},
+    { "@type": "Question", "name": "How do I track work across multiple Claude Code sessions?", "acceptedAnswer": { "@type": "Answer", "text": "The most reliable approach is to use the TodoWrite tool at the end of each session to record exactly where you stopped and what comes next. Write the task list to a file (tasks.md or similar) that you reference at the start of the next session. Some developers keep a session-state.md with the current context: what branch you are on, what the last successful state was, and the next three steps. This means a fresh session can be productive in seconds instead of spending messages reconstructing what you were doing." }}
+  ]
+};
+---
+
+<BlogPost
+  title="Claude Code session management: how to keep long sessions productive"
+  description="Context windows fill up, costs compound, and long sessions start working against you. Here is a practical guide to structuring your Claude Code sessions so you get more done for less."
+  date="April 12, 2026"
+  readTime="9 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "How to cut your Claude Code context window costs in half", slug: "reduce-claude-code-context-window-costs" },
+    { title: "How to debug Claude Code when it writes wrong code", slug: "debug-claude-code-wrong-output" },
+    { title: "Is Claude Code Max worth it?", slug: "is-claude-code-max-worth-it" },
+  ]}
+>
+  <p>
+    There is a point in a long Claude Code session where you can feel things getting worse. Responses slow down slightly. Claude starts hedging on things it was confident about earlier. It references something from the beginning of the session as if reminding itself. Then you notice the token counter and realize you have spent $4 on a session that produced three working functions.
+  </p>
+
+  <p>
+    This is not a model problem. It is a session management problem. Claude Code is a stateful tool and the state grows with every message. If you do not manage it actively, your sessions become progressively less efficient and more expensive as they run. The fix is not to use Claude less. It is to structure how you use it.
+  </p>
+
+  <p>
+    This guide covers the mechanics of how sessions work, the signs that a session is getting stale, and the specific changes that keep long-running work productive without burning through your quota.
+  </p>
+
+  <h2>How the context window actually works in practice</h2>
+
+  <p>
+    Every message you send to Claude Code includes the full conversation history from the current session. Message 1 carries your initial context. Message 15 carries messages 1 through 14, all their responses, every file Claude read, every tool call and result, and your CLAUDE.md loaded fresh on top.
+  </p>
+
+  <p>
+    This is why session cost grows non-linearly. The first few messages are cheap. By message 20, each message is carrying the weight of everything that came before it. A session that runs to 25 messages does not cost 25x the first message. It costs significantly more because each message is larger than the last.
+  </p>
+
+  <p>
+    The context window also has a hard limit. When you hit it, the oldest content gets dropped to make room for new content. For most sessions this means older parts of the conversation disappear. But in a long session with a large CLAUDE.md, parts of your project instructions can fall out of the window too. This is why Claude sometimes stops following rules it was following earlier in the same session. The rules are still in your file. They are just no longer in the active context.
+  </p>
+
+  <p>
+    Two numbers matter most: the size of your CLAUDE.md (loaded on every message) and the length of your conversation history (grows with every exchange). Managing both is the foundation of session hygiene.
+  </p>
+
+  <h2>Signs your session is getting stale</h2>
+
+  <p>
+    These are the concrete signals that a session has gotten too long and is working against you:
+  </p>
+
+  <ul>
+    <li><strong>Claude forgets a convention it was following earlier.</strong> You added a rule to CLAUDE.md, it worked for the first several messages, then Claude started doing the old thing again. Context overflow, not a model regression.</li>
+    <li><strong>Responses reference the wrong state.</strong> Claude mentions a file path or variable name that was true 15 messages ago but has since changed. It is working from stale history, not the current reality.</li>
+    <li><strong>Increasing hedging on straightforward questions.</strong> Claude starts giving qualified answers to questions it answered directly at the start of the session. This often means the earlier, confident context has been compressed or dropped.</li>
+    <li><strong>Noticeably slower response times.</strong> Large context windows take longer to process. If responses were fast at the start of a session and have gotten slower, the session is getting heavy.</li>
+    <li><strong>The same file gets re-read multiple times.</strong> Claude reads a file, you do some work, then a few messages later it reads the same file again. It no longer has the earlier read in reliable context.</li>
+  </ul>
+
+  <p>
+    Any one of these is a signal to act. More than two is a signal to restart.
+  </p>
+
+  <h2>When to restart vs when to use /compact</h2>
+
+  <p>
+    These are two different tools for two different situations.
+  </p>
+
+  <p>
+    <strong>Use /compact</strong> when you are mid-task and cannot afford to lose the current thread. Maybe you are debugging a complex problem and Claude has been accumulating context across several diagnostic steps. Starting fresh would mean reconstructing that context. Running <code>/compact</code> at this point summarizes the conversation into a shorter representation, reducing what gets carried into each subsequent message by 50-70%, while keeping the key facts from the session alive.
+  </p>
+
+  <p>
+    The right time to run <code>/compact</code> is before the session gets bloated, not after it has already degraded. Message 10-12 is a good target for most sessions. By that point there is enough history to summarize meaningfully, but not so much that the summary loses important detail.
+  </p>
+
+  <pre><code>/compact</code></pre>
+
+  <p>
+    <strong>Restart the session</strong> when you have completed a logical unit of work. One bug fixed, one feature merged, one refactor done. A fresh session reloads your CLAUDE.md from the top, starts with no conversation history, and costs you almost nothing per message for the first several exchanges. The productivity hit of a session restart is close to zero if you have tracked your next steps clearly.
+  </p>
+
+  <p>
+    The key distinction: <code>/compact</code> extends a session efficiently when you are in the middle of something. A restart gives you a clean start when you are moving to the next thing. Do not use <code>/compact</code> as a substitute for restarting when a logical stopping point exists.
+  </p>
+
+  <h2>The CLAUDE.md size and session cost tradeoff</h2>
+
+  <p>
+    Your CLAUDE.md is the single highest fixed cost in every session. It loads on every message regardless of whether the message needs those instructions. A 2,000-word CLAUDE.md costs roughly 3,000 tokens per message. In a 15-message session, that is 45,000 tokens before Claude touches a single file.
+  </p>
+
+  <p>
+    Most CLAUDE.md files grow in one direction: bigger. Every debugging session adds a new note. Every code review adds a new convention. Every architectural decision adds a new section. Within six months, a CLAUDE.md that started at 200 words is often sitting at 1,500-2,000 words, most of which Claude did not need today.
+  </p>
+
+  <p>
+    The fix is tiered loading. Keep CLAUDE.md to critical runtime instructions only. Move reference material to separate files and tell Claude to load them on demand:
+  </p>
+
+  <pre><code># CLAUDE.md (trimmed)
+## Architecture
+Monorepo. See docs/ARCHITECTURE.md before working on cross-package concerns.
+
+## Conventions
+See docs/CONVENTIONS.md for coding standards and naming rules.
+
+## Testing
+Run: npx vitest
+See docs/TESTING.md for framework conventions and folder structure.
+
+## Guardrails
+- Never delete files. Move to .trash/ using mv.
+- Never push to main directly. Always branch.
+</code></pre>
+
+  <p>
+    This version loads in under 200 tokens per message. Claude reads ARCHITECTURE.md when it is working on something architectural. It reads CONVENTIONS.md when writing new code. Most messages do not need either, so most messages do not pay for them.
+  </p>
+
+  <p>
+    If you want a quick read on which sections of your CLAUDE.md are essential and which are just adding token weight, the <a href="/contextkit/analyze">ContextKit Analyzer</a> scores your file and flags sections that are bloating it without meaningfully improving Claude's behavior. Paste your file and look at what is in there that Claude would follow by default anyway.
+  </p>
+
+  <h2>Structuring work across multiple sessions</h2>
+
+  <p>
+    The biggest productivity loss in multi-session work is the cost of reconstructing context at the start of each session. If you spend the first 3-4 messages of every session reminding Claude what you were doing, what state the code is in, and what the next step is, you are burning 20-30% of your session budget on orientation.
+  </p>
+
+  <p>
+    The solution is a session handoff file. At the end of each session, write a brief state dump that the next session can load in a single message:
+  </p>
+
+  <pre><code># session-state.md
+Last updated: 2026-04-12
+
+## Current branch
+feature/auth-refactor
+
+## Last completed
+Extracted token validation into src/lib/auth/tokens.ts.
+All tests passing on this branch.
+
+## Next steps
+1. Add refresh token rotation to tokens.ts
+2. Update AuthContext to use new token helpers
+3. Write integration test for token refresh flow
+
+## Open questions
+- Should refresh tokens be stored in httpOnly cookies or localStorage?
+  (Leaning cookies, need to check mobile client constraints)
+
+## Files in play
+- src/lib/auth/tokens.ts (main work file)
+- src/contexts/AuthContext.tsx (update after tokens.ts is stable)
+- src/lib/auth/tokens.test.ts (keep in sync)
+</code></pre>
+
+  <p>
+    Start the next session with: "Read session-state.md and pick up from next steps." One message, full context. Claude knows exactly where it is and what comes next.
+  </p>
+
+  <p>
+    You can also use the TodoWrite tool to manage the task list directly within Claude Code rather than maintaining a separate markdown file. The output persists across sessions as long as you reference it at the start of each new one.
+  </p>
+
+  <h2>Session cost awareness</h2>
+
+  <p>
+    Claude Code does not show you a live cost meter while you work. You see the bill after. This disconnect makes it easy to run expensive sessions without realizing it until you check your usage.
+  </p>
+
+  <p>
+    The main levers that drive session cost up unexpectedly:
+  </p>
+
+  <ul>
+    <li><strong>Reading large files repeatedly.</strong> Every file read pulls the full file content into context. If Claude reads a 500-line file at message 3, that 500 lines is part of the history carried in messages 4 through 20. If it reads the file again at message 15, you have paid for it twice and it is now in context twice.</li>
+    <li><strong>Running subagents in a session that is already large.</strong> Subagents inherit context from the parent session. A subagent spawned at message 20 of a bloated session starts with all that weight. Either spawn subagents early or start fresh before spawning.</li>
+    <li><strong>Exploratory conversations with no clear end state.</strong> "Let me show you the codebase and you tell me what to do" sessions run long and produce little. They are expensive for what they deliver. Come in with a specific task.</li>
+    <li><strong>Leaving a session running "just in case."</strong> A session left open with accumulated history costs money on every message, including follow-up questions that could have been a fresh session for a fraction of the price.</li>
+  </ul>
+
+  <p>
+    Knowing which of your sessions are actually expensive requires reading the session logs. Claude Code writes detailed JSONL logs for every session, including token counts per message and model used. The <a href="/cost-dashboard/analyze">CostPilot analyzer</a> parses those logs and shows you your most expensive sessions, where tokens went within each session, and how your costs trend over time. If you are on Max and wondering where your quota goes, the logs will tell you.
+  </p>
+
+  <h2>A practical session workflow</h2>
+
+  <p>
+    Put these pieces together and you get a session pattern that keeps costs predictable and productivity high:
+  </p>
+
+  <pre><code># Start of session
+"Read session-state.md. The next task is [specific task from next steps]."
+
+# During session
+- One logical task per session where possible
+- Run /compact at message 10-12 if the session needs to continue
+- Be specific about files: "edit src/lib/tokens.ts" not "edit the auth module"
+
+# End of session
+"Update session-state.md: mark [task] complete, set next steps to [X, Y, Z],
+note any open questions."
+</code></pre>
+
+  <p>
+    The whole pattern adds less than two messages per session. The overhead is minimal. What it prevents is the expensive, directionless session that costs four times as much as it should.
+  </p>
+
+  <h2>The one thing that moves the needle most</h2>
+
+  <p>
+    If you do nothing else from this guide, do this: treat session restarts as a feature, not a concession. The instinct is to keep a session open as long as possible because starting fresh feels like losing progress. It is not. Context is not progress. Code committed to your branch is progress.
+  </p>
+
+  <p>
+    A focused 10-message session on a specific task with a clear starting state is faster, cheaper, and produces better output than a 30-message exploratory session. The math on this is straightforward once you have looked at your actual session logs.
+  </p>
+
+  <p>
+    If you have not looked at those logs yet, start there. Run the <a href="/cost-dashboard/analyze">CostPilot analyzer</a> against your recent sessions and see which ones were actually expensive and why. The pattern becomes obvious quickly, and the fix takes less than an hour to put in place.
+  </p>
+</BlogPost>

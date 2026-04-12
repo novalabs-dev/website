@@ -1,0 +1,342 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Can Claude Code replace a human code reviewer?", "acceptedAnswer": { "@type": "Answer", "text": "No, and it should not try to. Claude Code is good at catching security issues, performance anti-patterns, and style violations consistently and quickly. It is bad at understanding team dynamics, business context, and long-term architectural intent. Use it to handle the mechanical layer of review so human reviewers can focus on the judgment calls." }},
+    { "@type": "Question", "name": "How do I define review standards for Claude Code?", "acceptedAnswer": { "@type": "Answer", "text": "Create a .claude/rules/review.md file that lists your review criteria by category: security, performance, patterns, style. Be specific. 'Avoid N+1 queries' is useful. 'Write good code' is not. Claude reads these rules and applies them during review, so the more concrete they are, the more useful the output." }},
+    { "@type": "Question", "name": "Can Claude Code run as a pre-commit hook?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Using Claude Code's hooks system, you can run a review script at the PreToolUse stage that triggers before commits go through. The hook reads staged files, runs Claude against your review rules, and can block or warn based on the findings. This catches issues before they hit your remote branch." }},
+    { "@type": "Question", "name": "How do parallel subagents improve code review?", "acceptedAnswer": { "@type": "Answer", "text": "For pull requests touching multiple layers of the stack, spawning parallel subagents means each layer gets a focused review simultaneously. One subagent reviews API security, another checks the database layer, another covers the frontend. The main agent collects findings and produces a unified report. This is faster than sequential review and each subagent focuses on its domain rather than skimming across all layers." }}
+  ]
+};
+---
+
+<BlogPost
+  title="How to automate code reviews with Claude Code"
+  description="A practical workflow for using Claude Code as a code reviewer. Set up review rules in .claude/rules/, run parallel reviews with subagents, and catch issues before commit with pre-commit hooks."
+  date="April 12, 2026"
+  readTime="10 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "Claude Code subagents: how to run parallel tasks and finish work faster", slug: "claude-code-subagents-parallel-tasks" },
+    { title: "Claude Code guardrails: how to prevent destructive actions and protect your codebase", slug: "claude-code-guardrails-prevent-destructive-actions" },
+    { title: "Claude Code CI/CD integration", slug: "claude-code-ci-cd-integration" },
+  ]}
+>
+  <p>
+    Code review is one of the most time-consuming parts of software development. It requires consistency, attention to detail across multiple categories, and the discipline to apply the same standards on the tenth PR of the day as on the first. Claude Code is good at all three of those things.
+  </p>
+
+  <p>
+    This is not about replacing the human reviewer. It is about offloading the mechanical layer of review, the pattern checks, the security gotchas, the style violations, so that humans can focus on the judgment calls: architecture decisions, team conventions, product direction. Claude handles what scales poorly. You handle what requires context.
+  </p>
+
+  <p>
+    Here is a complete workflow for setting this up, from defining your review standards to running parallel reviews on large pull requests to catching issues before they leave your machine.
+  </p>
+
+  <h2>Start with your review standards</h2>
+
+  <p>
+    Claude Code follows rules you define. Without explicit standards, it will review code against general best practices, which is better than nothing but not tailored to your project. With a review rules file, it applies your team's actual standards on every run.
+  </p>
+
+  <p>
+    Create a file at <code>.claude/rules/review.md</code>. This file lives in your repository alongside your other Claude rules. Structure it by review category:
+  </p>
+
+  <pre><code># Code Review Standards
+
+## Security
+- Flag any SQL queries built with string concatenation or f-strings (use parameterized queries)
+- Flag any secrets, tokens, or API keys hardcoded in source files
+- Flag use of subprocess with shell=True
+- Flag disabled SSL/TLS verification (verify=False, rejectUnauthorized: false)
+- Check that user input is validated before use in file paths or system calls
+
+## Performance
+- Flag N+1 query patterns in ORM code (queries inside loops)
+- Flag missing database indexes on columns used in WHERE clauses or JOIN conditions
+- Flag loading full objects when only a subset of fields is needed
+- Flag synchronous calls inside async functions where await is appropriate
+
+## Patterns and architecture
+- Flag circular imports
+- Flag functions longer than 50 lines without clear justification
+- Flag repeated logic that should be extracted into a shared utility
+- Flag direct mutation of props or function arguments
+- Check that error handling is present for all external calls (API, database, filesystem)
+
+## Style and consistency
+- Check that new functions have docstrings or JSDoc comments if the rest of the file uses them
+- Flag any TODO or FIXME comments added in this diff
+- Check that test coverage exists for new public functions
+- Flag test files with no assertions</code></pre>
+
+  <p>
+    Keep the rules concrete. "Avoid N+1 queries" gives Claude something to look for. "Write clean code" does not. Every rule should be something Claude can either find or not find in the diff.
+  </p>
+
+  <p>
+    Add a pointer to this file in your CLAUDE.md so it is loaded at the start of every session:
+  </p>
+
+  <pre><code># CLAUDE.md (excerpt)
+
+## Code Review
+When asked to review code, always read .claude/rules/review.md first and apply
+all rules in that file. Report findings by category. For each issue, include the
+file path, line reference, the rule it violates, and a concrete fix.</code></pre>
+
+  <p>
+    With this in place, you can ask Claude to review any file or diff and get back structured, consistent output every time.
+  </p>
+
+  <h2>Running a review on a pull request</h2>
+
+  <p>
+    For a basic review of staged changes, run Claude with a specific prompt:
+  </p>
+
+  <pre><code>Review the changes in this pull request against our review standards in
+.claude/rules/review.md. The diff is below.
+
+Focus on:
+1. Security issues (blocking)
+2. Performance problems (blocking if they affect production paths)
+3. Pattern violations (warn)
+4. Style inconsistencies (inform only)
+
+For each finding, state: file, approximate line, rule violated, suggested fix.
+If there are no issues in a category, say so explicitly.
+
+[paste git diff or describe the PR]</code></pre>
+
+  <p>
+    The explicit priority order matters. It tells Claude which findings to flag as blocking versus informational. Without it, a missing docstring gets the same weight as a SQL injection vector.
+  </p>
+
+  <p>
+    You can also point Claude at a branch directly:
+  </p>
+
+  <pre><code>Review the diff between main and feature/user-auth. Apply .claude/rules/review.md.
+Focus on the authentication flow in src/auth/ and any database queries that touch
+the users table.</code></pre>
+
+  <h2>Parallel reviews for larger pull requests</h2>
+
+  <p>
+    When a PR touches multiple layers of the stack, a single linear review gets messy. The reviewer switches context between API logic, database queries, and frontend components, and details get missed in the transitions.
+  </p>
+
+  <p>
+    Parallel subagents fix this. Each subagent focuses on one layer and applies the relevant subset of your review rules. The main agent collects findings and produces a unified report.
+  </p>
+
+  <p>
+    Here is how to set this up for a full-stack PR:
+  </p>
+
+  <pre><code>This PR adds a new user authentication flow. It touches:
+- src/api/auth.py (backend API endpoints)
+- src/db/migrations/0012_add_sessions_table.sql (database migration)
+- src/frontend/components/LoginForm.tsx (frontend component)
+
+Spawn three parallel read-only subagents:
+
+Subagent 1 — Backend security review:
+Read src/api/auth.py. Apply the Security and Patterns sections of
+.claude/rules/review.md. Focus specifically on: token handling, session
+management, input validation, and error handling for auth failure cases.
+Return findings as JSON: &#123;file, line, severity, rule, suggestion&#125;.
+
+Subagent 2 — Database review:
+Read src/db/migrations/0012_add_sessions_table.sql and any models that
+reference the sessions table. Apply the Performance section of
+.claude/rules/review.md. Check: indexes on foreign keys, query patterns that
+will hit the sessions table, and whether the migration is reversible.
+Return findings as JSON: &#123;file, line, severity, rule, suggestion&#125;.
+
+Subagent 3 — Frontend review:
+Read src/frontend/components/LoginForm.tsx. Apply the Security and Style
+sections of .claude/rules/review.md. Check: client-side validation, token
+storage approach (localStorage vs httpOnly cookies), error state handling.
+Return findings as JSON: &#123;file, line, severity, rule, suggestion&#125;.
+
+After all three finish, combine their findings. Group by severity: blocking,
+warn, inform. Deduplicate if the same issue appears in multiple layers.</code></pre>
+
+  <p>
+    Each subagent starts with a clean context and focuses on its domain. The main agent sees the full picture only at the aggregation step, which keeps the review sharp rather than diluted.
+  </p>
+
+  <p>
+    The read-only constraint matters here. You want the subagents to report findings, not start making changes mid-review.
+  </p>
+
+  <h2>Pre-commit hooks for catch-it-before-it-ships</h2>
+
+  <p>
+    Reviewing after a PR is open is fine. Catching issues before they leave your local machine is better. Claude Code's hooks system lets you run a review at commit time.
+  </p>
+
+  <p>
+    Hooks live in your <code>.claude/settings.json</code> file. The <code>PreToolUse</code> hook runs before Claude takes an action. You can use it to intercept the commit step and run a review first:
+  </p>
+
+  <pre><code>&#123;
+  "hooks": &#123;
+    "PreToolUse": [
+      &#123;
+        "matcher": "Bash",
+        "hooks": [
+          &#123;
+            "type": "command",
+            "command": "python .claude/scripts/pre_commit_review.py"
+          &#125;
+        ]
+      &#125;
+    ]
+  &#125;
+&#125;</code></pre>
+
+  <p>
+    The script at <code>.claude/scripts/pre_commit_review.py</code> does the actual work:
+  </p>
+
+  <pre><code>import subprocess
+import sys
+
+def get_staged_diff():
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--unified=3"],
+        capture_output=True, text=True
+    )
+    return result.stdout
+
+def run_review(diff):
+    # Read review rules
+    with open(".claude/rules/review.md") as f:
+        rules = f.read()
+
+    # Write a focused review prompt to a temp file for Claude to pick up
+    prompt = f"""
+You are doing a pre-commit security and pattern check.
+Review the following staged diff against these rules:
+
+&#123;rules&#125;
+
+STAGED DIFF:
+&#123;diff&#125;
+
+Output ONLY issues with severity BLOCKING. If there are none, output exactly:
+REVIEW PASSED
+
+For each blocking issue: file | line | rule | fix
+"""
+    with open(".tmp/pre_commit_prompt.txt", "w") as f:
+        f.write(prompt)
+
+    return prompt
+
+if __name__ == "__main__":
+    diff = get_staged_diff()
+    if not diff.strip():
+        sys.exit(0)  # Nothing staged, skip
+
+    run_review(diff)
+    # Output signals to the hook runner whether to proceed
+</code></pre>
+
+  <p>
+    This is intentionally lightweight. The pre-commit hook should only block on hard issues, not warn on every style nit. Your review rules file has the distinction built in: check the Security and blocking Performance rules at commit time, leave the Style and Patterns sections for the PR review.
+  </p>
+
+  <p>
+    If the hook overhead becomes noticeable, scope it to specific file patterns. Running a full review on every commit to a documentation file is wasteful. Trigger it for <code>*.py</code>, <code>*.ts</code>, and SQL files, skip everything else.
+  </p>
+
+  <h2>What to review and what not to</h2>
+
+  <p>
+    Claude Code is good at finding certain categories of issues and unreliable for others. Understanding this distinction keeps your review rules useful rather than noisy.
+  </p>
+
+  <p>
+    Where Claude adds consistent value:
+  </p>
+
+  <ul>
+    <li><strong>Security patterns.</strong> SQL injection, hardcoded secrets, insecure defaults, missing input validation. These are pattern-matching problems. Claude is fast and consistent at them.</li>
+    <li><strong>Performance anti-patterns.</strong> N+1 queries, missing indexes on obvious join columns, loading full records when projections would work. Again, pattern matching.</li>
+    <li><strong>Error handling gaps.</strong> External calls with no error handling, exceptions swallowed silently, missing fallbacks for nullable values.</li>
+    <li><strong>Style consistency.</strong> Whether new code follows the conventions already present in the file. Claude reads the existing code before reviewing, so it notices when something diverges.</li>
+    <li><strong>Test coverage gaps.</strong> New public functions with no corresponding test, or test files with no assertions.</li>
+  </ul>
+
+  <p>
+    Where Claude is less reliable:
+  </p>
+
+  <ul>
+    <li><strong>Long-term architectural decisions.</strong> Whether to add another microservice or extend the monolith. Claude can summarize tradeoffs, but the call depends on your team's specific constraints and direction.</li>
+    <li><strong>Business logic correctness.</strong> Claude does not know your domain rules. It can check that the code does what it appears to do, but not whether that is the right thing to do.</li>
+    <li><strong>Team convention judgment calls.</strong> Whether a naming choice fits the team's emerging style. This requires knowing what the team is moving toward, not just what it has done.</li>
+  </ul>
+
+  <p>
+    Keep your review rules in the first category. If you find yourself writing rules that require business context to evaluate, those belong in the human review, not the automated layer.
+  </p>
+
+  <h2>Structuring the output</h2>
+
+  <p>
+    A review that dumps a wall of text is not useful. Ask for structured output and you will get something you can actually act on.
+  </p>
+
+  <p>
+    The JSON format from the parallel review example above works well. You can also use a simpler table format for smaller reviews:
+  </p>
+
+  <pre><code>Return findings in this format:
+
+| Severity | File | Line | Rule | Suggested fix |
+|----------|------|------|------|---------------|
+| BLOCKING | src/api/auth.py | 47 | SQL parameterization | Replace f-string with parameterized query |
+| WARN | src/api/auth.py | 83 | Error handling | Wrap external call in try/except |
+
+If a category has no findings, include a row: | PASS | - | - | [category name] | No issues found |</code></pre>
+
+  <p>
+    The explicit "PASS" row for empty categories is useful. It tells you Claude looked and found nothing, rather than leaving you wondering whether it skipped a category.
+  </p>
+
+  <h2>Keeping your review rules current</h2>
+
+  <p>
+    Your review rules file is a living document. The first version covers the obvious categories. Over time, you add rules based on issues that slipped through, patterns that keep appearing, and conventions your team agrees on.
+  </p>
+
+  <p>
+    After each sprint retrospective or postmortem, ask: what bugs or review comments came up repeatedly? If something showed up twice in human reviews, it belongs in the automated layer. Add it to <code>.claude/rules/review.md</code>.
+  </p>
+
+  <p>
+    For teams, treat the rules file like any other configuration. Pull requests to add or change a rule, a brief discussion, then merge. The rules become a shared artifact that encodes what your team has learned about its own codebase.
+  </p>
+
+  <p>
+    Want to check whether your current CLAUDE.md is set up to support consistent code reviews? The <a href="/contextkit/analyze">ContextKit Analyzer</a> scores your configuration and flags gaps in your rules structure, including whether your review standards are specific enough to act on.
+  </p>
+
+  <p>
+    If you are starting from scratch, the <a href="/contextkit/generate">ContextKit Generator</a> can scaffold a review rules template based on your stack. Pick your language and framework, and it generates a starting set of review criteria you can refine to fit your project.
+  </p>
+
+  <p>
+    For the full setup, including how to chain review hooks into your CI pipeline and how to version your review rules alongside your code, the AI OS Blueprint has a complete section on code quality workflows.
+  </p>
+</BlogPost>

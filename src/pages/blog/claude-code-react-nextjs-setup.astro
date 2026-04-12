@@ -1,0 +1,372 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What should I put in CLAUDE.md for a React or Next.js project?", "acceptedAnswer": { "@type": "Answer", "text": "Cover your router setup (App Router vs Pages Router), component conventions (named exports, co-location rules), styling approach (Tailwind, CSS Modules, or styled-components), testing framework, and state management pattern. The most important thing is to be explicit about Next.js version and which router you're using - Claude's defaults differ between Next.js 13 App Router and the older Pages Router." }},
+    { "@type": "Question", "name": "How do I stop Claude from generating class components in React?", "acceptedAnswer": { "@type": "Answer", "text": "Add an explicit rule in CLAUDE.md: 'Function components only, no class components.' Also add: 'Hooks for all state and side effects - no lifecycle methods.' Without this, Claude occasionally falls back to class components, especially when it reads existing older code in your project." }},
+    { "@type": "Question", "name": "Does CLAUDE.md help with Next.js App Router vs Pages Router confusion?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, and this is one of the most important things to include. Explicitly state which router you use, whether server components are the default, and where data fetching happens. Without this, Claude mixes patterns from both routers - using getServerSideProps in an App Router project or forgetting 'use client' directives where they're needed." }},
+    { "@type": "Question", "name": "Should I document my Tailwind setup in CLAUDE.md?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, briefly. Tell Claude whether you're using standard Tailwind, shadcn/ui, or a custom component library built on top of Tailwind. If you have custom theme tokens or class name conventions, include those. Without this, Claude mixes Tailwind utility classes with inline styles or CSS modules depending on what it sees in nearby files." }}
+  ]
+};
+---
+
+<BlogPost
+  title="CLAUDE.md for React and Next.js: a stack-specific configuration guide"
+  description="React and Next.js projects have enough configuration surface area to trip up Claude constantly. Here's exactly what to put in your CLAUDE.md to get consistent, correct output across components, routing, testing, and state management."
+  date="April 12, 2026"
+  readTime="11 min read"
+  jsonLd={jsonLd}
+  relatedPosts={[
+    { title: "CLAUDE.md for TypeScript and Node.js: the complete configuration guide", slug: "claudemd-for-typescript-nodejs" },
+    { title: "How to create a CLAUDE.md: approaches compared", slug: "how-to-create-claudemd-approaches-compared" },
+    { title: "Claude Code tips and tricks", slug: "claude-code-tips-and-tricks" },
+  ]}
+>
+  <p>
+    React and Next.js projects accumulate configuration decisions quickly. App Router or Pages Router. Tailwind or CSS Modules. Vitest or Jest. Zustand or React Query or both. Server components or client components. Each decision changes what correct code looks like, and none of it is obvious to Claude without explicit instructions.
+  </p>
+
+  <p>
+    The default behavior when Claude is missing context: it writes code that compiles but doesn't match your project. It uses <code>getServerSideProps</code> in an App Router project. It forgets <code>'use client'</code> directives. It co-locates styles in CSS modules when you've standardized on Tailwind. It writes <code>export default</code> when your project uses named exports throughout.
+  </p>
+
+  <p>
+    A well-configured CLAUDE.md eliminates this category of mistake. This guide covers what to include, section by section, with copy-paste examples for each part. If you want to skip the manual setup, <a href="/contextkit/generate">the ContextKit generator</a> handles React and Next.js projects with a guided wizard.
+  </p>
+
+  <h2>Project overview and router setup</h2>
+
+  <p>
+    Start with the basics. Claude needs to know your Next.js version and which router you're using before anything else. This single piece of context changes the entire pattern set.
+  </p>
+
+  <p>
+    App Router (Next.js 13+) and Pages Router are not just different in file structure. They differ in how data fetching works, how layouts are composed, when components run on the server vs client, and what lifecycle patterns are valid. Claude knows both well, but it will mix them if you don't specify.
+  </p>
+
+  <pre><code>## Project Overview
+Next.js 14 App Router, TypeScript strict, React 18.
+Node 20. Package manager: pnpm.
+
+## Router
+App Router only. No Pages Router patterns.
+- Server components are the default - do not add 'use client' unless the component needs interactivity or browser APIs
+- Data fetching happens in server components via async/await, not useEffect
+- Layouts live in layout.tsx files, not _app.tsx or _document.tsx
+- Route handlers go in app/api/[route]/route.ts</code></pre>
+
+  <p>
+    If you're on the Pages Router (common in older codebases or if you haven't migrated), flip the context completely:
+  </p>
+
+  <pre><code>## Router
+Pages Router only. No App Router patterns.
+- Data fetching uses getServerSideProps, getStaticProps, or getStaticPaths
+- Layouts wrap pages in _app.tsx
+- API routes live in pages/api/
+- No server components - all components run on the client unless explicitly server-rendered via data fetching</code></pre>
+
+  <h2>Component conventions</h2>
+
+  <p>
+    React codebases drift toward inconsistency faster than almost any other stack. Function components vs class components, default exports vs named exports, file naming, prop types vs TypeScript interfaces - these seem like minor style choices, but Claude picks up on whatever pattern it sees most in nearby files. Without explicit rules, it mirrors the oldest code in your project.
+  </p>
+
+  <pre><code>## Component Conventions
+- Function components only. No class components.
+- Named exports only. No default exports.
+  Good: export function UserCard(&#123; name &#125;: UserCardProps) &#123;&#125;
+  Bad: export default function UserCard() &#123;&#125;
+- Props typed with interfaces, not type aliases
+  Good: interface UserCardProps &#123; name: string &#125;
+  Bad: type UserCardProps = &#123; name: string &#125;
+- One component per file. File name matches component name in PascalCase.
+- Co-locate component, test, and stories in the same directory:
+    components/UserCard/
+      UserCard.tsx
+      UserCard.test.tsx
+      UserCard.stories.tsx (if using Storybook)
+      index.ts (re-export for clean imports)
+
+## Hooks
+- Custom hooks go in src/hooks/
+- Hook file names prefixed with 'use': useAuth.ts, useUserData.ts
+- No state or side effects outside of hooks or server actions</code></pre>
+
+  <h2>Import rules and path aliases</h2>
+
+  <p>
+    Import paths are one of the most common sources of Claude errors in React projects. Without path alias documentation, Claude writes relative imports that work but create deep nesting problems. If you've configured <code>@/</code> as a root alias in your tsconfig, Claude needs to know that explicitly - and needs to know when to use it.
+  </p>
+
+  <pre><code>## Imports
+Path aliases configured in tsconfig.json:
+  @/* -> src/*
+  @components/* -> src/components/*
+  @lib/* -> src/lib/*
+  @hooks/* -> src/hooks/*
+
+Rules:
+- Always use path aliases for cross-directory imports
+- Only use relative imports within the same component directory
+- Import order: React, external packages, internal @/* imports, relative imports
+- Never import from node_modules with a relative path
+
+## Barrel Exports
+- Each component directory has an index.ts that re-exports the component
+- Import from the directory, not the file:
+  Good: import &#123; UserCard &#125; from '@components/UserCard'
+  Bad: import &#123; UserCard &#125; from '@components/UserCard/UserCard'</code></pre>
+
+  <h2>Tailwind setup</h2>
+
+  <p>
+    If you're using Tailwind, document it. Claude knows Tailwind well, but it doesn't know whether you're using standard utilities, a component library like shadcn/ui, or a custom design system. The gap between these is significant - shadcn/ui components use <code>cn()</code> for class merging, custom design systems might have their own conventions, and mixing approaches creates styling conflicts that are annoying to debug.
+  </p>
+
+  <pre><code>## Styling
+Tailwind CSS with shadcn/ui component library.
+
+Rules:
+- Tailwind utility classes only. No CSS modules. No inline styles. No styled-components.
+- Use the cn() utility from @lib/utils for conditional class merging
+  Good: className=&#123;cn('base-classes', condition &amp;&amp; 'conditional-class')&#125;
+  Bad: className=&#123;`base-classes $&#123;condition ? 'conditional-class' : ''&#125;`&#125;
+- shadcn/ui components are in src/components/ui/ - use them before building custom equivalents
+- Custom components extend shadcn primitives, not base HTML elements
+- Responsive classes use mobile-first approach: base -> sm: -> md: -> lg:
+
+## shadcn/ui
+Components installed: Button, Card, Dialog, Input, Select, Table, Tooltip.
+Do not install new shadcn components autonomously - ask first.</code></pre>
+
+  <p>
+    That last rule matters. Claude will happily run <code>npx shadcn@latest add</code> commands mid-session if you don't tell it not to. Decide upfront whether you want it to manage dependencies autonomously or ask.
+  </p>
+
+  <h2>Testing setup</h2>
+
+  <p>
+    React projects have settled into a rough consensus around Vitest (or Jest) plus React Testing Library, but the specifics still vary enough that Claude needs explicit guidance. Test file location, what to test, what not to test, whether you mock at the module level or the component level - without this, Claude writes tests that work but don't match your pattern.
+  </p>
+
+  <pre><code>## Testing
+Framework: Vitest + React Testing Library.
+Config: vitest.config.ts
+Run tests: pnpm test
+Run single file: pnpm test -- UserCard
+
+Rules:
+- Test files co-located with source: UserCard.test.tsx next to UserCard.tsx
+- Test what the component does, not how it's implemented
+  Good: test that a button click triggers the expected callback
+  Bad: test that useState was called with a specific value
+- Use screen queries in priority order: getByRole > getByLabelText > getByText > getByTestId
+- No getByTestId unless no semantic query is possible
+- Mock external dependencies at the module level with vi.mock(), not inline
+- Server components require different testing patterns - use MSW for API mocking
+- Do not write snapshot tests
+
+## Test Coverage
+- Unit tests for all utility functions in src/lib/
+- Integration tests for form submissions and data flows
+- No need to test every UI variant - focus on behavior</code></pre>
+
+  <p>
+    The "test what the component does, not how it's implemented" rule is worth enforcing explicitly. Without it, Claude tends to write brittle implementation tests that break when you refactor - which defeats the point of having tests.
+  </p>
+
+  <h2>State management patterns</h2>
+
+  <p>
+    State management is where React projects diverge most sharply. Some projects use Redux. Others use Zustand. Many have moved server state to React Query or TanStack Query and keep client state minimal with <code>useState</code>. Document what you're using and where each type of state belongs.
+  </p>
+
+  <pre><code>## State Management
+Client state: Zustand for global state, useState for local component state.
+Server state: TanStack Query (React Query) for all API data.
+
+Rules:
+- Do not use Redux. Do not add redux, @reduxjs/toolkit, or react-redux.
+- Server-derived data goes in TanStack Query - do not put API responses in Zustand
+- Zustand stores live in src/stores/, one file per domain:
+    src/stores/authStore.ts
+    src/stores/cartStore.ts
+- Local state (one component uses it) stays in useState - do not lift to Zustand prematurely
+- TanStack Query hooks live in src/queries/, co-located by resource:
+    src/queries/users.ts (useUser, useUsers, useMutateUser)
+
+## Server Actions (App Router)
+- Use server actions for form submissions and mutations
+- Server actions go in src/actions/, named by resource:
+    src/actions/users.ts
+- Revalidate affected paths explicitly after mutations using revalidatePath</code></pre>
+
+  <h2>File and folder structure</h2>
+
+  <p>
+    Claude will infer structure from existing files, but inference is unreliable in large codebases. Make the conventions explicit.
+  </p>
+
+  <pre><code>## File Structure
+src/
+  app/                  # Next.js App Router pages and layouts
+  components/           # Shared UI components
+    ui/                 # shadcn/ui components (do not edit manually)
+    [ComponentName]/    # Custom components (co-located with tests)
+  hooks/                # Custom React hooks
+  lib/                  # Utility functions and shared logic
+  stores/               # Zustand stores
+  queries/              # TanStack Query hooks
+  actions/              # Next.js server actions
+  types/                # Shared TypeScript types
+
+Rules:
+- Page-specific components go in the page's folder under app/, not in components/
+- Shared components go in components/ only if used by more than one page
+- Types used only in one file stay in that file, not in types/</code></pre>
+
+  <h2>Guardrails specific to React and Next.js</h2>
+
+  <p>
+    Beyond conventions, it's worth adding guardrails for actions that are easy to get wrong in a Next.js project. These are things where Claude can make a technically valid decision that creates a hard-to-debug problem.
+  </p>
+
+  <pre><code>## Guardrails
+- Never add 'use client' to a server component that doesn't need it - this moves rendering to the client unnecessarily
+- Never call async functions in useEffect without proper cleanup - always handle the cancelled state
+- Never store sensitive data in localStorage or Zustand (it persists across sessions) - use server-side session handling
+- Never modify files in src/components/ui/ - these are managed by shadcn/ui
+- Never run database queries in client components - use server actions or API routes
+- Ask before adding new dependencies - check if an existing package already covers the need
+- Ask before creating new Zustand stores - consider whether the state should live in TanStack Query instead
+
+## Performance
+- Images use next/image, not <img>
+- Links use next/link, not <a>
+- Fonts use next/font, not CSS @import
+- Dynamic imports (next/dynamic) for heavy client-side components above the fold</code></pre>
+
+  <h2>Environment variables</h2>
+
+  <p>
+    Next.js has a specific convention for environment variables that affects whether they're accessible on the server, client, or both. Claude gets this wrong unless you document it.
+  </p>
+
+  <pre><code>## Environment Variables
+- Server-only secrets: no NEXT_PUBLIC_ prefix (STRIPE_SECRET_KEY, DATABASE_URL)
+- Client-accessible values: NEXT_PUBLIC_ prefix (NEXT_PUBLIC_API_URL)
+- Never use NEXT_PUBLIC_ for secrets - they get bundled into the client
+- .env.local for local development, never committed
+- .env.example committed with placeholder values for all required variables</code></pre>
+
+  <h2>Putting it together</h2>
+
+  <p>
+    Here's what a complete CLAUDE.md looks like for a typical Next.js 14 App Router project. This is a starting point - adjust based on what your project actually uses.
+  </p>
+
+  <pre><code>## Project Overview
+Next.js 14 App Router, TypeScript strict, React 18, Tailwind CSS, shadcn/ui.
+Node 20. Package manager: pnpm.
+
+## Router
+App Router only. No Pages Router patterns.
+Server components are the default. Only add 'use client' when a component needs
+interactivity or browser APIs. Data fetching in server components via async/await.
+
+## Component Conventions
+- Function components only. Named exports only.
+- Props typed with interfaces.
+- One component per file, PascalCase filename.
+- Co-locate component + test + stories in one directory.
+
+## Imports
+Path aliases: @/* -> src/*
+Use path aliases for cross-directory imports.
+Relative imports only within the same component directory.
+
+## Styling
+Tailwind utilities only. No CSS modules, no inline styles.
+Use cn() from @lib/utils for conditional class merging.
+shadcn/ui components in src/components/ui/ - use before building custom equivalents.
+
+## State Management
+Client state: Zustand (src/stores/) for global, useState for local.
+Server state: TanStack Query (src/queries/).
+Do not use Redux.
+
+## Testing
+Vitest + React Testing Library.
+Run: pnpm test
+Test files co-located with source. Test behavior, not implementation.
+No snapshot tests. Prefer semantic queries over getByTestId.
+
+## Guardrails
+- Never add 'use client' without a reason
+- Never run database queries in client components
+- Images: next/image. Links: next/link. Fonts: next/font.
+- Ask before adding dependencies or creating new Zustand stores
+- Never modify src/components/ui/ (shadcn managed)
+
+## Environment Variables
+Server-only: no NEXT_PUBLIC_ prefix.
+Client-accessible: NEXT_PUBLIC_ prefix.
+Never NEXT_PUBLIC_ for secrets.</code></pre>
+
+  <p>
+    This covers the configuration surface that produces the most errors. It's around 50 lines - short enough that it doesn't waste significant token budget, specific enough that Claude has the context to make correct decisions.
+  </p>
+
+  <h2>Validating your CLAUDE.md</h2>
+
+  <p>
+    After writing your CLAUDE.md, test it with a few representative tasks. Ask Claude to create a new component, add a new page, and write a test. Check whether the output follows your conventions without you having to correct it.
+  </p>
+
+  <p>
+    Common gaps that only show up in practice:
+  </p>
+
+  <ul>
+    <li>Claude adds <code>'use client'</code> to components that don't need it - add a more explicit rule about when server components need to become client components</li>
+    <li>Claude writes relative imports across directories - verify your path alias section is specific enough</li>
+    <li>Claude adds new npm packages without asking - check whether your guardrails section covers this</li>
+    <li>Claude writes <code>getServerSideProps</code> in an App Router project - verify your router section states App Router explicitly</li>
+  </ul>
+
+  <p>
+    If your CLAUDE.md is already written and you want an objective read on what's missing or redundant, <a href="/contextkit/analyze">ContextKit's analyzer</a> reviews your config and flags sections that are likely to cause problems - vague rules, missing stack context, or conventions that conflict with each other.
+  </p>
+
+  <h2>Monorepo considerations</h2>
+
+  <p>
+    If your React app lives in a monorepo alongside other packages, CLAUDE.md placement matters. A root-level CLAUDE.md applies to the whole repo. A CLAUDE.md inside <code>apps/web/</code> applies only when Claude is working in that directory.
+  </p>
+
+  <p>
+    The practical approach: put shared conventions (TypeScript settings, code style, testing philosophy) in the root CLAUDE.md. Put framework-specific conventions (App Router rules, Tailwind config, component patterns) in the app's own CLAUDE.md. Claude merges both when working inside the app directory.
+  </p>
+
+  <p>
+    For a full breakdown of monorepo CLAUDE.md structure, see the <a href="/blog/claudemd-for-typescript-nodejs">TypeScript and Node.js guide</a> - it covers the monorepo section in depth.
+  </p>
+
+  <h2>Keeping it current</h2>
+
+  <p>
+    CLAUDE.md is documentation. It goes stale the same way comments go stale. When you switch from Jest to Vitest, update the testing section. When you add Zustand and remove Redux, update state management. When you upgrade to Next.js 15, check whether the App Router section still reflects the current patterns.
+  </p>
+
+  <p>
+    A stale CLAUDE.md is worse than no CLAUDE.md. Claude follows the instructions it's given - if the instructions describe your project from eight months ago, the output will match your project from eight months ago.
+  </p>
+
+  <p>
+    A low-friction approach: whenever you make a significant architectural change, add updating CLAUDE.md to the same pull request. It takes five minutes and keeps the config honest.
+  </p>
+</BlogPost>
