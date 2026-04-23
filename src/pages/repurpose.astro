@@ -1,0 +1,360 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: 'https://nova-labs.dev/repurpose',
+  name: 'Repurpose — Turn One Blog Post Into LinkedIn, X, and Newsletter Posts',
+  description: 'Stop rewriting the same content for every platform. Paste your blog post or transcript and get platform-native posts in seconds.',
+  isPartOf: { '@id': 'https://nova-labs.dev/#website' },
+  inLanguage: 'en-US',
+};
+---
+
+<Layout
+  title="Turn One Blog Post Into LinkedIn, X, and Newsletter Posts | Nova Labs"
+  description="Stop rewriting the same content for every platform. Paste your blog post and get platform-native posts for LinkedIn, X, and email — in seconds. Join the waitlist."
+  jsonLd={jsonLd}
+>
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-lg border-b border-surface-lighter/30">
+    <div class="section-container flex items-center justify-between py-4">
+      <a href="/" class="text-xl font-bold tracking-tight">
+        <span class="text-primary-light">Nova</span><span class="text-text-dim">Labs</span>
+      </a>
+      <div class="flex items-center gap-6">
+        <a href="/blog" class="text-text-muted hover:text-text text-sm transition-colors hidden sm:block">Blog</a>
+        <a href="#waitlist" class="btn-primary !py-2.5 !px-5 !text-sm">
+          Join waitlist
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-[90vh] flex items-center pt-20 pb-16 overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-primary/8 rounded-full blur-[130px]"></div>
+      <div class="absolute top-1/4 right-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="section-container relative z-10 max-w-4xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 text-sm text-primary-light">
+        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+        Early access — join before we launch
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6 tracking-tight">
+        Write it once.<br />
+        <span class="text-primary-light">Post it everywhere.</span>
+      </h1>
+
+      <p class="text-xl text-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+        Paste your blog post, meeting notes, or transcript. Get ready-to-post content for LinkedIn, X, and your email newsletter — that actually sounds like you.
+      </p>
+
+      <!-- CTA Form -->
+      <div id="waitlist" class="max-w-md mx-auto mb-12">
+        <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3">
+          <input
+            type="email"
+            id="email-input"
+            name="email"
+            placeholder="your@email.com"
+            required
+            autocomplete="email"
+            class="flex-1 px-4 py-3 rounded-lg bg-surface-light border border-surface-lighter text-text placeholder-text-dim focus:outline-none focus:border-primary transition-colors"
+          />
+          <button
+            type="submit"
+            class="btn-primary whitespace-nowrap"
+          >
+            Join the waitlist
+          </button>
+        </form>
+        <p class="text-text-dim text-sm mt-3">No spam. Unsubscribe anytime.</p>
+        <div id="form-success" class="hidden mt-4 p-4 rounded-lg bg-success/10 border border-success/20 text-success text-sm">
+          You're on the list. We'll email you when we launch.
+        </div>
+        <div id="form-error" class="hidden mt-4 p-4 rounded-lg bg-warning/10 border border-warning/20 text-warning text-sm">
+          Something went wrong. Try again or email us at support@nova-labs.dev
+        </div>
+      </div>
+
+      <!-- Social proof indicators -->
+      <div class="flex items-center justify-center gap-8 text-sm text-text-dim">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          No credit card
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          Works with any blog post
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          Early access pricing
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="py-20 bg-surface-light/30">
+    <div class="section-container max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">You wrote the piece. Now you have to write it four more times.</h2>
+      <p class="text-lg text-text-muted leading-relaxed mb-10">
+        Same idea. Different format. Different platform. Different tone. LinkedIn wants paragraphs. X wants hooks. Your newsletter wants conversational. You end up spending 3 hours rewriting content you already wrote.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-xl bg-surface border border-surface-lighter text-left">
+          <div class="text-3xl font-black text-primary-light mb-2">10–15h</div>
+          <div class="text-text-muted text-sm">per week content creators spend manually repurposing content across platforms</div>
+        </div>
+        <div class="p-6 rounded-xl bg-surface border border-surface-lighter text-left">
+          <div class="text-3xl font-black text-primary-light mb-2">$29–127/mo</div>
+          <div class="text-text-muted text-sm">what existing tools charge — most built for video, not your blog posts</div>
+        </div>
+        <div class="p-6 rounded-xl bg-surface border border-surface-lighter text-left">
+          <div class="text-3xl font-black text-primary-light mb-2">35%</div>
+          <div class="text-text-muted text-sm">of creators repurpose content consistently — most give up because it takes too long</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="py-20">
+    <div class="section-container max-w-4xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Three steps. Thirty seconds.</h2>
+        <p class="text-text-muted text-lg">No prompts to write. No formatting to fix. Just paste and post.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-light font-bold text-lg">1</div>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Paste your content</h3>
+          <p class="text-text-muted">Blog post URL, raw text, or meeting transcript. Anything long-form works.</p>
+        </div>
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-light font-bold text-lg">2</div>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Pick your platforms</h3>
+          <p class="text-text-muted">LinkedIn post, X thread, email newsletter intro — or all three at once.</p>
+        </div>
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-light font-bold text-lg">3</div>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Get posts that sound like you</h3>
+          <p class="text-text-muted">Platform-native tone, right length, ready to copy-paste. Not generic AI output.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEFORE/AFTER DEMO -->
+  <section class="py-20 bg-surface-light/30">
+    <div class="section-container max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">From one source to three platforms</h2>
+        <p class="text-text-muted text-lg">One blog post. Three platform-native posts. Under a minute.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- INPUT -->
+        <div class="p-6 rounded-xl bg-surface border border-surface-lighter">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-2 h-2 rounded-full bg-text-dim"></div>
+            <span class="text-text-dim text-sm font-medium uppercase tracking-wider">Input: Blog post excerpt</span>
+          </div>
+          <div class="text-text-muted text-sm leading-relaxed font-mono">
+            <p class="mb-3">"Most founders think they need to post more. They don't. They need to post better.</p>
+            <p class="mb-3">We spent 3 months tracking 50 founder accounts. The ones growing fastest weren't posting every day — they were turning one good idea into content that worked on every platform.</p>
+            <p>The secret: treat each platform as a different format, not a different message..."</p>
+          </div>
+        </div>
+
+        <!-- OUTPUTS -->
+        <div class="flex flex-col gap-4">
+          <!-- LinkedIn -->
+          <div class="p-5 rounded-xl bg-surface border border-surface-lighter">
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <span class="text-blue-400 text-xs font-medium uppercase tracking-wider">LinkedIn</span>
+            </div>
+            <p class="text-text text-sm leading-relaxed">Founders don't need to post more. They need to post smarter.<br /><br />We tracked 50 founder accounts for 3 months. The fastest-growing ones weren't posting every day — they were turning one good idea into content that worked across every platform.<br /><br />The ones burning out? They were writing from scratch each time.<br /><br />Treat each platform as a different format, not a different message. Same idea. Different lens.</p>
+          </div>
+
+          <!-- X Thread -->
+          <div class="p-5 rounded-xl bg-surface border border-surface-lighter">
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="text-text-muted text-xs font-medium uppercase tracking-wider">X / Twitter</span>
+            </div>
+            <p class="text-text text-sm leading-relaxed">Most founders think they need to post more.<br /><br />They don't.<br /><br />We tracked 50 founder accounts for 3 months. The ones growing fastest weren't posting every day. They were turning one good idea into content for every platform.<br /><br />Same message. Different format. That's the game. 🧵</p>
+          </div>
+
+          <!-- Newsletter -->
+          <div class="p-5 rounded-xl bg-surface border border-surface-lighter">
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              <span class="text-accent text-xs font-medium uppercase tracking-wider">Email Newsletter</span>
+            </div>
+            <p class="text-text text-sm leading-relaxed">Here's something we found after tracking 50 founder accounts over 3 months: the fastest-growing ones weren't posting every day. They were posting strategically — taking one solid idea and making it work across every platform.<br /><br />The secret is treating each platform as a different format, not a different message. This week's piece breaks down exactly how to do that.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="py-20">
+    <div class="section-container max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">Built for people who write</h2>
+      <p class="text-text-muted text-lg mb-12">If you create long-form content and dread turning it into social posts, this is for you.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-12">
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-surface-light border border-surface-lighter">
+          <svg class="w-5 h-5 text-success mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          <div>
+            <div class="font-medium mb-1">Solopreneurs and founders</div>
+            <div class="text-text-muted text-sm">Who write newsletters, blog posts, or threads but can't keep up with posting consistently</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-surface-light border border-surface-lighter">
+          <svg class="w-5 h-5 text-success mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          <div>
+            <div class="font-medium mb-1">Content creators</div>
+            <div class="text-text-muted text-sm">Who publish long-form content and want to get more out of every piece they write</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-surface-light border border-surface-lighter">
+          <svg class="w-5 h-5 text-success mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          <div>
+            <div class="font-medium mb-1">Consultants and coaches</div>
+            <div class="text-text-muted text-sm">Who share expertise through writing but spend too much time reformatting for each channel</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-surface-light border border-surface-lighter">
+          <svg class="w-5 h-5 text-success mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+          <div>
+            <div class="font-medium mb-1">Developer-founders</div>
+            <div class="text-text-muted text-sm">Who ship things and write about it but hate the social media rewrite loop</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 rounded-xl bg-surface border border-warning/20 text-left">
+        <p class="text-text-muted text-sm"><strong class="text-text">Not for you if:</strong> you primarily create video content, you need a full social media scheduling suite, or you're looking for something that auto-posts without review. This is a writing tool, not a social media manager.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="py-24 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-primary/8 rounded-full blur-[100px]"></div>
+    </div>
+    <div class="section-container relative z-10 max-w-2xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Stop rewriting. Start posting.</h2>
+      <p class="text-text-muted text-lg mb-8">Join the waitlist and get early access when we launch. We'll email you with a demo before anyone else.</p>
+
+      <form id="waitlist-form-bottom" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input
+          type="email"
+          id="email-input-bottom"
+          name="email"
+          placeholder="your@email.com"
+          required
+          autocomplete="email"
+          class="flex-1 px-4 py-3 rounded-lg bg-surface-light border border-surface-lighter text-text placeholder-text-dim focus:outline-none focus:border-primary transition-colors"
+        />
+        <button
+          type="submit"
+          class="btn-primary whitespace-nowrap"
+        >
+          Join the waitlist
+        </button>
+      </form>
+      <div id="form-success-bottom" class="hidden mt-4 p-4 rounded-lg bg-success/10 border border-success/20 text-success text-sm">
+        You're on the list. We'll email you when we launch.
+      </div>
+      <div id="form-error-bottom" class="hidden mt-4 p-4 rounded-lg bg-warning/10 border border-warning/20 text-warning text-sm">
+        Something went wrong. Try again or email support@nova-labs.dev
+      </div>
+      <p class="text-text-dim text-sm mt-4">Built by Nova Labs. No spam. Unsubscribe anytime.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-surface-lighter py-8">
+    <div class="section-container flex flex-col sm:flex-row items-center justify-between gap-4 text-text-dim text-sm">
+      <div>
+        <span class="text-primary-light font-semibold">Nova</span><span>Labs</span>
+        <span class="mx-2">·</span>
+        <span>An AI-first experiment by AckNova Automations</span>
+      </div>
+      <div class="flex gap-4">
+        <a href="/terms" class="hover:text-text transition-colors">Terms</a>
+        <a href="/refund-policy" class="hover:text-text transition-colors">Refund Policy</a>
+        <a href="mailto:support@nova-labs.dev" class="hover:text-text transition-colors">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function setupWaitlistForm(formId: string, emailId: string, successId: string, errorId: string) {
+      const form = document.getElementById(formId) as HTMLFormElement;
+      if (!form) return;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailInput = document.getElementById(emailId) as HTMLInputElement;
+        const email = emailInput?.value?.trim();
+        if (!email) return;
+
+        const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+        btn.disabled = true;
+        btn.textContent = 'Joining...';
+
+        try {
+          const res = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, source: 'repurpose-landing' }),
+          });
+
+          const successEl = document.getElementById(successId);
+          const errorEl = document.getElementById(errorId);
+
+          if (res.ok) {
+            form.style.display = 'none';
+            successEl?.classList.remove('hidden');
+            // GA4 event
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'waitlist_signup', { experiment: 'content-repurposing', source: formId });
+            }
+          } else {
+            errorEl?.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = 'Join the waitlist';
+          }
+        } catch {
+          const errorEl = document.getElementById(errorId);
+          errorEl?.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = 'Join the waitlist';
+        }
+      });
+    }
+
+    setupWaitlistForm('waitlist-form', 'email-input', 'form-success', 'form-error');
+    setupWaitlistForm('waitlist-form-bottom', 'email-input-bottom', 'form-success-bottom', 'form-error-bottom');
+  </script>
+</Layout>
