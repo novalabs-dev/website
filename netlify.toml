@@ -36,3 +36,17 @@
   to = "https://lmgkaljzocppkiqmevis.supabase.co/storage/v1/object/public/products/skill-pack/business-skill-pack.zip"
   status = 302
   force = true
+
+# Killed experiments — return 410 Gone (search engines deindex)
+# Content Repurposing: killed 2026-04-25 per council verdict (Stout/markt-gap citations refuted)
+[[redirects]]
+  from = "/repurpose"
+  to = "/"
+  status = 410
+  force = true
+
+[[redirects]]
+  from = "/repurpose/*"
+  to = "/"
+  status = 410
+  force = true
