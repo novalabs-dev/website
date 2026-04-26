@@ -18,6 +18,31 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Paused experiment redirects (Nova Labs op pauze 2026-04-26) — free tool pages removed
+[[redirects]]
+  from = "/contextkit"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contextkit/*"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/cost-dashboard"
+  to = "/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/cost-dashboard/*"
+  to = "/blog"
+  status = 301
+  force = true
+
 # Product download redirects -> Supabase Storage (public bucket)
 [[redirects]]
   from = "/download/playbook"
